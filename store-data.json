@@ -1,0 +1,99 @@
+{
+  "config": {
+    "bankName": "BBVA México / STP (SPEI) / OXXO",
+    "clabe": "012180015489203148",
+    "accountHolder": "Tragoo Check México",
+    "cardNumberRef": "Pago en OXXO o Link de Pago por WhatsApp",
+    "whatsappNumber": "524792293687",
+    "instagramUrl": "https://www.instagram.com/tragoocheck/",
+    "customDomain": "tragoocheck.shop",
+    "shippingFee": 99,
+    "freeShippingThreshold": 899,
+    "speiDiscountPercent": 5,
+    "stripeSecretKeyOverride": "",
+    "stripePaymentLinks": {},
+    "videoUrl": "/tragoo-reel-1792028727460.mp4"
+  },
+  "orders": [
+    {
+      "folio": "TC-9045",
+      "createdAt": "2026-10-15T01:14:48.324Z",
+      "customerName": "Grupo Hostelero Roma Norte (Bar)",
+      "customerPhone": "55 6102 9941",
+      "customerEmail": "compras@gruporoma.mx",
+      "shippingAddress": "Colima 268, Col. Roma Norte",
+      "city": "Ciudad de México",
+      "state": "CDMX",
+      "postalCode": "06700",
+      "items": [
+        {
+          "id": "mayoreo-exhibidor-30",
+          "name": "Caja Exhibidora Bares, Antros & Farmacias (30 Kits)",
+          "price": 7800,
+          "quantity": 1
+        }
+      ],
+      "subtotal": 7800,
+      "discount": 390,
+      "shipping": 0,
+      "total": 7410,
+      "paymentMethod": "spei",
+      "paymentStatus": "pagado",
+      "transferReference": "Confirmado por WhatsApp",
+      "trackingNumber": "DHL-884920192"
+    },
+    {
+      "folio": "TC-9041",
+      "createdAt": "2026-10-15T00:44:48.324Z",
+      "customerName": "Valeria Montes de Oca",
+      "customerPhone": "55 4192 8831",
+      "customerEmail": "valeria.mo@gmail.com",
+      "shippingAddress": "Av. Tamaulipas 142, Int 402, Col. Condesa",
+      "city": "Ciudad de México",
+      "state": "CDMX",
+      "postalCode": "06140",
+      "items": [
+        {
+          "id": "pack-trio-amigas-3x",
+          "name": "Pack Trío Amigas (3x Kits Noche Completa)",
+          "price": 1125,
+          "quantity": 1
+        }
+      ],
+      "subtotal": 1125,
+      "discount": 0,
+      "shipping": 0,
+      "total": 1125,
+      "paymentMethod": "oxxo",
+      "paymentStatus": "pendiente_comprobante",
+      "transferReference": "Ficha OXXO enviada por WhatsApp"
+    },
+    {
+      "folio": "TC-9038",
+      "createdAt": "2026-10-14T22:47:48.324Z",
+      "customerName": "Sofía Elizondo",
+      "customerPhone": "81 2093 4410",
+      "customerEmail": "sofi.elizondo@outlook.com",
+      "shippingAddress": "Río Guadalquivir 208, Col. Del Valle",
+      "city": "San Pedro Garza García",
+      "state": "Nuevo León",
+      "postalCode": "66220",
+      "items": [
+        {
+          "id": "kit-noche-completa",
+          "name": "Kit Noche Completa",
+          "price": 449,
+          "quantity": 1
+        }
+      ],
+      "subtotal": 449,
+      "discount": 0,
+      "shipping": 99,
+      "total": 548,
+      "paymentMethod": "link_pago",
+      "paymentStatus": "enviado",
+      "transferReference": "Link de pago WhatsApp",
+      "trackingNumber": "ESTAFETA-4029182"
+    }
+  ]
+}
