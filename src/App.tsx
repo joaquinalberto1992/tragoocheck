@@ -286,6 +286,10 @@ export default function App() {
         )}
       </header>
 
+      <div className="bg-[#A3E635] px-4 py-2.5 text-center text-xs sm:text-sm font-extrabold tracking-wide text-[#0B0910]">
+        PROMOCIÓN DEL MES · 50% DE REBAJA EN TODOS LOS PRECIOS PUBLICADOS
+      </div>
+
       {/* Optional Stripe Return Confirmation Banner */}
       {stripeReturnFolio && (
         <div className="bg-[#172312] border-b border-[#A3E635]/40 px-4 py-3">
@@ -750,6 +754,9 @@ export default function App() {
                           ${kit.price.toLocaleString('es-MX')}
                         </span>
                         <span className="text-xs text-[#A19BB2]">MXN</span>
+                        <span className="rounded-full bg-[#A3E635]/10 px-2 py-1 text-[10px] font-extrabold text-[#A3E635]">
+                          50% OFF ESTE MES
+                        </span>
                       </div>
 
                       <p className="text-xs sm:text-sm text-[#C4BED4] leading-relaxed">
