@@ -366,8 +366,8 @@ export default function App() {
                     </strong>
                     .
                   </p>
-                  <p className="max-w-2xl rounded-lg border border-amber-400/30 bg-amber-400/5 px-3.5 py-3 text-xs sm:text-sm leading-relaxed text-amber-100" role="note">
-                    <strong>Importante:</strong> es una prueba orientativa de un solo uso, no confirma que una bebida sea segura. Un resultado sin cambio visible no descarta otras sustancias. Si sospechas que fue manipulada, no la tomes; aléjate con alguien de confianza y busca ayuda.
+                  <p className="max-w-2xl text-sm leading-relaxed text-[#A3E635]">
+                    Creemos que contar con más información y herramientas de autocuidado puede ayudar a las personas a cuidarse y acompañarse mejor.
                   </p>
                 </div>
 
