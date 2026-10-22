@@ -179,7 +179,7 @@ export const PWAInstallSection: React.FC<{ compact?: boolean }> = ({
       >
         <TragooLogoIcon className={compact ? 'w-5 h-5' : 'w-6 h-6'} />
         <span>
-          {compact ? 'Instalar App' : 'Instalar App (Android / iPhone)'}
+          {compact ? 'Añadir acceso' : 'Añadir a pantalla de inicio'}
         </span>
         <Download className="w-3.5 h-3.5 text-[#A3E635]" />
       </button>
@@ -195,7 +195,7 @@ export const PWAInstallSection: React.FC<{ compact?: boolean }> = ({
                     Instalar App Tragoo Check
                   </h3>
                   <p className="text-xs text-[#A19BB2]">
-                    Compatible con Android y iPhone (iOS) · Sin ocupar espacio
+                    Acceso web instalable en Android y iPhone
                   </p>
                 </div>
               </div>

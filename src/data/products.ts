@@ -112,7 +112,7 @@ export const PRODUCT_KITS: ProductKit[] = [
       '10 stickers reactivos discretos para uñas (detección rápida de GHB)',
       '5 tiras reactivas de doble panel en bolsa doy-pack negra mate resellable',
       '1 estuche llavero mini-tumbler Tragoo Check con mosquetón metálico',
-      'Reverso con instrucciones paso a paso (Seguro Amarillo vs Inseguro Mitad Verde)',
+      'Reverso con instrucciones paso a paso para interpretar el cambio de color',
     ],
     idealFor: 'Salidas de fin de semana, bares, antros y viajes con cobertura dual.',
     stockCount: 28,
@@ -137,7 +137,7 @@ export const PRODUCT_KITS: ProductKit[] = [
     includedItems: [
       '10 stickers reactivos con adhesivo hipoalergénico para uña (un solo uso)',
       'Tarjeta negra impermeable portastickers + bolsa doy-pack Tragoo Check',
-      'Indicador colorimétrico en corazón: Amarillo (Seguro) / Mitad Verde (Inseguro)',
+      'Indicador colorimétrico en corazón; interpreta el resultado según las instrucciones del fabricante',
     ],
     idealFor:
       'Llevar puesto en la uña antes de salir y checar cualquier trago con 1 gota.',
@@ -466,9 +466,9 @@ export const FAQS = [
       '¡Es súper rápido! Elige tus kits en la página, llena tus datos de envío y toca "Enviar Pedido a WhatsApp". Tu pedido se enviará directo a nuestro WhatsApp oficial 479 229 3687, donde te daremos al instante tu Link de Pago con Tarjeta, tu referencia para Pago en Efectivo en OXXO o los datos de Transferencia SPEI (-5% de descuento extra) junto con la confirmación de tu envío.',
   },
   {
-    question: '¿Cómo se aplica el sticker de uña y cómo sé si mi bebida es segura?',
+    question: '¿Cómo se aplica el sticker y qué significa el resultado?',
     answer:
-      '1) Limpia y seca la superficie de tu uña. 2) Despega un sticker y colócalo en cualquier uña. 3) Coloca una gota de tu bebida sobre el sticker y espera 10 a 15 segundos. 4) Deja secar y revisa el color: si permanece amarillo es SEGURO; si la mitad del sticker se vuelve verde es INSEGURO — NO TOMES esa bebida.',
+      '1) Limpia y seca la superficie de tu uña. 2) Despega un sticker y colócalo en una uña. 3) Sigue las instrucciones del empaque para aplicar la muestra y esperar el tiempo indicado. 4) Interpreta cualquier cambio de color según el fabricante. Es una prueba orientativa: un resultado sin cambio no confirma que la bebida sea segura ni descarta otras sustancias. Si sospechas que fue manipulada, no la tomes y busca ayuda.',
   },
   {
     question: '¿Cuáles son las condiciones de envío y cuándo es gratis?',
@@ -476,14 +476,14 @@ export const FAQS = [
       'Todos los pedidos de una sola pieza o pedidos pequeños menores a $899 MXN pagan un envío express único de $99 MXN a cualquier parte de México. En todos los pedidos a partir de $899 MXN (como el Pack Trío 3x, Pack Squad 5x, Pack VIP 10x y todas las Cajas de Mayoreo), el Envío Express Asegurado es completamente GRATIS.',
   },
   {
-    question: '¿Puedo instalar la aplicación de Tragoo Check en mi celular Android o iPhone?',
+    question: '¿Puedo añadir Tragoo Check a la pantalla de inicio?',
     answer:
-      'Sí. En cualquier celular Android (Chrome) o iPhone/iPad (Safari), toca el botón "Instalar App (Android / iPhone)" en la página para agregar el icono oficial de Tragoo Check a tu pantalla de inicio sin ocupar espacio de memoria.',
+      'Sí. En Android o iPhone puedes usar el botón "Añadir a pantalla de inicio" para crear un acceso directo web. Tragoo Check es un sitio web instalable, no una aplicación nativa.',
   },
   {
     question: '¿Qué información de seguridad importante debo conocer?',
     answer:
-      'Este es un producto de un solo uso para fines informativos y de detección personal solamente. No garantiza el 100% de precisión y puede generar falsos positivos. No reutilizar. El lavado de manos es posible con el sticker puesto, pero la exposición a ciertos jabones o químicos puede reducir la detección o provocar un cambio de color falso. No está clasificado como dispositivo médico de diagnóstico in vitro (IVD).',
+      'Este es un producto de un solo uso para fines informativos y de detección personal solamente. No garantiza el 100% de precisión, puede generar falsos positivos y no detecta todas las sustancias. Un resultado sin cambio no confirma que una bebida sea segura. No reutilizar. La exposición a ciertos jabones o químicos puede reducir la detección o provocar un cambio de color falso. No está clasificado como dispositivo médico de diagnóstico in vitro (IVD). Si sospechas adulteración, no consumas la bebida y busca ayuda.',
   },
 ];
 

@@ -18,6 +18,8 @@ import {
   CreditCard,
   Store,
   Building2,
+  Menu,
+  X,
 } from 'lucide-react';
 import {
   PRODUCT_KITS,
@@ -65,9 +67,7 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
 };
 
 export default function App() {
-  const [cart, setCart] = useState<CartItem[]>([
-    { product: PRODUCT_KITS[0], quantity: 1 },
-  ]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [heroView, setHeroView] = useState<
     'video' | 'empaque' | 'reverso' | 'squad'
   >('video');
@@ -78,6 +78,7 @@ export default function App() {
     null
   );
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMerchantPanelOpen, setIsMerchantPanelOpen] = useState(false);
   const [merchantConfig, setMerchantConfig] =
     useState<MerchantConfigClient>(DEFAULT_CONFIG);
@@ -156,6 +157,16 @@ export default function App() {
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
   };
 
+  const handleOpenOrder = () => {
+    if (cart.length) {
+      setIsCheckoutOpen(true);
+      setIsMobileMenuOpen(false);
+      return;
+    }
+    setIsMobileMenuOpen(false);
+    document.getElementById('kits')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const handleSelectKitById = (kitId: string) => {
     const found = ALL_PRODUCTS.find((p) => p.id === kitId) || PRODUCT_KITS[0];
     handleAddToCart(found, true);
@@ -163,7 +174,7 @@ export default function App() {
 
   const handleActivateCoupon = (code: string) => {
     setSelectedCouponCode(code);
-    setIsCheckoutOpen(true);
+    handleOpenOrder();
   };
 
   const handleCopyQuickClabe = () => {
@@ -204,8 +215,8 @@ export default function App() {
             Tragoo <span className="text-[#A3E635]">Check</span>
           </a>
 
-          {/* Zone 2: 5 concise single-line navigation links */}
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-[#C4BED4]">
+          {/* Desktop navigation */}
+          <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-6 text-sm font-medium text-[#C4BED4]">
             <a
               href="#kits"
               className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
@@ -242,14 +253,37 @@ export default function App() {
           <div className="flex items-center shrink-0">
             <button
               type="button"
-              onClick={() => setIsCheckoutOpen(true)}
+              onClick={handleOpenOrder}
               className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-lg bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
             >
               <MessageCircle className="w-3.5 h-3.5" />
-              <span>Pedir por WhatsApp · ({cartCount})</span>
+              <span>{cartCount ? `Pedir por WhatsApp · (${cartCount})` : 'Ver kits y precios'}</span>
+            </button>
+            <button
+              type="button"
+              aria-label={isMobileMenuOpen ? 'Cerrar menú' : 'Abrir menú'}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-navigation"
+              onClick={() => setIsMobileMenuOpen((open) => !open)}
+              className="md:hidden ml-2 p-2 rounded-lg border border-[#2E2840] text-white hover:bg-[#1C1729]"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
+        {isMobileMenuOpen && (
+          <nav id="mobile-navigation" aria-label="Navegación móvil" className="md:hidden border-t border-[#231E30] bg-[#0B0910] px-4 py-3 grid grid-cols-2 gap-2 text-sm">
+            {[
+              ['Kits', '#kits'],
+              ['Promociones', '#promociones'],
+              ['Mayoreo', '#mayoreo'],
+              ['Simulador', '#simulador'],
+              ['Preguntas', '#preguntas'],
+            ].map(([label, href]) => (
+              <a key={href} href={href} onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg px-3 py-3 text-[#E4E0EB] hover:bg-[#1C1729]">{label}</a>
+            ))}
+          </nav>
+        )}
       </header>
 
       {/* Optional Stripe Return Confirmation Banner */}
@@ -323,13 +357,17 @@ export default function App() {
                     Pruebas portátiles en{' '}
                     <strong className="text-white">stickers para uñas</strong> y{' '}
                     <strong className="text-white">tiras reactivas</strong> con
-                    estuche llavero mini-tumbler que detectan GHB, ketamina,
-                    escopolamina y cocaína en 10 a 15 segundos. Envía tu pedido
+                    estuche llavero mini-tumbler, diseñadas para indicar la posible
+                    presencia de algunas sustancias según el tipo de prueba y sus
+                    instrucciones. Envía tu pedido
                     directo a nuestro WhatsApp y recibe tu{' '}
                     <strong className="text-white">
                       Link de Pago, ficha OXXO o SPEI (-5%)
                     </strong>
                     .
+                  </p>
+                  <p className="max-w-2xl rounded-lg border border-amber-400/30 bg-amber-400/5 px-3.5 py-3 text-xs sm:text-sm leading-relaxed text-amber-100" role="note">
+                    <strong>Importante:</strong> es una prueba orientativa de un solo uso, no confirma que una bebida sea segura. Un resultado sin cambio visible no descarta otras sustancias. Si sospechas que fue manipulada, no la tomes; aléjate con alguien de confianza y busca ayuda.
                   </p>
                 </div>
 
@@ -357,14 +395,14 @@ export default function App() {
                   <div className="flex flex-wrap items-center gap-2.5 pt-1">
                     <PWAInstallSection />
 
-                    <button
+                    {import.meta.env.DEV && <button
                       type="button"
                       onClick={() => setIsMerchantPanelOpen(true)}
                       className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#14111D] hover:bg-[#1D182B] border border-[#2E2840] text-xs font-semibold text-[#C4BED4] hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
                     >
                       <ClipboardList className="w-3.5 h-3.5 text-[#A3E635]" />
                       <span>Panel de Pedidos y Dominio ({orders.length})</span>
-                    </button>
+                    </button>}
                   </div>
 
                   <p className="text-xs text-[#8E87A0] leading-relaxed max-w-xl">
@@ -536,10 +574,10 @@ export default function App() {
 
               <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30]">
                 <div className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
-                  App Android y iPhone
+                  Instalable en Android y iPhone
                 </div>
                 <div className="text-xs text-[#C4BED4] mt-0.5">
-                  Instala la App en tu celular Android o iOS y síguenos en{' '}
+                  Añade el sitio a tu pantalla de inicio en Android o iPhone y síguenos en{' '}
                   <a
                     href={activeInstagramUrl}
                     target="_blank"
@@ -625,12 +663,13 @@ export default function App() {
                 </h2>
               </div>
 
-              {/* Interactive Segmented Filter Control (Scrollable on small screens) */}
-              <div className="flex overflow-x-auto max-w-full p-1 bg-[#14111D] border border-[#262136] rounded-xl self-start">
+              {/* Responsive filter controls */}
+              <div role="group" aria-label="Filtrar catálogo" className="grid grid-cols-1 sm:grid-cols-3 gap-1 w-full lg:w-auto p-1 bg-[#14111D] border border-[#262136] rounded-xl self-start">
                 <button
                   type="button"
                   onClick={() => setCatalogFilter('all')}
-                  className={`px-3.5 sm:px-4 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  aria-pressed={catalogFilter === 'all'}
+                  className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
                     catalogFilter === 'all'
                       ? 'bg-[#A3E635] text-[#0B0910] font-bold'
                       : 'text-[#C4BED4] hover:text-white'
@@ -641,7 +680,8 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setCatalogFilter('individual')}
-                  className={`px-3.5 sm:px-4 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  aria-pressed={catalogFilter === 'individual'}
+                  className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
                     catalogFilter === 'individual'
                       ? 'bg-[#A3E635] text-[#0B0910] font-bold'
                       : 'text-[#C4BED4] hover:text-white'
@@ -652,7 +692,8 @@ export default function App() {
                 <button
                   type="button"
                   onClick={() => setCatalogFilter('promocion')}
-                  className={`px-3.5 sm:px-4 py-2 text-xs font-medium rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 ${
+                  aria-pressed={catalogFilter === 'promocion'}
+                  className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
                     catalogFilter === 'promocion'
                       ? 'bg-[#A3E635] text-[#0B0910] font-bold'
                       : 'text-[#C4BED4] hover:text-white'
@@ -781,7 +822,7 @@ export default function App() {
                 <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                   <button
                     type="button"
-                    onClick={() => setIsCheckoutOpen(true)}
+                    onClick={handleOpenOrder}
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] text-xs font-bold transition-colors cursor-pointer"
                   >
                     <MessageCircle className="w-4 h-4" />
@@ -906,17 +947,17 @@ export default function App() {
                 {/* Highlighted Warning from Pouch */}
                 <div className="p-4 rounded-xl bg-[#14111D] border border-[#A855F7]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="text-sm sm:text-base font-bold text-white">
-                    Si la mitad del sticker se vuelve verde,{' '}
+                    Si observas el cambio de color indicado por el fabricante,{' '}
                     <span className="text-[#A3E635]">NO TOMES.</span>
                   </div>
                   <div className="flex items-center gap-3 text-xs font-semibold shrink-0">
                     <span className="inline-flex items-center gap-1.5 text-yellow-300">
                       <span className="w-3 h-3 rounded-full bg-yellow-400 inline-block" />
-                      SEGURO
+                      Sin cambio visible
                     </span>
                     <span className="inline-flex items-center gap-1.5 text-[#A3E635]">
                       <span className="w-3 h-3 rounded-full bg-gradient-to-r from-yellow-400 to-[#22C55E] inline-block" />
-                      INSEGURO
+                      Posible reacción
                     </span>
                   </div>
                 </div>
@@ -1088,7 +1129,7 @@ export default function App() {
               <div className="flex flex-wrap items-center gap-3 shrink-0">
                 <button
                   type="button"
-                  onClick={() => setIsCheckoutOpen(true)}
+                  onClick={handleOpenOrder}
                   className="px-5 py-3 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
                   Enviar Pedido ({cartCount})
@@ -1145,7 +1186,7 @@ export default function App() {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <button
+            {import.meta.env.DEV && <button
               type="button"
               onClick={() => setIsMerchantPanelOpen(true)}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
@@ -1154,7 +1195,7 @@ export default function App() {
               <span>
                 Panel de Pedidos · Dominio · WhatsApp ({orders.length})
               </span>
-            </button>
+            </button>}
           </div>
         </div>
       </footer>
@@ -1165,13 +1206,12 @@ export default function App() {
 
         <button
           type="button"
-          onClick={() => setIsCheckoutOpen(true)}
+          onClick={handleOpenOrder}
           className="flex-1 py-2.5 px-3.5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-md shadow-[#A3E635]/15"
         >
           <MessageCircle className="w-4 h-4 shrink-0" />
           <span className="truncate">
-            Enviar Pedido a WhatsApp ({cartCount}) · $
-            {cartTotalEstimate.toLocaleString('es-MX')}
+            {cartCount ? `Enviar Pedido a WhatsApp (${cartCount}) · $${cartTotalEstimate.toLocaleString('es-MX')}` : 'Ver kits y precios'}
           </span>
         </button>
       </div>
