@@ -26,9 +26,9 @@ export interface PersuasiveSlide {
 export const WOMEN_PERSUASIVE_SLIDES: PersuasiveSlide[] = [
   {
     id: 'slide-1',
-    slogan: 'NO HUELE. NO SABE. NO SE VE.',
+    slogan: 'UNA PRUEBA ORIENTATIVA, CON LÍMITES.',
     phrase:
-      'Las sustancias como el GHB o la ketamina no cambian el sabor ni el color de tu trago. Pero una sola gota en tu uña las detecta en 15 segundos.',
+      'Algunas sustancias pueden ser difíciles de identificar a simple vista. La prueba ofrece una señal orientativa para las sustancias indicadas por el fabricante; no detecta todo.',
     subtext: 'Frase 1 de 5 · Lectura pausada (5.6 seg)',
     durationMs: 5600,
     ctaLabel: 'Quiero mi Kit Noche Completa · $449',
@@ -38,7 +38,7 @@ export const WOMEN_PERSUASIVE_SLIDES: PersuasiveSlide[] = [
     id: 'slide-2',
     slogan: 'SALIR DE FIESTA ES PARA DISFRUTAR, NO PARA DUDAR DE TU VASO.',
     phrase:
-      '¿Dejaste tu bebida en la mesa un segundo o alguien te invitó un cóctel? No adivines: toca tu trago, pon una gota en tu sticker y sal de dudas antes del primer sorbo.',
+      '¿Dejaste tu bebida sin vigilar? La prueba puede orientar, pero un resultado sin cambio no confirma que sea segura. Si tienes dudas, no la tomes y pide ayuda.',
     subtext: 'Frase 2 de 5 · Lectura pausada (6.2 seg)',
     durationMs: 6200,
     ctaLabel: 'Probar Stickers para Uñas · $249',
@@ -58,7 +58,7 @@ export const WOMEN_PERSUASIVE_SLIDES: PersuasiveSlide[] = [
     id: 'slide-4',
     slogan: 'SI LA MITAD DEL STICKER SE VUELVE VERDE, NO TOMES.',
     phrase:
-      'Sin depender de nadie y con total discreción: si permanece amarillo tu bebida es segura; si cambia a verde, deja ese vaso de inmediato y avisa a tus amigas.',
+      'Sigue las instrucciones del fabricante. Un cambio de color puede indicar una reacción, pero ningún resultado descarta todas las sustancias ni sustituye pedir ayuda.',
     subtext: 'Frase 4 de 5 · Lectura pausada (5.8 seg)',
     durationMs: 5800,
     ctaLabel: 'Ver Kit Tiras + Stickers + Llavero · $449',
@@ -68,7 +68,7 @@ export const WOMEN_PERSUASIVE_SLIDES: PersuasiveSlide[] = [
     id: 'slide-5',
     slogan: 'TU TRANQUILIDAD VALE MÁS QUE CUALQUIER CÓCTEL.',
     phrase:
-      'Por menos de lo que cuesta una salida al bar, llevas 15 pruebas de detección y tu llavero mini-tumbler para proteger todas tus noches de fin de semana o festival.',
+      'Lleva las pruebas contigo y revisa sus instrucciones antes de usarlas. Son una herramienta complementaria, no una garantía de seguridad para todas las bebidas o sustancias.',
     subtext: 'Frase 5 de 5 · Lectura pausada (5.8 seg)',
     durationMs: 5800,
     ctaLabel: 'Ver Pack Squad 5 Amigas · $1,745',
@@ -84,7 +84,9 @@ export const WomenSloganBanner: React.FC<WomenSloganBannerProps> = ({
   onSelectKit,
 }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
   const [progress, setProgress] = useState(0);
 
   const activeSlide = WOMEN_PERSUASIVE_SLIDES[currentIndex];
@@ -196,6 +198,7 @@ export const WomenSloganBanner: React.FC<WomenSloganBannerProps> = ({
               onClick={() => setIsPaused(!isPaused)}
               className="p-1.5 rounded-lg text-[#A3E635] hover:bg-[#1E192B] cursor-pointer"
               aria-label={isPaused ? 'Reanudar frases' : 'Pausar lectura'}
+              aria-pressed={isPaused}
               title={isPaused ? 'Reanudar' : 'Pausar lectura'}
             >
               {isPaused ? (
@@ -279,19 +282,19 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
 
   return (
     <div className="relative flex-1 min-h-[380px] rounded-2xl overflow-hidden border border-[#2E2840] bg-[#09070E] flex flex-col justify-between shadow-2xl">
-      <input
+      {import.meta.env.DEV && <input
         ref={fileInputRef}
         type="file"
         accept="video/mp4,video/webm,video/quicktime"
         onChange={handleFileChange}
         className="hidden"
-      />
+      />}
 
       {/* Top Overlay Header */}
       <div className="relative z-10 px-4 py-3 bg-[#14111D]/95 border-b border-[#262136] flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-xs font-bold text-[#A3E635]">
           <Video className="w-4 h-4" />
-          <span>VIDEO OFICIAL TRAGOO CHECK · NO HUELE, NO SABE, NO SE VE</span>
+          <span>VIDEO OFICIAL TRAGOO CHECK</span>
         </div>
 
         <button
@@ -324,7 +327,7 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
           loop
           playsInline
           controls
-          preload="auto"
+          preload="metadata"
           className="w-full h-full max-h-[430px] object-contain bg-black"
         />
       </div>
@@ -340,7 +343,7 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
           <span>Pedir Kit del Video · $449 MXN</span>
         </button>
 
-        <button
+        {import.meta.env.DEV && <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
@@ -348,7 +351,7 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
         >
           <Upload className="w-3.5 h-3.5 text-[#A3E635]" />
           <span>{isUploading ? 'Actualizando video...' : 'Cambiar video MP4'}</span>
-        </button>
+        </button>}
       </div>
     </div>
   );

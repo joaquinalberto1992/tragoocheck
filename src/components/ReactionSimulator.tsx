@@ -52,16 +52,15 @@ export const ReactionSimulator: React.FC<ReactionSimulatorProps> = ({ onSelectKi
           {/* Left Column: Explanation & Controls */}
           <div className="lg:col-span-6 space-y-6">
             <div className="text-xs font-medium text-[#A3E635] tracking-wide">
-              Demostración interactiva · Lectura en 15 segundos
+              Simulador visual ilustrativo · No es una prueba real
             </div>
 
             <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white [text-wrap:balance]">
-              No huele. No sabe. No se ve. Pero cambia de color en segundos.
+              Explora cómo se muestra un cambio de color.
             </h2>
 
             <p className="text-[#A19BB2] text-base leading-relaxed">
-              Sustancias como el GHB o la ketamina son incoloras e inodoras en bebidas mezcladas.
-              Selecciona el formato de prueba y aplica una gota virtual para ver cómo reacciona el sensor colorimétrico.
+              Selecciona un formato y una muestra de demostración para ver una animación. El resultado es predeterminado y no mide una bebida ni representa con precisión una reacción real. Usa el producto solo según las instrucciones del fabricante.
             </p>
 
             {/* Step 1: Choose Format */}
@@ -277,16 +276,16 @@ export const ReactionSimulator: React.FC<ReactionSimulatorProps> = ({ onSelectKi
                     {completed ? (
                       sampleType === 'adulterated' ? (
                         <span>
-                          <strong className="text-white">Resultado Positivo (Alerta):</strong> El cambio de color indica posible adulteración. No consumas la bebida y avisa a tus amigas.
+                <strong className="text-white">Animación de demostración:</strong> el color mostrado no analiza ni confirma la presencia de sustancias. Si sospechas que una bebida fue manipulada, no la consumas y busca ayuda.
                         </span>
                       ) : (
                         <span>
-                          <strong className="text-white">Sin cambio colorimétrico:</strong> El sensor mantiene su tono amarillo base. Recuerda nunca perder de vista tu vaso.
+                <strong className="text-white">Sin cambio en esta animación:</strong> esto no significa que una bebida real sea segura. Nunca pierdas de vista tu vaso.
                         </span>
                       )
                     ) : (
                       <span>
-                        Presiona <strong className="text-white">Aplicar 1 gota al sensor</strong> para observar cómo funciona la lectura en tiempo real.
+                Presiona <strong className="text-white">Aplicar 1 gota al sensor</strong> para ver una animación interactiva, no una medición real.
                       </span>
                     )}
                   </div>
