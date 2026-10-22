@@ -236,10 +236,9 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // Use dedicated /api/video byte-range stream so the uploaded MP4 always plays reliably
-  const activeVideoSrc = `/api/video?v=${streamVersion}${
-    videoUrl ? `&u=${encodeURIComponent(videoUrl)}` : ''
-  }`;
+  // Prefer the configured public media URL. This also works when the page is
+  // deployed as a static AI Studio build without the Express /api/video route.
+  const activeVideoSrc = videoUrl || '/tragoo-oficial.mp4';
 
   const handleToggleMute = () => {
     if (!videoRef.current) return;
@@ -317,7 +316,7 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
       {/* Main Native HTML5 MP4 Video Stream */}
       <div className="relative flex-1 bg-black flex items-center justify-center min-h-[300px]">
         <video
-          key={activeVideoSrc}
+          key={`${activeVideoSrc}-${streamVersion}`}
           ref={videoRef}
           src={activeVideoSrc}
           autoPlay

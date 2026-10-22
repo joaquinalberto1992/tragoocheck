@@ -29,16 +29,22 @@ export interface PromoCoupon {
   description: string;
 }
 
-export const HERO_PRODUCT_IMAGE =
-  '/src/assets/images/tragoo_kit_noche_completa_clean_1792026634047.jpg';
-export const HERO_LIFESTYLE_IMAGE =
-  '/src/assets/images/hero_drink_test_1792021357545.jpg';
-export const BACK_POUCH_INSTRUCTIONS_IMAGE =
-  '/src/assets/images/tragoo_reverso_empaque_oficial_1792026633826.jpg';
-export const WHOLESALE_BOX_IMAGE =
-  '/src/assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg';
-export const WHOLESALE_MASTER_IMAGE =
-  '/src/assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg';
+// Import assets through Vite so their URLs point to the built files in `dist`.
+import heroProductImage from '../assets/images/tragoo_kit_noche_completa_clean_1792026634047.jpg';
+import heroLifestyleImage from '../assets/images/hero_drink_test_1792021357545.jpg';
+import backPouchInstructionsImage from '../assets/images/tragoo_reverso_empaque_oficial_1792026633826.jpg';
+import wholesaleBoxImage from '../assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg';
+import wholesaleMasterImage from '../assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg';
+import kitStickersImage from '../assets/images/tragoo_kit_stickers_unas_1792022749823.jpg';
+import kitStripsImage from '../assets/images/tragoo_kit_tiras_reactivas_1792022751432.jpg';
+import duoPackImage from '../assets/images/tragoo_pack_duo_amigas_1792022753318.jpg';
+import squadPackImage from '../assets/images/tragoo_pack_squad_5x_1792022755033.jpg';
+
+export const HERO_PRODUCT_IMAGE = heroProductImage;
+export const HERO_LIFESTYLE_IMAGE = heroLifestyleImage;
+export const BACK_POUCH_INSTRUCTIONS_IMAGE = backPouchInstructionsImage;
+export const WHOLESALE_BOX_IMAGE = wholesaleBoxImage;
+export const WHOLESALE_MASTER_IMAGE = wholesaleMasterImage;
 
 export const INSTAGRAM_URL = 'https://www.instagram.com/tragoocheck/';
 export const INSTAGRAM_HANDLE = '@tragoocheck';
@@ -97,7 +103,7 @@ export const PRODUCT_KITS: ProductKit[] = [
     unitPriceNumeric: 449,
     unitPriceLabel: '$449.00 MXN por kit (1 pza)',
     kitEquivalentCount: 1,
-    image: '/src/assets/images/tragoo_kit_noche_completa_clean_1792026634047.jpg',
+    image: HERO_PRODUCT_IMAGE,
     contentsSummary:
       '5 tiras multipanel · 10 stickers de uñas · 1 llavero mini-tumbler Tragoo Check',
     substancesDetected: 'GHB, ketamina, escopolamina, cocaína y aminas adulterantes',
@@ -124,7 +130,7 @@ export const PRODUCT_KITS: ProductKit[] = [
     unitPriceNumeric: 249,
     unitPriceLabel: '$24.90 MXN por sticker (10 pruebas)',
     kitEquivalentCount: 1,
-    image: '/src/assets/images/tragoo_kit_stickers_unas_1792022749823.jpg',
+    image: kitStickersImage,
     contentsSummary: '10 stickers adhesivos para uñas · Bolsa resellable Tragoo Check',
     substancesDetected: 'GHB (ácido gamma-hidroxibutírico)',
     reactionTime: '10 a 15 segundos',
@@ -149,7 +155,7 @@ export const PRODUCT_KITS: ProductKit[] = [
     unitPriceNumeric: 299,
     unitPriceLabel: '$59.80 MXN por tira doble (5 pruebas)',
     kitEquivalentCount: 1,
-    image: '/src/assets/images/tragoo_kit_tiras_reactivas_1792022751432.jpg',
+    image: kitStripsImage,
     contentsSummary: '5 tiras reactivas multipanel · Empaque hermético Tragoo Check',
     substancesDetected:
       'GHB, ketamina, escopolamina, cocaína y sustancias a base de aminas',
@@ -174,7 +180,7 @@ export const PRODUCT_KITS: ProductKit[] = [
     unitPriceNumeric: 274.5,
     unitPriceLabel: '$18.30 MXN por prueba (30 pruebas)',
     kitEquivalentCount: 2,
-    image: '/src/assets/images/tragoo_reverso_empaque_oficial_1792026633826.jpg',
+    image: BACK_POUCH_INSTRUCTIONS_IMAGE,
     contentsSummary: '10 tiras multipanel · 20 stickers de uñas (Refill sin llavero)',
     substancesDetected: 'GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -201,7 +207,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 399.5,
     unitPriceLabel: '$399.50 MXN por kit (Ahorras $99)',
     kitEquivalentCount: 2,
-    image: '/src/assets/images/tragoo_pack_duo_amigas_1792022753318.jpg',
+    image: duoPackImage,
     contentsSummary: '10 tiras multipanel · 20 stickers de uñas · 2 llaveros mini-tumbler',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -226,7 +232,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 375,
     unitPriceLabel: '$375.00 MXN por kit · Envío Gratis incluido',
     kitEquivalentCount: 3,
-    image: '/src/assets/images/tragoo_pack_duo_amigas_1792022753318.jpg',
+    image: duoPackImage,
     contentsSummary: '15 tiras multipanel · 30 stickers de uñas · 3 llaveros mini-tumbler',
     substancesDetected: 'GHB, ketamina, escopolamina, cocaína y aminas adulterantes',
     reactionTime: '10 a 15 segundos',
@@ -252,7 +258,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 349,
     unitPriceLabel: '$349.00 MXN por kit (Ahorras $500 + Envío Gratis)',
     kitEquivalentCount: 5,
-    image: '/src/assets/images/tragoo_pack_squad_5x_1792022755033.jpg',
+    image: squadPackImage,
     contentsSummary: '25 tiras multipanel · 50 stickers de uñas · 5 llaveros mini-tumbler',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -277,7 +283,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 319,
     unitPriceLabel: '$319.00 MXN por kit (Ahorras $1,300 + Envío Gratis)',
     kitEquivalentCount: 10,
-    image: '/src/assets/images/tragoo_pack_squad_5x_1792022755033.jpg',
+    image: squadPackImage,
     contentsSummary: '50 tiras multipanel · 100 stickers de uñas · 10 llaveros mini-tumbler',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -305,7 +311,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 290,
     unitPriceLabel: '$290.00 MXN por kit (Precio público: $449)',
     kitEquivalentCount: 15,
-    image: '/src/assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg',
+    image: WHOLESALE_BOX_IMAGE,
     contentsSummary:
       '15 Kits Noche Completa (75 tiras · 150 stickers · 15 llaveros mini-tumbler)',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
@@ -330,7 +336,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 260,
     unitPriceLabel: '$260.00 MXN por kit (Precio público: $449)',
     kitEquivalentCount: 30,
-    image: '/src/assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg',
+    image: WHOLESALE_BOX_IMAGE,
     contentsSummary: '30 Kits Noche Completa + 1 Caja Exhibidora Oficial Tragoo Check',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -356,7 +362,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 230,
     unitPriceLabel: '$230.00 MXN por kit (Precio público: $449)',
     kitEquivalentCount: 60,
-    image: '/src/assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg',
+    image: WHOLESALE_MASTER_IMAGE,
     contentsSummary: '60 Kits Noche Completa + 2 Exhibidores Oficiales Tragoo Check',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -381,7 +387,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 205,
     unitPriceLabel: '$205.00 MXN por kit (Más del doble de retorno)',
     kitEquivalentCount: 120,
-    image: '/src/assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg',
+    image: WHOLESALE_MASTER_IMAGE,
     contentsSummary: '120 Kits Noche Completa + 4 Exhibidores Oficiales Tragoo Check',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -407,7 +413,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 185,
     unitPriceLabel: '$185.00 MXN por kit (Precio Distribuidor Estatal)',
     kitEquivalentCount: 250,
-    image: '/src/assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg',
+    image: WHOLESALE_MASTER_IMAGE,
     contentsSummary: '250 Kits Noche Completa + 8 Exhibidores Oficiales Tragoo Check',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -432,7 +438,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 165,
     unitPriceLabel: '$165.00 MXN por kit (Tarifa Mínima Nacional)',
     kitEquivalentCount: 500,
-    image: '/src/assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg',
+    image: WHOLESALE_MASTER_IMAGE,
     contentsSummary: '500 Kits Noche Completa + 15 Exhibidores Oficiales Tragoo Check',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',

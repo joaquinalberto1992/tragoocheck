@@ -46,6 +46,7 @@ import {
   WomenSloganBanner,
   HeroVideoPlayer,
 } from './components/VideoStoryShowcase';
+import squadPackImage from './assets/images/tragoo_pack_squad_5x_1792022755033.jpg';
 
 const DEFAULT_CONFIG: MerchantConfigClient = {
   bankName: 'BBVA México / STP (SPEI) / OXXO',
@@ -182,7 +183,7 @@ export default function App() {
     heroView === 'empaque'
       ? HERO_PRODUCT_IMAGE
       : heroView === 'squad'
-      ? '/src/assets/images/tragoo_pack_squad_5x_1792022755033.jpg'
+      ? squadPackImage
       : BACK_POUCH_INSTRUCTIONS_IMAGE;
 
   const activeInstagramUrl = merchantConfig.instagramUrl || INSTAGRAM_URL;
@@ -486,7 +487,7 @@ export default function App() {
                     }`}
                   >
                     <img
-                      src="/src/assets/images/tragoo_pack_squad_5x_1792022755033.jpg"
+                      src={squadPackImage}
                       alt="Pack Squad 5x"
                       referrerPolicy="no-referrer"
                       className="w-9 h-9 rounded-lg object-cover shrink-0"
