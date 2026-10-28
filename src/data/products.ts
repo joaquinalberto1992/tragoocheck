@@ -44,6 +44,7 @@ import braceletIndividualImage from '../assets/images/pulsera-individual.jpg';
 import braceletDetailImage from '../assets/images/pulsera-individual-detalle.jpg';
 import braceletTrioImage from '../assets/images/pulseras-trio-amigas.jpg';
 import braceletGroupImage from '../assets/images/pulseras-grupo-cinco.png';
+import braceletRefillsImage from '../assets/images/repuestos-pulseras-30.jpg';
 
 export const HERO_PRODUCT_IMAGE = heroProductImage;
 export const HERO_LIFESTYLE_IMAGE = heroLifestyleImage;
@@ -490,6 +491,18 @@ export const WHOLESALE_KITS: ProductKit[] = [
 ];
 
 export const BRACELET_PRODUCTS: ProductKit[] = [
+  {
+    id: 'repuestos-pulseras-30', category: 'individual', name: 'Repuestos exclusivos para pulseras (30 parches)',
+    subtitle: 'Paquete con 30 parches reactivos de repuesto, diseñados exclusivamente para las pulseras Tragoo Check. Una presentación práctica para quienes ya tienen su pulsera y desean contar con repuestos para sus próximos eventos, conciertos y reuniones.',
+    kicker: '30 parches · Exclusivos para pulseras Tragoo Check',
+    price: 1589, unitPriceNumeric: 1589 / 30, unitPriceLabel: '$52.97 MXN por parche',
+    kitEquivalentCount: 0, image: braceletRefillsImage,
+    gallery: [{ src: braceletRefillsImage, alt: 'Paquete de 30 parches de repuesto exclusivos para pulseras Tragoo Check, frente y reverso del empaque' }],
+    contentsSummary: '30 parches reactivos de repuesto para pulseras Tragoo Check',
+    substancesDetected: '', reactionTime: '',
+    includedItems: ['30 parches reactivos de repuesto exclusivos para pulseras Tragoo Check'],
+    idealFor: 'Personas que ya tienen su pulsera Tragoo Check.', stockCount: null,
+  },
   {
     id: 'pulsera-individual', category: 'individual', name: 'Pulsera Individual',
     subtitle: 'Un sobre con una pulsera ajustable morada y zona de prueba integrada. Presentación compacta, pensada para llevar a conciertos, festivales y reuniones.',
