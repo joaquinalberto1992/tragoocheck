@@ -1,3 +1,6 @@
+import { ProductVisual } from './components/ProductVisual';
+import { VideoGallery } from './components/VideoGallery';
+import { UpcomingProducts } from './components/UpcomingProducts';
 import React, { useState, useEffect } from 'react';
 import {
   ShoppingBag,
@@ -215,7 +218,7 @@ export default function App() {
             Tragoo <span className="text-[#A3E635]">Check</span>
           </a>
 
-          {/* Desktop navigation */}
+          <div className="flex gap-3 text-xs"><a href="#videos">Videos</a><a href="#novedades">Novedades</a></div>
           <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-6 text-sm font-medium text-[#C4BED4]">
             <a
               href="#kits"
@@ -654,6 +657,8 @@ export default function App() {
         </section>
 
         {/* FEATURED CATALOG: INDIVIDUALS + MULTIPACK PROMOTIONS */}
+        <VideoGallery />
+        <UpcomingProducts onBuy={handleBuyNow} />
         <section id="kits" className="py-14 md:py-24 border-t border-[#231E30]">
           <div className="max-w-[1160px] mx-auto px-4 sm:px-6 space-y-10">
             {/* Header + Interactive Category Filter Tabs */}
@@ -703,7 +708,7 @@ export default function App() {
                       : 'text-[#C4BED4] hover:text-white'
                   }`}
                 >
-                  Packs Ahorro 2x a 10x ({PROMO_BUNDLES.length})
+                  Paquetes de 2 a 10 kits ({PROMO_BUNDLES.length})
                 </button>
               </div>
             </div>
@@ -718,14 +723,7 @@ export default function App() {
                   }`}
                 >
                   <div>
-                    <div className="relative aspect-[4/3] w-full bg-[#E2E2E2] border-b border-[#231E30] overflow-hidden">
-                      <img
-                        src={kit.image}
-                        alt={kit.name}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                    <ProductVisual product={kit} />
 
                     <div className="p-5 sm:p-6 space-y-4">
                       {/* Unboxed Metadata Kicker */}
