@@ -5,8 +5,8 @@ export function UpcomingProducts({ onBuy }: { onBuy: (product: ProductKit) => vo
     <div className="max-w-[1160px] mx-auto px-4 sm:px-6">
       <p className="text-[#A3E635] text-sm font-bold mb-3">NUEVAS PRESENTACIONES</p>
       <h2 className="text-3xl font-bold mb-8">Más opciones para tu próximo plan.</h2>
-      <h3 className="text-2xl font-bold mb-5">Pulseras Tragoo Check</h3>
-      <div className="grid gap-6 lg:grid-cols-3 mb-8">
+      <h3 className="text-2xl font-bold mb-5">Pulseras y repuestos Tragoo Check</h3>
+      <div className="grid gap-6 md:grid-cols-2 mb-8">
         {BRACELET_PRODUCTS.map(product => <article key={product.id} className="rounded-2xl border border-[#6D438A] p-6 bg-[#14111D] flex flex-col">
           <span className="text-sm text-[#D8B4FE] font-bold">{product.kicker}</span>
           <h4 className="text-xl font-bold mt-3 mb-3">{product.name}</h4>
