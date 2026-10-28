@@ -12,12 +12,13 @@ export interface ProductKit {
   unitPriceLabel: string;
   kitEquivalentCount: number;
   image: string;
+  gallery?: { src: string; alt: string }[];
   contentsSummary: string;
   substancesDetected: string;
   reactionTime: string;
   includedItems: string[];
   idealFor: string;
-  stockCount: number;
+  stockCount: number | null;
   featured?: boolean;
 }
 
@@ -39,6 +40,10 @@ import kitStickersImage from '../assets/images/tragoo_kit_stickers_unas_17920227
 import kitStripsImage from '../assets/images/tragoo_kit_tiras_reactivas_1792022751432.jpg';
 import duoPackImage from '../assets/images/tragoo_pack_duo_amigas_1792022753318.jpg';
 import squadPackImage from '../assets/images/tragoo_pack_squad_5x_1792022755033.jpg';
+import braceletIndividualImage from '../assets/images/pulsera-individual.jpg';
+import braceletDetailImage from '../assets/images/pulsera-individual-detalle.jpg';
+import braceletTrioImage from '../assets/images/pulseras-trio-amigas.jpg';
+import braceletGroupImage from '../assets/images/pulseras-grupo-cinco.png';
 
 export const HERO_PRODUCT_IMAGE = heroProductImage;
 export const HERO_LIFESTYLE_IMAGE = heroLifestyleImage;
@@ -207,7 +212,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 399.5,
     unitPriceLabel: '$399.50 MXN por kit (Ahorras $99)',
     kitEquivalentCount: 2,
-    image: duoPackImage,
+    image: HERO_PRODUCT_IMAGE,
     contentsSummary: '10 tiras multipanel · 20 stickers de uñas · 2 llaveros mini-tumbler',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -232,7 +237,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 375,
     unitPriceLabel: '$375.00 MXN por kit · Envío Gratis incluido',
     kitEquivalentCount: 3,
-    image: duoPackImage,
+    image: HERO_PRODUCT_IMAGE,
     contentsSummary: '15 tiras multipanel · 30 stickers de uñas · 3 llaveros mini-tumbler',
     substancesDetected: 'GHB, ketamina, escopolamina, cocaína y aminas adulterantes',
     reactionTime: '10 a 15 segundos',
@@ -258,7 +263,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 349,
     unitPriceLabel: '$349.00 MXN por kit (Ahorras $500 + Envío Gratis)',
     kitEquivalentCount: 5,
-    image: squadPackImage,
+    image: HERO_PRODUCT_IMAGE,
     contentsSummary: '25 tiras multipanel · 50 stickers de uñas · 5 llaveros mini-tumbler',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -283,7 +288,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 319,
     unitPriceLabel: '$319.00 MXN por kit (Ahorras $1,300 + Envío Gratis)',
     kitEquivalentCount: 10,
-    image: squadPackImage,
+    image: HERO_PRODUCT_IMAGE,
     contentsSummary: '50 tiras multipanel · 100 stickers de uñas · 10 llaveros mini-tumbler',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -297,6 +302,37 @@ export const PROMO_BUNDLES: ProductKit[] = [
     stockCount: 9,
   },
 ];
+
+// Combinations use existing bundle prices; no additional discount or gifts are assumed.
+const combinations = [
+  { id: 'pack-cuatro-4x', name: 'Pack Cuatro', sources: ['pack-amigas-2x', 'pack-amigas-2x'] },
+  { id: 'pack-seis-6x', name: 'Pack Seis', sources: ['pack-squad-5x', 'kit-noche-completa'] },
+  { id: 'pack-ocho-8x', name: 'Pack Ocho', sources: ['pack-squad-5x', 'pack-trio-amigas-3x'] },
+];
+for (const combination of combinations) {
+  const catalog = [...PRODUCT_KITS, ...PROMO_BUNDLES];
+  const parts = combination.sources.map(id => catalog.find(product => product.id === id)!);
+  const quantity = parts.reduce((sum, part) => sum + part.kitEquivalentCount, 0);
+  const price = parts.reduce((sum, part) => sum + part.price, 0);
+  const inventoryLimits = [...new Set(combination.sources)].map(id => {
+    const product = catalog.find(item => item.id === id)!;
+    return Math.floor((product.stockCount ?? 0) / combination.sources.filter(source => source === id).length);
+  });
+  PROMO_BUNDLES.push({
+    ...PRODUCT_KITS[0], id: combination.id, category: 'promocion',
+    name: `${combination.name} (${quantity} Kits Completos)`,
+    subtitle: `Combina ${parts.map(part => part.name).join(' + ')} en un pedido.`,
+    kicker: `${quantity} kits · Combinación de paquetes del catálogo`,
+    price, compareAtPrice: quantity * PRODUCT_KITS[0].price,
+    unitPriceNumeric: price / quantity,
+    unitPriceLabel: `${(price / quantity).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} MXN por kit`,
+    kitEquivalentCount: quantity,
+    contentsSummary: `${quantity * 5} tiras · ${quantity * 10} stickers · ${quantity} llaveros`,
+    includedItems: parts.flatMap(part => part.includedItems),
+    idealFor: 'Grupos que quieren repartir un kit completo por persona.',
+    stockCount: Math.min(...inventoryLimits), featured: false,
+  });
+}
 
 export const WHOLESALE_KITS: ProductKit[] = [
   {
@@ -453,10 +489,51 @@ export const WHOLESALE_KITS: ProductKit[] = [
   },
 ];
 
+export const BRACELET_PRODUCTS: ProductKit[] = [
+  {
+    id: 'pulsera-individual', category: 'individual', name: 'Pulsera Individual',
+    subtitle: 'Un sobre con una pulsera ajustable morada y zona de prueba integrada. Presentación compacta, pensada para llevar a conciertos, festivales y reuniones.',
+    kicker: '1 sobre · 1 pulsera', price: 599, unitPriceNumeric: 599,
+    unitPriceLabel: '$599.00 MXN por pulsera', kitEquivalentCount: 0,
+    image: braceletDetailImage,
+    gallery: [
+      { src: braceletDetailImage, alt: 'Pulsera individual morada Tragoo Check fuera del sobre, junto al frente y reverso de su empaque' },
+      { src: braceletIndividualImage, alt: 'Pulsera individual Tragoo Check: frente y reverso del mismo sobre, presentación de una pulsera' },
+    ],
+    contentsSummary: '1 sobre con 1 pulsera ajustable morada y zona de prueba integrada',
+    substancesDetected: '', reactionTime: '',
+    includedItems: ['1 sobre', '1 pulsera ajustable morada con zona de prueba integrada'],
+    idealFor: 'Conciertos, festivales y reuniones.', stockCount: null,
+  },
+  {
+    id: 'pulseras-trio', category: 'promocion', name: 'Pack Trío de Pulseras',
+    subtitle: 'Un solo sobre con tres pulseras. Ideal para compartir con amistades y llevar cada quien su propia pulsera durante un evento.',
+    kicker: '1 sobre · 3 pulseras', price: 1499, unitPriceNumeric: 1499 / 3,
+    unitPriceLabel: '$499.67 MXN por pulsera', kitEquivalentCount: 0,
+    image: braceletTrioImage,
+    gallery: [{ src: braceletTrioImage, alt: 'Pack Trío de pulseras Tragoo Check: tres pulseras moradas fuera del sobre y vistas del frente y reverso del empaque' }],
+    contentsSummary: '1 solo sobre con 3 pulseras',
+    substancesDetected: '', reactionTime: '', includedItems: ['1 sobre con 3 pulseras'],
+    idealFor: 'Compartir con amistades durante un evento.', stockCount: null,
+  },
+  {
+    id: 'pulseras-grupo', category: 'promocion', name: 'Pack Grupo de Pulseras',
+    subtitle: 'Un sobre con cinco pulseras. Presentación pensada para grupos, celebraciones y eventos.',
+    kicker: '1 sobre · 5 pulseras', price: 2299, unitPriceNumeric: 2299 / 5,
+    unitPriceLabel: '$459.80 MXN por pulsera', kitEquivalentCount: 0,
+    image: braceletGroupImage,
+    gallery: [{ src: braceletGroupImage, alt: 'Presentación ilustrativa del Pack Grupo Tragoo Check: cinco pulseras moradas fuera del sobre, con frente y reverso del empaque' }],
+    contentsSummary: '1 sobre con 5 pulseras',
+    substancesDetected: '', reactionTime: '', includedItems: ['1 sobre con 5 pulseras'],
+    idealFor: 'Grupos, celebraciones y eventos.', stockCount: null,
+  },
+];
+
 export const ALL_PRODUCTS: ProductKit[] = [
   ...PRODUCT_KITS,
   ...PROMO_BUNDLES,
   ...WHOLESALE_KITS,
+  ...BRACELET_PRODUCTS,
 ];
 
 export const FAQS = [

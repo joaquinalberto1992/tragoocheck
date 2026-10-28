@@ -1,3 +1,4 @@
+import { ProductVisual } from './ProductVisual';
 import React, { useState } from 'react';
 import {
   Check,
@@ -199,14 +200,7 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
               }`}
             >
               <div>
-                <div className="relative aspect-[4/3] w-full bg-[#E2E2E2] border-b border-[#231E30] overflow-hidden">
-                  <img
-                    src={box.image}
-                    alt={box.name}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
+                <ProductVisual product={box} />
 
                 <div className="p-6 space-y-4">
                   <div className="text-xs font-medium text-[#A3E635]">{box.kicker}</div>
