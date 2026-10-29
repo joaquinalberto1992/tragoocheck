@@ -530,7 +530,7 @@ export default function App() {
                   WhatsApp 479 229 3687
                 </div>
                 <div className="text-xs text-[#C4BED4] mt-0.5">
-                  Envía tu pedido directo por WhatsApp y recibe al instante tu{' '}
+                  Envía tu pedido directo por WhatsApp para solicitar tu{' '}
                   <strong className="text-white">
                     Link de Pago o ficha OXXO
                   </strong>
@@ -795,10 +795,10 @@ export default function App() {
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="text-xs font-semibold text-[#A3E635]">
-                    Pagos 100% seguros directo por WhatsApp · Atención inmediata al 479 229 3687
+                    Opciones de pago y atención por WhatsApp · 479 229 3687
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-white">
-                    Envía tu pedido a WhatsApp y elige cómo pagar al instante:
+                    Envía tu pedido con folio y total; confirma los datos antes de pagar:
                   </h3>
                 </div>
 

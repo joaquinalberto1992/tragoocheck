@@ -54,6 +54,9 @@ export interface ConfirmedOrder {
   items: { id: string; name: string; price: number; quantity: number }[];
   subtotal: number;
   discount: number;
+  couponCode?: string;
+  couponDiscount?: number;
+  speiDiscount?: number;
   shipping: number;
   total: number;
   paymentMethod: OrderPaymentMethod;
@@ -231,7 +234,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     const baseItems = cart.map((i) => ({
       id: i.product.id,
       name: i.product.name,
-      price: Math.round(getEffectiveUnitPrice(i.product, i.quantity)),
+      price: getEffectiveUnitPrice(i.product, i.quantity),
       quantity: i.quantity,
     }));
     if (unlocksFreeGift) {
@@ -250,7 +253,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       return 'Pago en Efectivo en OXXO (Solicito ficha/referencia OXXO)';
     }
     if (method === 'spei') {
-      return 'Transferencia Bancaria SPEI (-5% Descuento aplicado)';
+      return `Transferencia Bancaria SPEI (-${merchantConfig.speiDiscountPercent || 5}% aplicado)`;
     }
     return 'Link de Pago con Tarjeta (Solicito link de pago por WhatsApp)';
   };
@@ -273,8 +276,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       ``,
       `*Resumen de cobro:*`,
       `• Subtotal: $${order.subtotal.toLocaleString('es-MX')} MXN`,
-      ...(order.discount > 0
-        ? [`• Descuento aplicado: -$${order.discount.toLocaleString('es-MX')} MXN`]
+      ...(order.couponDiscount
+        ? [`• Cupón ${order.couponCode}: -$${order.couponDiscount.toLocaleString('es-MX')} MXN`]
+        : []),
+      ...(order.speiDiscount
+        ? [`• Descuento SPEI: -$${order.speiDiscount.toLocaleString('es-MX')} MXN`]
         : []),
       `• Envío Express: ${
         order.shipping === 0
@@ -335,6 +341,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       items: buildOrderItemsPayload(),
       subtotal,
       discount: totalDiscount,
+      couponCode: couponDiscount > 0 ? appliedCoupon?.code : undefined,
+      couponDiscount,
+      speiDiscount,
       shipping,
       total,
       paymentMethod,
@@ -737,7 +746,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               {/* 3 Payment Options Handled via WhatsApp 479 229 3687 */}
               <div className="space-y-2.5">
                 <label className="block text-xs font-bold text-white">
-                  1. ¿Cómo prefieres pagar al enviar tu pedido a WhatsApp?
+                  1. Elige cómo deseas pagar
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <button
@@ -759,7 +768,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       Link de Pago
                     </div>
                     <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
-                      Te damos el link de cobro en WhatsApp
+                      Solicita el enlace de pago por WhatsApp
                     </div>
                   </button>
 
@@ -782,7 +791,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       Pago en OXXO
                     </div>
                     <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
-                      Recibe los datos para pagar en OXXO
+                      Solicita la ficha de pago por WhatsApp
                     </div>
                   </button>
 
@@ -805,10 +814,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       Transferencia SPEI
                     </div>
                     <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
-                      5% de descuento extra inmediato
+                      Descuento adicional incluido en tu total
                     </div>
                   </button>
                 </div>
+              </div>
+
+              <div className="rounded-xl border border-[#262136] bg-[#14111D] px-3.5 py-3 text-[11px] leading-relaxed text-[#C4BED4]">
+                Al continuar se abrirá WhatsApp con tu folio, productos, cupón y total. Ahí confirmas los datos de pago antes de pagar; el enlace de tarjeta o la ficha OXXO se solicitan por ese chat.
               </div>
 
               {/* Shipping Address Form */}
@@ -934,6 +947,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <span className="font-mono">
                     -${couponDiscount.toLocaleString('es-MX')} MXN
                   </span>
+                </div>
+              )}
+              {appliedCoupon && couponDiscount === 0 && (
+                <div className="text-[11px] text-amber-300">
+                  El cupón {appliedCoupon.code} se aplicará al llegar a ${appliedCoupon.minPurchase.toLocaleString('es-MX')} MXN en productos.
                 </div>
               )}
               {speiDiscount > 0 && (
