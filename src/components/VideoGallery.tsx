@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react';
 
 const videos = [
-  { src: '/tragoo-oficial.mp4', poster: '/videos/oficial.jpg', title: 'Conoce Tragoo Check', description: 'Una mirada a nuestra marca y sus productos.' },
-  { src: '/videos/antes-de-salir.mp4', poster: '/videos/antes-de-salir.jpg', title: 'Tu kit antes de salir', description: 'Conoce el Kit Noche Completa y lo que incluye.' },
-  { src: '/videos/tiras.mp4', poster: '/videos/tiras.jpg', title: 'Tiras reactivas', description: 'Descubre esta presentación del catálogo.' },
+  { src: '/videos/intro-premium.mp4', poster: '/videos/intro-premium.jpg', title: 'Mira cómo se usa Tragoo Check', description: 'Una demostración del producto y sus indicaciones.' },
+  { src: '/videos/pulsera-premium.mp4', poster: '/videos/pulsera-premium.jpg', title: 'Pulsera Tragoo Check', description: 'Presentación individual para conciertos, festivales y reuniones.' },
+  { src: '/videos/popotes-premium.mp4', poster: '/videos/popotes-premium.jpg', title: 'Popotes de prueba', description: 'Conoce los paquetes de 10, 20 y 30 unidades.' },
 ];
 
 export function VideoGallery() {

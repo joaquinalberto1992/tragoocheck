@@ -241,7 +241,7 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
 
   // Prefer the configured public media URL. This also works when the page is
   // deployed as a static AI Studio build without the Express /api/video route.
-  const activeVideoSrc = videoUrl || '/tragoo-oficial.mp4';
+  const activeVideoSrc = videoUrl || '/videos/intro-premium.mp4';
 
   const handleToggleMute = () => {
     if (!videoRef.current) return;
