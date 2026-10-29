@@ -10,7 +10,7 @@ export async function POST(request: Request): Promise<Response> {
   try {
     const body = await request.json() as Record<string, unknown>;
     const quote = quoteCheckout(body);
-    const stripe = stripeClient();
+    const stripe = await stripeClient();
     const origin = new URL(request.url).origin;
     const folio = `TC-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const customerName = String(body.customerName || '').trim().slice(0, 120);

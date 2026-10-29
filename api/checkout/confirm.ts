@@ -10,7 +10,7 @@ export async function GET(request: Request): Promise<Response> {
   if (!sessionId || !sessionId.startsWith('cs_')) return json({ error: 'Sesión de pago inválida.' }, 400);
 
   try {
-    const stripe = stripeClient();
+    const stripe = await stripeClient();
     const session = await stripe.checkout.sessions.retrieve(sessionId);
     if (session.payment_status !== 'paid') {
       return json({ paid: false, error: 'Stripe todavía no confirma el pago.' }, 402);
