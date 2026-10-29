@@ -30,7 +30,7 @@ import {
   ALL_PRODUCTS,
   ACTIVE_COUPONS,
   HERO_PRODUCT_IMAGE,
-  BACK_POUCH_INSTRUCTIONS_IMAGE,
+  KIT_STICKERS_IMAGE,
   INSTAGRAM_URL,
   INSTAGRAM_HANDLE,
   FAQS,
@@ -72,7 +72,7 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [heroView, setHeroView] = useState<
-    'video' | 'empaque' | 'reverso' | 'squad'
+    'video' | 'empaque' | 'squad'
   >('video');
   const [catalogFilter, setCatalogFilter] = useState<
     'all' | 'individual' | 'promocion'
@@ -198,7 +198,7 @@ export default function App() {
       ? HERO_PRODUCT_IMAGE
       : heroView === 'squad'
       ? squadPackImage
-      : BACK_POUCH_INSTRUCTIONS_IMAGE;
+      : HERO_PRODUCT_IMAGE;
 
   const activeInstagramUrl = merchantConfig.instagramUrl || INSTAGRAM_URL;
   const cleanWhatsAppPhone = normalizeWhatsAppPhone(
@@ -450,8 +450,6 @@ export default function App() {
                         <span>
                           {heroView === 'empaque'
                             ? 'KIT NOCHE COMPLETA · BOLSA DOY-PACK + LLAVERO'
-                            : heroView === 'reverso'
-                            ? 'REVERSO OFICIAL · INSTRUCCIONES Y ESCALA DE COLOR'
                             : 'PACK SQUAD 5X · 5 BOLSAS + 5 LLAVEROS'}
                         </span>
                         <span>@TRAGOOCHECK</span>
@@ -460,8 +458,8 @@ export default function App() {
                   </div>
                 )}
 
-                {/* Interactive Gallery Switcher (4 Tabs: Video 00:16s + 3 Product Views) */}
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {/* Product gallery uses verified front-of-pack photos only. */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                   <button
                     type="button"
                     onClick={() => setHeroView('video')}
@@ -499,26 +497,6 @@ export default function App() {
                     />
                     <span className="text-xs font-semibold truncate">
                       Frente + Llavero
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setHeroView('reverso')}
-                    className={`p-2 rounded-xl border text-left flex items-center gap-2 transition-colors cursor-pointer ${
-                      heroView === 'reverso'
-                        ? 'bg-[#14111D] border-[#A3E635] text-white'
-                        : 'bg-[#14111D]/60 border-[#262136] text-[#A19BB2] hover:text-white'
-                    }`}
-                  >
-                    <img
-                      src={BACK_POUCH_INSTRUCTIONS_IMAGE}
-                      alt="Reverso Instructivo"
-                      referrerPolicy="no-referrer"
-                      className="w-9 h-9 rounded-lg object-cover shrink-0"
-                    />
-                    <span className="text-xs font-semibold truncate">
-                      Reverso Guía
                     </span>
                   </button>
 
@@ -1027,8 +1005,8 @@ export default function App() {
               <div className="lg:col-span-6">
                 <div className="rounded-2xl overflow-hidden border border-[#2E2840] bg-[#E2E2E2]">
                   <img
-                    src={BACK_POUCH_INSTRUCTIONS_IMAGE}
-                    alt="Reverso oficial del empaque Tragoo Check — Cómo aplicar e Información de Seguridad Importante"
+                    src={KIT_STICKERS_IMAGE}
+                    alt="Frente del empaque Tragoo Check de stickers para uñas"
                     referrerPolicy="no-referrer"
                     className="w-full h-auto object-cover"
                   />

@@ -31,9 +31,8 @@ export interface PromoCoupon {
 }
 
 // Import assets through Vite so their URLs point to the built files in `dist`.
-import heroProductImage from '../assets/images/tragoo_kit_noche_completa_clean_1792026634047.jpg';
+import heroProductImage from '../assets/images/tragoo-kit-noche-completa-branded-tumbler-v2.png';
 import heroLifestyleImage from '../assets/images/hero_drink_test_1792021357545.jpg';
-import backPouchInstructionsImage from '../assets/images/tragoo_reverso_empaque_oficial_1792026633826.jpg';
 import wholesaleBoxImage from '../assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg';
 import wholesaleMasterImage from '../assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg';
 import kitStickersImage from '../assets/images/tragoo_kit_stickers_unas_1792022749823.jpg';
@@ -49,7 +48,7 @@ import testingStrawsImage from '../assets/images/popotes-prueba.jpg';
 
 export const HERO_PRODUCT_IMAGE = heroProductImage;
 export const HERO_LIFESTYLE_IMAGE = heroLifestyleImage;
-export const BACK_POUCH_INSTRUCTIONS_IMAGE = backPouchInstructionsImage;
+export const KIT_STICKERS_IMAGE = kitStickersImage;
 export const WHOLESALE_BOX_IMAGE = wholesaleBoxImage;
 export const WHOLESALE_MASTER_IMAGE = wholesaleMasterImage;
 
@@ -187,7 +186,7 @@ export const PRODUCT_KITS: ProductKit[] = [
     unitPriceNumeric: 274.5,
     unitPriceLabel: '$18.30 MXN por prueba (30 pruebas)',
     kitEquivalentCount: 2,
-    image: BACK_POUCH_INSTRUCTIONS_IMAGE,
+    image: kitStripsImage,
     contentsSummary: '10 tiras multipanel · 20 stickers de uñas (Refill sin llavero)',
     substancesDetected: 'GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -498,7 +497,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '10 popotes de prueba', price: 599, unitPriceNumeric: 59.9,
     unitPriceLabel: '$59.90 MXN por popote', kitEquivalentCount: 0,
     image: testingStrawsImage,
-    gallery: [{ src: testingStrawsImage, alt: 'Presentación e instrucciones de los popotes de prueba Tragoo Check y sus paquetes de 10, 20 y 30 unidades' }],
+    gallery: [{ src: testingStrawsImage, alt: 'Empaque y popotes de prueba Tragoo Check; la imagen presenta los formatos de 10, 20 y 30 unidades' }],
     contentsSummary: '10 popotes de prueba Tragoo Check', substancesDetected: 'GHB (según el empaque del proveedor)', reactionTime: '10 a 15 segundos (según el empaque del proveedor)',
     includedItems: ['10 popotes de prueba Tragoo Check'], idealFor: 'Eventos y reuniones.', stockCount: null,
   },
@@ -508,7 +507,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '20 popotes de prueba', price: 1499, unitPriceNumeric: 74.95,
     unitPriceLabel: '$74.95 MXN por popote', kitEquivalentCount: 0,
     image: testingStrawsImage,
-    gallery: [{ src: testingStrawsImage, alt: 'Presentación e instrucciones de los popotes de prueba Tragoo Check y sus paquetes de 10, 20 y 30 unidades' }],
+    gallery: [{ src: testingStrawsImage, alt: 'Empaque y popotes de prueba Tragoo Check; la imagen presenta los formatos de 10, 20 y 30 unidades' }],
     contentsSummary: '20 popotes de prueba Tragoo Check', substancesDetected: 'GHB (según el empaque del proveedor)', reactionTime: '10 a 15 segundos (según el empaque del proveedor)',
     includedItems: ['20 popotes de prueba Tragoo Check'], idealFor: 'Compartir en eventos y reuniones.', stockCount: null,
   },
@@ -518,7 +517,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '30 popotes de prueba', price: 2299, unitPriceNumeric: 2299 / 30,
     unitPriceLabel: '$76.63 MXN por popote', kitEquivalentCount: 0,
     image: testingStrawsImage,
-    gallery: [{ src: testingStrawsImage, alt: 'Presentación e instrucciones de los popotes de prueba Tragoo Check y sus paquetes de 10, 20 y 30 unidades' }],
+    gallery: [{ src: testingStrawsImage, alt: 'Empaque y popotes de prueba Tragoo Check; la imagen presenta los formatos de 10, 20 y 30 unidades' }],
     contentsSummary: '30 popotes de prueba Tragoo Check', substancesDetected: 'GHB (según el empaque del proveedor)', reactionTime: '10 a 15 segundos (según el empaque del proveedor)',
     includedItems: ['30 popotes de prueba Tragoo Check'], idealFor: 'Grupos y eventos.', stockCount: null,
   },
