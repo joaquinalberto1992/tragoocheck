@@ -45,6 +45,7 @@ import braceletDetailImage from '../assets/images/pulsera-individual-detalle.jpg
 import braceletTrioImage from '../assets/images/pulseras-trio-amigas.jpg';
 import braceletGroupImage from '../assets/images/pulseras-grupo-cinco.png';
 import braceletRefillsImage from '../assets/images/repuestos-pulseras-30.jpg';
+import testingStrawsImage from '../assets/images/popotes-prueba.jpg';
 
 export const HERO_PRODUCT_IMAGE = heroProductImage;
 export const HERO_LIFESTYLE_IMAGE = heroLifestyleImage;
@@ -491,6 +492,36 @@ export const WHOLESALE_KITS: ProductKit[] = [
 ];
 
 export const BRACELET_PRODUCTS: ProductKit[] = [
+  {
+    id: 'popotes-prueba-10', category: 'individual', name: 'Popotes de Prueba · Paquete de 10',
+    subtitle: 'Paquete con 10 popotes de prueba Tragoo Check para llevar a conciertos, reuniones y otros eventos.',
+    kicker: '10 popotes de prueba', price: 599, unitPriceNumeric: 59.9,
+    unitPriceLabel: '$59.90 MXN por popote', kitEquivalentCount: 0,
+    image: testingStrawsImage,
+    gallery: [{ src: testingStrawsImage, alt: 'Presentación e instrucciones de los popotes de prueba Tragoo Check y sus paquetes de 10, 20 y 30 unidades' }],
+    contentsSummary: '10 popotes de prueba Tragoo Check', substancesDetected: 'GHB (según el empaque del proveedor)', reactionTime: '10 a 15 segundos (según el empaque del proveedor)',
+    includedItems: ['10 popotes de prueba Tragoo Check'], idealFor: 'Eventos y reuniones.', stockCount: null,
+  },
+  {
+    id: 'popotes-prueba-20', category: 'promocion', name: 'Popotes de Prueba · Paquete de 20',
+    subtitle: 'Paquete de 20 popotes de prueba Tragoo Check para compartir en eventos y reuniones.',
+    kicker: '20 popotes de prueba', price: 1499, unitPriceNumeric: 74.95,
+    unitPriceLabel: '$74.95 MXN por popote', kitEquivalentCount: 0,
+    image: testingStrawsImage,
+    gallery: [{ src: testingStrawsImage, alt: 'Presentación e instrucciones de los popotes de prueba Tragoo Check y sus paquetes de 10, 20 y 30 unidades' }],
+    contentsSummary: '20 popotes de prueba Tragoo Check', substancesDetected: 'GHB (según el empaque del proveedor)', reactionTime: '10 a 15 segundos (según el empaque del proveedor)',
+    includedItems: ['20 popotes de prueba Tragoo Check'], idealFor: 'Compartir en eventos y reuniones.', stockCount: null,
+  },
+  {
+    id: 'popotes-prueba-30', category: 'promocion', name: 'Popotes de Prueba · Paquete de 30',
+    subtitle: 'Paquete de 30 popotes de prueba Tragoo Check para grupos y eventos.',
+    kicker: '30 popotes de prueba', price: 2299, unitPriceNumeric: 2299 / 30,
+    unitPriceLabel: '$76.63 MXN por popote', kitEquivalentCount: 0,
+    image: testingStrawsImage,
+    gallery: [{ src: testingStrawsImage, alt: 'Presentación e instrucciones de los popotes de prueba Tragoo Check y sus paquetes de 10, 20 y 30 unidades' }],
+    contentsSummary: '30 popotes de prueba Tragoo Check', substancesDetected: 'GHB (según el empaque del proveedor)', reactionTime: '10 a 15 segundos (según el empaque del proveedor)',
+    includedItems: ['30 popotes de prueba Tragoo Check'], idealFor: 'Grupos y eventos.', stockCount: null,
+  },
   {
     id: 'repuestos-pulseras-30', category: 'individual', name: 'Repuestos exclusivos para pulseras (30 parches)',
     subtitle: 'Paquete con 30 parches reactivos de repuesto, diseñados exclusivamente para las pulseras Tragoo Check. Una presentación práctica para quienes ya tienen su pulsera y desean contar con repuestos para sus próximos eventos, conciertos y reuniones.',
