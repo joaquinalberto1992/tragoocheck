@@ -261,6 +261,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   const buildWhatsAppMessageText = (order: ConfirmedOrder) => {
+    const instagramSource = ['ig', 'instagram'].includes(
+      new URLSearchParams(window.location.search).get('utm_source')?.toLowerCase() || ''
+    );
     const itemsLines = order.items
       .map(
         (i) =>
@@ -290,19 +293,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           : `$${order.shipping} MXN`
       }`,
       `• *TOTAL A PAGAR: $${order.total.toLocaleString('es-MX')} MXN*`,
+      ...(instagramSource ? [`• Canal: Instagram`] : []),
+      ...(order.customerName ? [`• Nombre: ${order.customerName}`] : []),
       ``,
       `*Método de pago elegido:*`,
       `👉 *${getPaymentMethodTitle(order.paymentMethod)}*`,
       ``,
-      `*Datos de envío discreto:*`,
-      `• Nombre: ${order.customerName}`,
-      `• Mi WhatsApp: ${order.customerPhone}`,
-      `• Dirección: ${order.shippingAddress}`,
-      `• Ciudad/Estado: ${order.city}, ${order.state} (CP ${order.postalCode})`,
-      ``,
       order.paymentStatus === 'pagado'
         ? `El pago ya aparece confirmado por Stripe. ¿Me confirmas la recepción del pedido? ¡Gracias!`
-        : `¿Me compartes mi link de pago / ficha OXXO y confirmación por aquí? ¡Gracias!`,
+        : `¿Me confirmas disponibilidad y me compartes el link de pago o la ficha OXXO por aquí? Después te envío mis datos de entrega. ¡Gracias!`,
     ].join('\n');
   };
 
@@ -314,12 +313,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleSendOrderToWhatsApp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (
+    if (paymentMethod === 'stripe' && (
       !customerName.trim() ||
       !customerPhone.trim() ||
       !shippingAddress.trim() ||
       !postalCode.trim()
-    ) {
+    )) {
       setErrorMsg(
         'Completa tu nombre, tu número de WhatsApp, dirección y código postal para enviarte tu pedido.'
       );
@@ -437,10 +436,34 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   };
 
-  const upsellProduct = ALL_PRODUCTS.find(
-    (p) =>
-      p.id === 'kit-stickers' && !cart.some((c) => c.product.id === 'kit-stickers')
-  );
+  const upsellProduct = ALL_PRODUCTS.find((p) => p.id === 'kit-stickers');
+  const upsellCartItem = upsellProduct
+    ? cart.find((item) => item.product.id === upsellProduct.id)
+    : undefined;
+  const currentUpsellQuantity = upsellCartItem?.quantity || 0;
+  const currentUpsellSubtotal = upsellProduct && currentUpsellQuantity
+    ? Math.round(getEffectiveUnitPrice(upsellProduct, currentUpsellQuantity) * currentUpsellQuantity)
+    : 0;
+  let upsellQuantity = 0;
+  if (upsellProduct && !qualifiesFreeShipping) {
+    for (let quantity = 1; quantity <= 10; quantity += 1) {
+      const proposedQuantity = currentUpsellQuantity + quantity;
+      const proposedSubtotal =
+        subtotal - currentUpsellSubtotal +
+        Math.round(getEffectiveUnitPrice(upsellProduct, proposedQuantity) * proposedQuantity);
+      if (proposedSubtotal >= effectiveThreshold) {
+        upsellQuantity = quantity;
+        break;
+      }
+    }
+  }
+  const upsellAddedCost = upsellProduct && upsellQuantity
+    ? Math.round(
+        getEffectiveUnitPrice(upsellProduct, currentUpsellQuantity + upsellQuantity) *
+          (currentUpsellQuantity + upsellQuantity) -
+          currentUpsellSubtotal
+      )
+    : 0;
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-xs">
@@ -777,25 +800,29 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 )}
               </div>
 
-              {/* 1-Click Upsell to help reach $899 Free Shipping */}
-              {!qualifiesFreeShipping && upsellProduct && (
+              {/* Accurate add-on quantity to reach the free-shipping threshold */}
+              {!qualifiesFreeShipping && upsellProduct && upsellQuantity > 0 && (
                 <div className="p-3 rounded-xl bg-[#14111D]/80 border border-dashed border-[#362E4C] flex items-center justify-between gap-3">
                   <div className="text-xs">
                     <div className="font-semibold text-white flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-[#A3E635]" />
-                      ¿Sumar {upsellProduct.name} por ${upsellProduct.price} MXN?
+                      Suma {upsellQuantity} × {upsellProduct.name} por ${upsellAddedCost.toLocaleString('es-MX')} MXN
                     </div>
                     <div className="text-[#A19BB2] mt-0.5">
-                      Llega a $899 MXN para tener{' '}
+                      Con este agregado llegas al mínimo de ${effectiveThreshold.toLocaleString('es-MX')} para tener{' '}
                       <strong className="text-white">Envío Express Gratis</strong>.
                     </div>
                   </div>
                   <button
                     type="button"
-                    onClick={() => onAddProduct(upsellProduct)}
+                    onClick={() => {
+                      for (let i = 0; i < upsellQuantity; i += 1) {
+                        onAddProduct(upsellProduct);
+                      }
+                    }}
                     className="px-3 py-1.5 rounded-lg bg-[#1F192E] hover:bg-[#A3E635] text-white hover:text-[#0B0910] text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
-                    + Sumar
+                    + Agregar {upsellQuantity}
                   </button>
                 </div>
               )}
@@ -900,105 +927,73 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               <div className="rounded-xl border border-[#262136] bg-[#14111D] px-3.5 py-3 text-[11px] leading-relaxed text-[#C4BED4]">
                 {paymentMethod === 'stripe'
                   ? 'Pagarás en el checkout alojado por Stripe. Al confirmarse el pago, se abrirá WhatsApp con tu folio y el pedido listo para enviar.'
-                  : 'Al continuar se abrirá WhatsApp con tu folio, productos, cupón y total. Ahí confirmas los datos de pago antes de pagar; el enlace de tarjeta o la ficha OXXO se solicitan por ese chat.'}
+                  : 'Al continuar se abrirá WhatsApp con el resumen. Aún no pagas: confirma disponibilidad y método; después compartes tus datos de entrega por el chat.'}
               </div>
 
-              {/* Shipping Address Form */}
+              {/* Minimal order-start form: collect delivery details in WhatsApp after confirmation */}
               <form
                 id="checkout-form"
                 onSubmit={handleSendOrderToWhatsApp}
                 className="space-y-3 pt-1"
               >
                 <div className="text-xs font-bold text-white">
-                  2. Tus datos de envío discreto (se enviarán a nuestro WhatsApp 479 229 3687)
+                  2. Nombre para identificar tu pedido (opcional)
                 </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  <div>
-                    <label className="block text-[11px] text-[#A19BB2] mb-1">
-                      Tu Nombre o Alias *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      placeholder="Ej. Daniela Morales"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-[#A19BB2] mb-1">
-                      Tu WhatsApp (10 dígitos) *
-                    </label>
-                    <input
+                <label className="sr-only" htmlFor="checkout-customer-name">
+                  Nombre para identificar tu pedido (opcional)
+                </label>
+                <input
+                  id="checkout-customer-name"
+                  type="text"
+                  autoComplete="name"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  placeholder="Tu nombre (opcional)"
+                  className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                />
+                <div className="rounded-lg border border-[#262136] bg-[#14111D] px-3 py-2.5 text-[11px] leading-relaxed text-[#C4BED4]">
+                  No necesitas escribir aquí tu teléfono ni tu dirección. Se abrirá WhatsApp con el folio, productos, descuentos y total; primero confirmas el pedido y luego compartes tus datos de entrega por el chat.
+                </div>
+                {paymentMethod === 'stripe' && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <input
                       type="tel"
                       required
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      placeholder="Ej. 479 123 4567"
+                      placeholder="Tu WhatsApp (10 dígitos)"
+                      aria-label="Tu WhatsApp"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                  />
+                    <input
+                      type="text"
+                      required
+                      value={shippingAddress}
+                      onChange={(e) => setShippingAddress(e.target.value)}
+                      placeholder="Dirección de entrega"
+                      aria-label="Dirección de entrega"
                       className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
                     />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-[11px] text-[#A19BB2] mb-1">
-                    Calle, número exterior/interior y colonia *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={shippingAddress}
-                    onChange={(e) => setShippingAddress(e.target.value)}
-                    placeholder="Calle, Número, Colonia y referencias"
-                    className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                  />
-                </div>
-
-                <div className="grid grid-cols-3 gap-2.5">
-                  <div>
-                    <label className="block text-[11px] text-[#A19BB2] mb-1">
-                      Código Postal *
-                    </label>
                     <input
                       type="text"
                       required
                       maxLength={5}
                       value={postalCode}
-                      onChange={(e) =>
-                        setPostalCode(e.target.value.replace(/\D/g, ''))
-                      }
-                      placeholder="37000"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] font-mono text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                      onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ''))}
+                      placeholder="Código Postal"
+                      aria-label="Código Postal"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
                     />
-                  </div>
-                  <div>
-                    <label className="block text-[11px] text-[#A19BB2] mb-1">
-                      Ciudad *
-                    </label>
                     <input
                       type="text"
-                      required
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder="León / CDMX"
+                      placeholder="Ciudad"
+                      aria-label="Ciudad"
                       className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
                     />
                   </div>
-                  <div>
-                    <label className="block text-[11px] text-[#A19BB2] mb-1">
-                      Estado
-                    </label>
-                    <input
-                      type="text"
-                      value={stateName}
-                      onChange={(e) => setStateName(e.target.value)}
-                      placeholder="Gto / CDMX"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                    />
-                  </div>
-                </div>
+                )}
 
                 {errorMsg && (
                   <div className="p-3 rounded-lg bg-red-950/60 border border-red-800/60 text-xs text-red-200">
@@ -1074,10 +1069,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   : paymentMethod === 'stripe'
                   ? `Pagar con tarjeta en Stripe · $${total.toLocaleString('es-MX')}`
                   : paymentMethod === 'oxxo'
-                  ? `Enviar Pedido a WhatsApp (Pago OXXO · $${total.toLocaleString('es-MX')})`
+                  ? `Solicitar ficha OXXO · $${total.toLocaleString('es-MX')}`
                   : paymentMethod === 'spei'
-                  ? `Enviar Pedido a WhatsApp (Pago SPEI · $${total.toLocaleString('es-MX')})`
-                  : `Enviar Pedido a WhatsApp y Recibir Link ($${total.toLocaleString('es-MX')})`}
+                  ? `Continuar con SPEI (-5%) · $${total.toLocaleString('es-MX')}`
+                  : `Solicitar link de pago · $${total.toLocaleString('es-MX')}`}
               </span>
             </button>
           </div>

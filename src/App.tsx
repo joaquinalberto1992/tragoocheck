@@ -357,9 +357,9 @@ export default function App() {
         )}
       </header>
 
-      <div className="bg-[#A3E635] px-4 py-2.5 text-center text-xs sm:text-sm font-extrabold tracking-wide text-[#0B0910]">
-        PROMOCIÓN DEL MES · 50% DE REBAJA EN TODOS LOS PRECIOS PUBLICADOS
-      </div>
+      <a href="#promociones" className="block bg-[#A3E635] px-4 py-2.5 text-center text-xs sm:text-sm font-extrabold tracking-wide text-[#0B0910] hover:bg-[#BEF264]">
+        CUPONES EN TU PEDIDO · HOY10: 10% DESDE $449 · AMIGAS15: 15% DESDE $1,100 · 5% EXTRA CON SPEI · VER DETALLES
+      </a>
 
       {/* Optional Stripe Return Confirmation Banner */}
       {stripeReturnFolio && (

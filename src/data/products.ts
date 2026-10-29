@@ -59,11 +59,11 @@ export const OFFICIAL_DOMAIN = 'tragoocheck.shop';
 export const ACTIVE_COUPONS: PromoCoupon[] = [
   {
     code: 'HOY10',
-    label: '10% OFF en tu 1ra compra',
+    label: '10% OFF desde $449',
     discountPercent: 10,
     minPurchase: 449,
     description:
-      '10% de descuento directo en tu primer pedido (acumulable con el 5% extra por Transferencia SPEI).',
+      '10% de descuento en pedidos desde $449 MXN (acumulable con el 5% extra por Transferencia SPEI).',
   },
   {
     code: 'AMIGAS15',
