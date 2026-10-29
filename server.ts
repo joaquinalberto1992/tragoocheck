@@ -1,9 +1,10 @@
 import express from 'express';
 import fs from 'fs';
 import path from 'path';
-import Stripe from 'stripe';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
+import { POST as stripeCheckoutPost } from './api/checkout/stripe';
+import { GET as stripeCheckoutConfirmGet } from './api/checkout/confirm';
 
 dotenv.config();
 
@@ -289,13 +290,13 @@ async function startServer() {
   // Get Merchant Config & Stripe Status
   app.get('/api/config', (_req, res) => {
     const data = loadStoreData();
-    const activeStripeKey =
-      data.config.stripeSecretKeyOverride || process.env.STRIPE_SECRET_KEY || '';
-    const hasLiveStripeKey = Boolean(activeStripeKey && activeStripeKey.startsWith('sk_'));
+    const activeStripeKey = process.env.STRIPE_SECRET_KEY || '';
+    const hasLiveStripeKey = Boolean(activeStripeKey && activeStripeKey.startsWith('sk_live_'));
     const safeConfig = {
       ...data.config,
       stripeSecretKeyOverride: data.config.stripeSecretKeyOverride ? '••••••••' : '',
       hasLiveStripeKey,
+      hasStripeCheckout: Boolean(activeStripeKey && activeStripeKey.startsWith('sk_')),
     };
     res.json(safeConfig);
   });
@@ -334,12 +335,12 @@ async function startServer() {
     };
     saveStoreData(data);
 
-    const activeStripeKey =
-      data.config.stripeSecretKeyOverride || process.env.STRIPE_SECRET_KEY || '';
+    const activeStripeKey = process.env.STRIPE_SECRET_KEY || '';
     res.json({
       ...data.config,
       stripeSecretKeyOverride: data.config.stripeSecretKeyOverride ? '••••••••' : '',
-      hasLiveStripeKey: Boolean(activeStripeKey && activeStripeKey.startsWith('sk_')),
+      hasLiveStripeKey: Boolean(activeStripeKey && activeStripeKey.startsWith('sk_live_')),
+      hasStripeCheckout: Boolean(activeStripeKey && activeStripeKey.startsWith('sk_')),
     });
   });
 
@@ -424,150 +425,31 @@ async function startServer() {
   // Create Stripe Checkout Session
   app.post('/api/checkout/stripe', async (req, res) => {
     try {
-      const data = loadStoreData();
-      const body = req.body;
-      const randomDigits = Math.floor(1000 + Math.random() * 9000);
-      const folio = `TC-${randomDigits}`;
-
-      const items: OrderItem[] = Array.isArray(body.items) ? body.items : [];
-      const shipping = Number(body.shipping || 0);
-      const activeStripeKey =
-        data.config.stripeSecretKeyOverride || process.env.STRIPE_SECRET_KEY || '';
-
-      // 1. Check if single item has a direct Stripe Payment Link configured
-      if (items.length === 1 && items[0].quantity === 1) {
-        const directLink = data.config.stripePaymentLinks?.[items[0].id];
-        if (directLink && directLink.startsWith('https://buy.stripe.com/')) {
-          const pendingOrder: OrderRecord = {
-            folio,
-            createdAt: new Date().toISOString(),
-            customerName: body.customerName || 'Cliente Stripe',
-            customerPhone: body.customerPhone || '',
-            customerEmail: body.customerEmail || '',
-            shippingAddress: body.shippingAddress || '',
-            city: body.city || '',
-            state: body.state || '',
-            postalCode: body.postalCode || '',
-            notes: body.notes || '',
-            items,
-            subtotal: Number(body.subtotal || 0),
-            discount: Number(body.discount || 0),
-            couponCode: typeof body.couponCode === 'string' ? body.couponCode : undefined,
-            couponDiscount: Number(body.couponDiscount || 0),
-            speiDiscount: Number(body.speiDiscount || 0),
-            shipping,
-            total: Number(body.total || 0),
-            paymentMethod: 'stripe',
-            paymentStatus: 'pagado',
-          };
-          data.orders.unshift(pendingOrder);
-          saveStoreData(data);
-          res.json({
-            mode: 'payment_link',
-            url: directLink,
-            folio,
-            order: pendingOrder,
-          });
-          return;
-        }
-      }
-
-      // 2. If STRIPE_SECRET_KEY is configured, create a real Stripe Checkout Session
-      if (activeStripeKey && activeStripeKey.startsWith('sk_')) {
-        const stripe = new Stripe(activeStripeKey);
-        const origin =
-          req.headers.origin ||
-          (data.config.customDomain
-            ? `https://${data.config.customDomain}`
-            : process.env.APP_URL) ||
-          'http://localhost:3000';
-
-        const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items
-          .filter((item) => item.price > 0)
-          .map((item) => ({
-            price_data: {
-              currency: 'mxn',
-              product_data: {
-                name: item.name,
-                description:
-                  'Tragoo Check México — Pruebas portátiles de detección en bebidas',
-              },
-              unit_amount: Math.round(item.price * 100),
-            },
-            quantity: item.quantity,
-          }));
-
-        if (shipping > 0) {
-          lineItems.push({
-            price_data: {
-              currency: 'mxn',
-              product_data: {
-                name: 'Envío Express Discreto a todo México (Pedidos menores a $899 MXN)',
-              },
-              unit_amount: Math.round(shipping * 100),
-            },
-            quantity: 1,
-          });
-        }
-
-        const session = await stripe.checkout.sessions.create({
-          allowed_payment_method_types: ['card'],
-          line_items: lineItems,
-          mode: 'payment',
-          customer_email: body.customerEmail || undefined,
-          metadata: {
-            folio,
-            customerName: body.customerName || '',
-            customerPhone: body.customerPhone || '',
-          },
-          success_url: `${origin}/?stripe_success=1&folio=${folio}`,
-          cancel_url: `${origin}/?stripe_canceled=1`,
-        });
-
-        const newOrder: OrderRecord = {
-          folio,
-          createdAt: new Date().toISOString(),
-          customerName: body.customerName || 'Cliente Stripe',
-          customerPhone: body.customerPhone || '',
-          customerEmail: body.customerEmail || '',
-          shippingAddress: body.shippingAddress || '',
-          city: body.city || '',
-          state: body.state || '',
-          postalCode: body.postalCode || '',
-          notes: body.notes || '',
-          items,
-          subtotal: Number(body.subtotal || 0),
-          discount: Number(body.discount || 0),
-          couponCode: typeof body.couponCode === 'string' ? body.couponCode : undefined,
-          couponDiscount: Number(body.couponDiscount || 0),
-          speiDiscount: Number(body.speiDiscount || 0),
-          shipping,
-          total: Number(body.total || 0),
-          paymentMethod: 'stripe',
-          paymentStatus: 'pagado',
-        };
-        data.orders.unshift(newOrder);
-        saveStoreData(data);
-
-        res.json({
-          mode: 'live_stripe_session',
-          url: session.url,
-          folio,
-          order: newOrder,
-        });
-        return;
-      }
-
-      // 3. Otherwise use built-in instant Stripe card gateway modal
-      res.json({
-        mode: 'instant_card_gateway',
-        folio,
+      const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
+      const webRequest = new Request(`${origin}/api/checkout/stripe`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body),
       });
+      const response = await stripeCheckoutPost(webRequest);
+      res.status(response.status).json(await response.json());
     } catch (error: any) {
       console.error('Stripe checkout error:', error);
-      res.status(500).json({
-        error: error?.message || 'Error al iniciar sesión de Stripe',
-      });
+      res.status(500).json({ error: error?.message || 'Error al iniciar el pago' });
+    }
+  });
+
+  app.get('/api/checkout/confirm', async (req, res) => {
+    try {
+      const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
+      const sessionId = encodeURIComponent(String(req.query.session_id || ''));
+      const webRequest = new Request(
+        `${origin}/api/checkout/confirm?session_id=${sessionId}`
+      );
+      const response = await stripeCheckoutConfirmGet(webRequest);
+      res.status(response.status).json(await response.json());
+    } catch (error: any) {
+      res.status(500).json({ error: error?.message || 'Error al comprobar el pago' });
     }
   });
 

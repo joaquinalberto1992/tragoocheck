@@ -66,6 +66,7 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
   freeShippingThreshold: 899,
   speiDiscountPercent: 5,
   hasLiveStripeKey: false,
+  hasStripeCheckout: false,
   stripePaymentLinks: {},
 };
 
@@ -91,12 +92,16 @@ export default function App() {
   const [stripeReturnFolio, setStripeReturnFolio] = useState<string | null>(
     null
   );
+  const [stripePaymentMessage, setStripePaymentMessage] = useState('');
+  const [stripeWhatsAppUrl, setStripeWhatsAppUrl] = useState('');
 
   useEffect(() => {
     fetch('/api/config')
       .then((r) => r.json())
       .then((data) => {
-        if (data && data.clabe) setMerchantConfig(data);
+        if (data && data.clabe) {
+          setMerchantConfig((previous) => ({ ...previous, ...data }));
+        }
       })
       .catch(() => {});
 
@@ -108,8 +113,64 @@ export default function App() {
       .catch(() => {});
 
     const params = new URLSearchParams(window.location.search);
-    if (params.get('stripe_success') === '1' && params.get('folio')) {
-      setStripeReturnFolio(params.get('folio'));
+    const sessionId = params.get('stripe_session');
+    if (sessionId) {
+      window.history.replaceState({}, '', window.location.pathname);
+      fetch(`/api/checkout/confirm?session_id=${encodeURIComponent(sessionId)}`, {
+        cache: 'no-store',
+      })
+        .then(async (response) => {
+          const result = await response.json();
+          if (!response.ok || !result.paid || !result.whatsappUrl) {
+            throw new Error(result.error || 'No pudimos confirmar el pago.');
+          }
+          setStripeReturnFolio(result.folio);
+          setStripePaymentMessage('Pago confirmado. Abriendo WhatsApp para enviar tu pedido.');
+          setStripeWhatsAppUrl(result.whatsappUrl);
+          sessionStorage.removeItem('tragoo-pending-stripe');
+          window.location.assign(result.whatsappUrl);
+        })
+        .catch(() => {
+          setStripeReturnFolio('Pago pendiente de confirmar');
+          setStripePaymentMessage(
+            'No pudimos verificar el pago automáticamente. Contacta a Tragoo Check por WhatsApp antes de volver a pagar.'
+          );
+          try {
+            const pending = JSON.parse(sessionStorage.getItem('tragoo-pending-stripe') || '{}');
+            if (pending.folio) {
+              setStripeWhatsAppUrl(
+                `https://wa.me/${normalizeWhatsAppPhone(merchantConfig.whatsappNumber)}?text=${encodeURIComponent(`Hola Tragoo Check. Regresé de Stripe y necesito confirmar el pago de mi pedido ${pending.folio}.`)}`
+              );
+            }
+          } catch {
+            // Keep the confirmation notice visible if browser storage is unavailable.
+          }
+        });
+    } else if (params.get('stripe_cancelled') === '1') {
+      setStripeReturnFolio('Pago cancelado');
+      setStripePaymentMessage('El pago no se completó. Tu carrito se conservó para que puedas intentarlo de nuevo.');
+      try {
+        const pending = JSON.parse(sessionStorage.getItem('tragoo-pending-stripe') || '{}');
+        if (typeof pending.couponCode === 'string') {
+          setSelectedCouponCode(pending.couponCode);
+        }
+        const restored = Array.isArray(pending.items)
+          ? pending.items
+              .map((item: { id: string; quantity: number }) => ({
+                product: ALL_PRODUCTS.find((product) => product.id === item.id),
+                quantity: item.quantity,
+              }))
+              .filter((item: { product?: ProductKit; quantity: number }) => item.product)
+              .map((item: { product?: ProductKit; quantity: number }) => ({
+                product: item.product!,
+                quantity: item.quantity,
+              }))
+          : [];
+        if (restored.length) setCart(restored);
+        sessionStorage.removeItem('tragoo-pending-stripe');
+      } catch {
+        // The cart remains empty if browser storage is unavailable.
+      }
       window.history.replaceState({}, '', window.location.pathname);
     }
   }, []);
@@ -302,11 +363,19 @@ export default function App() {
               <span>
                 ¡Tu pedido{' '}
                 <strong className="font-mono text-[#A3E635]">
-                  {stripeReturnFolio}
+                {stripeReturnFolio}
                 </strong>{' '}
-                fue confirmado con éxito!
+                {stripePaymentMessage || 'Pago confirmado.'}
               </span>
             </div>
+            {stripeWhatsAppUrl && (
+              <a
+                href={stripeWhatsAppUrl}
+                className="rounded-lg bg-[#A3E635] px-3 py-2 text-xs font-bold text-[#0B0910]"
+              >
+                Abrir WhatsApp
+              </a>
+            )}
             <button
               type="button"
               onClick={() => setStripeReturnFolio(null)}
