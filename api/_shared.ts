@@ -1,4 +1,4 @@
-import Stripe from 'stripe';
+import type Stripe from 'stripe';
 
 export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '524792293687';
 
@@ -33,13 +33,14 @@ const COUPONS: Record<string, { percent: number; minimum: number }> = {
   SOCIOB2B: { percent: 8, minimum: 4350 },
 };
 
-export function stripeClient(): Stripe {
+export async function stripeClient(): Promise<Stripe> {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key?.startsWith('sk_')) throw new Error('STRIPE_NOT_CONFIGURED');
   if (process.env.VERCEL_ENV === 'production' && !key.startsWith('sk_live_')) {
     throw new Error('STRIPE_NOT_CONFIGURED');
   }
-  return new Stripe(key);
+  const StripeConstructor = (await import('stripe')).default;
+  return new StripeConstructor(key);
 }
 
 function unitPrice(id: string, quantity: number): number {
