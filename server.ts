@@ -46,6 +46,9 @@ export interface OrderRecord {
   items: OrderItem[];
   subtotal: number;
   discount: number;
+  couponCode?: string;
+  couponDiscount?: number;
+  speiDiscount?: number;
   shipping: number;
   total: number;
   paymentMethod: 'link_pago' | 'oxxo' | 'spei' | 'stripe';
@@ -367,6 +370,9 @@ async function startServer() {
       items: Array.isArray(body.items) ? body.items : [],
       subtotal: Number(body.subtotal || 0),
       discount: Number(body.discount || 0),
+      couponCode: typeof body.couponCode === 'string' ? body.couponCode : undefined,
+      couponDiscount: Number(body.couponDiscount || 0),
+      speiDiscount: Number(body.speiDiscount || 0),
       shipping: Number(body.shipping || 0),
       total: Number(body.total || 0),
       paymentMethod: ['link_pago', 'oxxo', 'spei', 'stripe'].includes(body.paymentMethod)
@@ -446,6 +452,9 @@ async function startServer() {
             items,
             subtotal: Number(body.subtotal || 0),
             discount: Number(body.discount || 0),
+            couponCode: typeof body.couponCode === 'string' ? body.couponCode : undefined,
+            couponDiscount: Number(body.couponDiscount || 0),
+            speiDiscount: Number(body.speiDiscount || 0),
             shipping,
             total: Number(body.total || 0),
             paymentMethod: 'stripe',
@@ -529,6 +538,9 @@ async function startServer() {
           items,
           subtotal: Number(body.subtotal || 0),
           discount: Number(body.discount || 0),
+          couponCode: typeof body.couponCode === 'string' ? body.couponCode : undefined,
+          couponDiscount: Number(body.couponDiscount || 0),
+          speiDiscount: Number(body.speiDiscount || 0),
           shipping,
           total: Number(body.total || 0),
           paymentMethod: 'stripe',
