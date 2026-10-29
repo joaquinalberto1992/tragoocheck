@@ -139,9 +139,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 }) => {
   const [paymentMethod, setPaymentMethod] = useState<
     'link_pago' | 'oxxo' | 'spei' | 'stripe'
-  >(
-    merchantConfig.hasStripeCheckout ? 'stripe' : 'link_pago'
-  );
+  >('link_pago');
   const [copiedOrderText, setCopiedOrderText] = useState(false);
 
   // Coupon state

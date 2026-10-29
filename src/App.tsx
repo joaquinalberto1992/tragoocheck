@@ -100,7 +100,14 @@ export default function App() {
       .then((r) => r.json())
       .then((data) => {
         if (data && data.clabe) {
-          setMerchantConfig((previous) => ({ ...previous, ...data }));
+          setMerchantConfig((previous) => ({
+            ...previous,
+            ...data,
+            // Keep automatic Stripe checkout paused until the merchant is ready.
+            hasLiveStripeKey: false,
+            hasStripeCheckout: false,
+            stripePaymentLinks: {},
+          }));
         }
       })
       .catch(() => {});
