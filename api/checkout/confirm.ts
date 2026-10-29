@@ -1,4 +1,4 @@
-import { CATALOG, formatMx, stripeClient, WHATSAPP_NUMBER } from '../_shared';
+import { CATALOG, formatMx, stripeClient, WHATSAPP_NUMBER } from '../_shared.js';
 
 function json(data: unknown, status = 200): Response {
   return Response.json(data, { status });

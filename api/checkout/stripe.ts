@@ -1,4 +1,4 @@
-import { quoteCheckout, stripeClient } from '../_shared';
+import { quoteCheckout, stripeClient } from '../_shared.js';
 
 function json(data: unknown, status = 200): Response {
   return Response.json(data, { status });
