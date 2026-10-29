@@ -475,6 +475,22 @@ export default function App() {
                     </a>
                   </div>
 
+                  <div className="rounded-xl border border-[#2E2840] bg-[#14111D] px-4 py-3.5">
+                    <p className="mb-2 text-xs font-bold uppercase tracking-wide text-white">
+                      Compra en 3 pasos
+                    </p>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed text-[#C4BED4]">
+                      <span><strong className="text-[#A3E635]">1.</strong> Elige tus productos</span>
+                      <ArrowRight aria-hidden="true" className="hidden h-3.5 w-3.5 text-[#746C87] sm:block" />
+                      <span><strong className="text-[#A3E635]">2.</strong> Envía el pedido por WhatsApp</span>
+                      <ArrowRight aria-hidden="true" className="hidden h-3.5 w-3.5 text-[#746C87] sm:block" />
+                      <span><strong className="text-[#A3E635]">3.</strong> Recibe tu opción de pago</span>
+                    </div>
+                    <p className="mt-1.5 text-[11px] text-[#8E87A0]">
+                      Link de pago, OXXO o SPEI; confirmas los detalles por WhatsApp.
+                    </p>
+                  </div>
+
                   <div className="flex flex-wrap items-center gap-2.5 pt-1">
                     <PWAInstallSection />
 
