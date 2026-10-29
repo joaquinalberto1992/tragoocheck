@@ -61,7 +61,7 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
   whatsappNumber: '524792293687',
   instagramUrl: INSTAGRAM_URL,
   customDomain: 'tragoocheck.shop',
-  videoUrl: '/tragoo-oficial.mp4',
+  videoUrl: '/videos/intro-premium.mp4',
   shippingFee: 99,
   freeShippingThreshold: 899,
   speiDiscountPercent: 5,
@@ -475,7 +475,7 @@ export default function App() {
                     <div className="min-w-0">
                       <div className="text-xs font-bold truncate">Video Oficial</div>
                       <div className="text-[10px] text-[#A3E635] truncate">
-                        No huele, no se ve
+                        Mira cómo se usa
                       </div>
                     </div>
                   </button>
