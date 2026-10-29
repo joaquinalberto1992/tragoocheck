@@ -3,8 +3,8 @@ import fs from 'fs';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
-import { POST as stripeCheckoutPost } from './api/checkout/stripe';
-import { GET as stripeCheckoutConfirmGet } from './api/checkout/confirm';
+import { POST as stripeCheckoutPost } from './api/checkout/stripe.js';
+import { GET as stripeCheckoutConfirmGet } from './api/checkout/confirm.js';
 
 dotenv.config();
 

@@ -1,4 +1,4 @@
-import { WHATSAPP_NUMBER } from './_shared';
+import { WHATSAPP_NUMBER } from './_shared.js';
 
 export function GET(_request: Request): Response {
   const key = process.env.STRIPE_SECRET_KEY || '';
