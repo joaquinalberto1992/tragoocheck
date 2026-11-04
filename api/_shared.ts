@@ -4,14 +4,28 @@ export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '524792293687';
 
 export type StripeKeyMode = 'test' | 'live' | null;
 
-export function getStripeKeyMode(key = process.env.STRIPE_SECRET_KEY || ''): StripeKeyMode {
+/**
+ * Vercel's Stripe integration manages STRIPE_SECRET_KEY for Preview and
+ * Production together. Keep that key for Preview tests, and let Production
+ * opt into a separate live key without changing the integration-managed one.
+ */
+export function getStripeSecretKey(
+  vercelEnvironment = process.env.VERCEL_ENV || '',
+): string {
+  if (vercelEnvironment === 'production') {
+    return process.env.STRIPE_SECRET_KEY_LIVE || process.env.STRIPE_SECRET_KEY || '';
+  }
+  return process.env.STRIPE_SECRET_KEY || '';
+}
+
+export function getStripeKeyMode(key = getStripeSecretKey()): StripeKeyMode {
   if (key.startsWith('sk_test_') || key.startsWith('rk_test_')) return 'test';
   if (key.startsWith('sk_live_') || key.startsWith('rk_live_')) return 'live';
   return null;
 }
 
 export function isStripeConfiguredForEnvironment(
-  key = process.env.STRIPE_SECRET_KEY || '',
+  key = getStripeSecretKey(),
   vercelEnvironment = process.env.VERCEL_ENV || '',
 ): boolean {
   const mode = getStripeKeyMode(key);
@@ -54,7 +68,7 @@ const COUPONS: Record<string, { percent: number; minimum: number }> = {
 };
 
 export async function stripeClient(): Promise<Stripe> {
-  const key = process.env.STRIPE_SECRET_KEY;
+  const key = getStripeSecretKey();
   if (!key || !isStripeConfiguredForEnvironment(key)) throw new Error('STRIPE_NOT_CONFIGURED');
   const StripeConstructor = (await import('stripe')).default;
   return new StripeConstructor(key);
