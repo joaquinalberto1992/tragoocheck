@@ -74,8 +74,6 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
   const totalInvestment = wholesaleUnitCost * calcUnits;
   const totalRetailValue = baseRetailPrice * calcUnits;
   const estimatedProfit = totalRetailValue - totalInvestment;
-  const speiExtraPrice = Math.round(totalInvestment * 0.95);
-  const speiUnitCost = (speiExtraPrice / calcUnits).toFixed(2);
   const includedDisplays = Math.max(1, Math.floor(calcUnits / 30));
 
   const handleAddCustomLotToCheckout = () => {
@@ -116,9 +114,8 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
       `• *Cantidad:* ${calcUnits} unidades (-${discountPercent}% OFF)`,
       `• *Costo unitario mayoreo:* $${wholesaleUnitCost} MXN (Público: $${baseRetailPrice} MXN)`,
       `• *Inversión total:* $${totalInvestment.toLocaleString('es-MX')} MXN`,
-      `• *Con 5% desc. SPEI:* $${speiExtraPrice.toLocaleString('es-MX')} MXN ($${speiUnitCost} MXN c/u)`,
       ``,
-      `¿Me compartes el link de pago / datos SPEI u OXXO y confirmación por aquí?`,
+      `¿Me compartes un enlace de pago seguro y los pasos para confirmar el pedido?`,
     ].join('\n');
     return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
   };
@@ -141,9 +138,6 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
           </div>
           <div className="text-xs text-[#C4BED4] space-y-1 md:text-right">
             <div>Facturación CFDI · Exhibidores de mostrador incluidos</div>
-            <div className="text-[#A3E635] font-medium">
-              + 5% de descuento adicional al liquidar por Transferencia SPEI
-            </div>
           </div>
         </div>
 
@@ -401,12 +395,6 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
                       <span className="text-xs font-normal text-[#A19BB2]">MXN c/u</span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-xs text-[#A19BB2]">Con pago SPEI (-5% extra)</div>
-                    <div className="font-mono text-base font-bold text-white tabular-nums">
-                      ${speiUnitCost} MXN c/u
-                    </div>
-                  </div>
                 </div>
 
                 <div className="space-y-2.5 text-xs">
@@ -414,12 +402,6 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
                     <span>Inversión del lote ({calcUnits} pzas):</span>
                     <span className="font-mono font-semibold text-white tabular-nums">
                       ${totalInvestment.toLocaleString('es-MX')} MXN
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-[#A3E635]">
-                    <span>Total con Transferencia SPEI (-5%):</span>
-                    <span className="font-mono font-bold tabular-nums">
-                      ${speiExtraPrice.toLocaleString('es-MX')} MXN
                     </span>
                   </div>
                   <div className="flex justify-between text-[#C4BED4]">
@@ -454,7 +436,7 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
                   >
                     <ShoppingBag className="w-4 h-4" />
                     <span>
-                      Pedir este lote hoy (Link de Pago, OXXO o SPEI) · ${totalInvestment.toLocaleString('es-MX')}
+                      Pedir este lote hoy (solicitar link de pago) · ${totalInvestment.toLocaleString('es-MX')}
                     </span>
                   </button>
 

@@ -64,7 +64,7 @@ export const ACTIVE_COUPONS: PromoCoupon[] = [
     discountPercent: 10,
     minPurchase: 449,
     description:
-      '10% de descuento en pedidos desde $449 MXN (acumulable con el 5% extra por Transferencia SPEI).',
+      '10% de descuento en pedidos desde $449 MXN.',
   },
   {
     code: 'AMIGAS15',
@@ -484,7 +484,6 @@ export const WHOLESALE_KITS: ProductKit[] = [
       '500 Kits Noche Completa (2,500 tiras + 5,000 stickers + 500 llaveros)',
       'Venta al público: $224,500 MXN → Tu ganancia neta: $142,000 MXN (+172% ROI)',
       '15 Exhibidores de mostrador + Atención ejecutiva directa y reposición garantizada',
-      'Con pago SPEI (-5% extra) baja a $156.75 MXN por kit ($78,375 MXN total)',
     ],
     idealFor: 'Socios comerciales nacionales, festivales masivos, corporativos y licitaciones.',
     stockCount: 3,
@@ -615,7 +614,7 @@ export const FAQS = [
   {
     question: '¿Cómo realizo mi pedido y cuáles son las formas de pago?',
     answer:
-      'Agrega tus productos al carrito y revisa el total y el envío. Cuando el pago directo esté activo, puedes elegir tarjeta en el checkout seguro de Stripe; también están disponibles el link por WhatsApp, OXXO y SPEI. Tras pagar con Stripe, se abre WhatsApp con el folio para coordinar el envío.',
+      'Agrega tus productos al carrito y revisa el total y el envío. Cuando el pago con tarjeta esté habilitado, podrás pagar en el checkout seguro de Stripe. También puedes solicitar atención por WhatsApp para coordinar tu pedido.',
   },
   {
     question: '¿Cómo se aplica el sticker y qué significa el resultado?',

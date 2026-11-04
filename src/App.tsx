@@ -55,9 +55,10 @@ import {
 import squadPackImage from './assets/images/tragoo_pack_squad_5x_1792022755033.jpg';
 
 const DEFAULT_CONFIG: MerchantConfigClient = {
-  bankName: 'BBVA México / STP (SPEI) / OXXO',
-  clabe: '012180015489203148',
-  accountHolder: 'Tragoo Check México',
+  bankName: '',
+  clabe: '',
+  accountHolder: '',
+  hasSpeiAccount: false,
   cardNumberRef: 'Pago en OXXO o Link de Pago por WhatsApp',
   whatsappNumber: '524792293687',
   instagramUrl: INSTAGRAM_URL,
@@ -100,7 +101,7 @@ export default function App() {
     fetch('/api/config')
       .then((r) => r.json())
       .then((data) => {
-        if (data && data.clabe) {
+        if (data && typeof data === 'object') {
           setMerchantConfig((previous) => ({
             ...previous,
             ...data,
@@ -247,11 +248,14 @@ export default function App() {
   };
 
   const handleCopyQuickClabe = () => {
+    if (!merchantConfig.hasSpeiAccount || !merchantConfig.clabe) return;
     navigator.clipboard.writeText(merchantConfig.clabe.replace(/\s+/g, ''));
     setCopiedClabeBanner(true);
     setTimeout(() => setCopiedClabeBanner(false), 2000);
   };
 
+  const paymentInfoColumns =
+    2 + Number(Boolean(merchantConfig.hasStripeCheckout)) + Number(Boolean(merchantConfig.hasSpeiAccount));
   const displayedRetailProducts =
     catalogFilter === 'individual'
       ? PRODUCT_KITS
@@ -363,7 +367,7 @@ export default function App() {
       </header>
 
       <a href="#promociones" className="block bg-[#A3E635] px-4 py-2.5 text-center text-xs sm:text-sm font-extrabold tracking-wide text-[#0B0910] hover:bg-[#BEF264]">
-        CUPONES EN TU PEDIDO · HOY10: 10% DESDE $449 · AMIGAS15: 15% DESDE $1,100 · 5% EXTRA CON SPEI · VER DETALLES
+        CUPONES EN TU PEDIDO · HOY10: 10% DESDE $449 · AMIGAS15: 15% DESDE $1,100{merchantConfig.hasSpeiAccount ? ' · 5% EXTRA CON SPEI' : ''} · VER DETALLES
       </a>
 
       {/* Optional Stripe Return Confirmation Banner */}
@@ -429,7 +433,7 @@ export default function App() {
                       ·
                     </span>
                     <span className="text-[#C4BED4]">
-                      WhatsApp 479 229 3687 · Link de Pago, OXXO o SPEI
+                      WhatsApp 479 229 3687 · Opciones de pago disponibles al pedir
                     </span>
                   </div>
 
@@ -449,8 +453,8 @@ export default function App() {
                     presencia de algunas sustancias según el tipo de prueba y sus
                     instrucciones.{' '}
                     {merchantConfig.hasStripeCheckout
-                      ? 'Paga con tarjeta en línea mediante Stripe, o elige OXXO o SPEI; también te atendemos por WhatsApp.'
-                      : 'Envía tu pedido por WhatsApp para solicitar link de pago con tarjeta, OXXO o SPEI (-5%).'}
+                      ? 'Paga con tarjeta en el checkout seguro de Stripe; también te atendemos por WhatsApp.'
+                      : 'Envía tu pedido por WhatsApp para solicitar un link de pago con tarjeta.'}
                   </p>
                   <p className="max-w-2xl text-sm leading-relaxed text-[#A3E635]">
                     Creemos que contar con más información y herramientas de autocuidado puede ayudar a las personas a cuidarse y acompañarse mejor.
@@ -490,7 +494,7 @@ export default function App() {
                       <span><strong className="text-[#A3E635]">3.</strong> Elige cómo pagar</span>
                     </div>
                     <p className="mt-1.5 text-[11px] text-[#8E87A0]">
-                      {merchantConfig.hasStripeCheckout ? 'Tarjeta en línea con Stripe, OXXO o SPEI; WhatsApp sigue disponible.' : 'Link de pago con tarjeta, OXXO o SPEI por WhatsApp.'}
+                      {merchantConfig.hasStripeCheckout ? 'Paga con tarjeta en Stripe; WhatsApp está disponible para coordinar el envío.' : 'Solicita un link de pago con tarjeta por WhatsApp.'}
                     </p>
                   </div>
 
@@ -626,8 +630,8 @@ export default function App() {
                 </div>
                 <div className="text-xs text-[#C4BED4] mt-0.5">
                   {merchantConfig.hasStripeCheckout
-                    ? 'Checkout de Stripe para tarjeta; WhatsApp, OXXO y SPEI como alternativas.'
-                    : 'Escríbenos para elegir link de pago, OXXO o SPEI.'}
+                    ? 'Checkout de Stripe para tarjeta; WhatsApp para resolver dudas y coordinar el envío.'
+                    : 'Escríbenos por WhatsApp para solicitar un link de pago con tarjeta.'}
                 </div>
               </div>
 
@@ -677,7 +681,7 @@ export default function App() {
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div className="space-y-1.5">
                 <div className="text-xs font-medium text-[#A3E635]">
-                  Promociones de lanzamiento · Acumulables con el 5% extra por Transferencia SPEI
+                  Promociones de lanzamiento{merchantConfig.hasSpeiAccount ? ' · 5% extra pagando por SPEI' : ''}
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
                   Cupones activos hoy y Paquetes Grupales (Envío Gratis desde $899 MXN)
@@ -976,27 +980,29 @@ export default function App() {
                     <span>Abrir carrito y elegir pago ({cartCount})</span>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={handleCopyQuickClabe}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#1E192B] hover:bg-[#2A233B] text-xs font-semibold text-white transition-colors cursor-pointer"
-                  >
-                    {copiedClabeBanner ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-[#A3E635]" />
-                        <span>CLABE Copiada</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3.5 h-3.5 text-[#A3E635]" />
-                        <span>Copiar CLABE SPEI</span>
-                      </>
-                    )}
-                  </button>
+                  {merchantConfig.hasSpeiAccount && (
+                    <button
+                      type="button"
+                      onClick={handleCopyQuickClabe}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl bg-[#1E192B] hover:bg-[#2A233B] text-xs font-semibold text-white transition-colors cursor-pointer"
+                    >
+                      {copiedClabeBanner ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-[#A3E635]" />
+                          <span>CLABE Copiada</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-[#A3E635]" />
+                          <span>Copiar CLABE SPEI</span>
+                        </>
+                      )}
+                    </button>
+                  )}
                 </div>
               </div>
 
-              <div className={`grid grid-cols-1 ${merchantConfig.hasStripeCheckout ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-3.5`}>
+              <div className={`grid grid-cols-1 md:grid-cols-2 ${paymentInfoColumns === 4 ? 'xl:grid-cols-4' : paymentInfoColumns === 3 ? 'xl:grid-cols-3' : 'xl:grid-cols-2'} gap-3.5`}>
                 {merchantConfig.hasStripeCheckout && (
                   <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30] space-y-1.5">
                     <div className="flex items-center gap-2 text-xs font-bold text-white">
@@ -1034,7 +1040,7 @@ export default function App() {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30] space-y-1.5">
+                {merchantConfig.hasSpeiAccount && <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30] space-y-1.5">
                   <div className="flex items-center gap-2 text-xs font-bold text-white">
                     <Building2 className="w-4 h-4 text-[#A3E635]" />
                     <span>{merchantConfig.hasStripeCheckout ? '4. Transferencia SPEI (-5% Extra)' : '3. Transferencia SPEI (-5% Extra)'}</span>
@@ -1047,7 +1053,7 @@ export default function App() {
                     </span>
                     ).
                   </p>
-                </div>
+                </div>}
               </div>
             </div>
           </div>
@@ -1248,8 +1254,8 @@ export default function App() {
                 const isOpen = openFaqIndex === idx;
                 const answer = idx === 0
                   ? merchantConfig.hasStripeCheckout
-                    ? `Agrega tus productos al carrito, revisa el total y el envío y paga con tarjeta en el checkout seguro de Stripe. Después puedes enviar el folio por WhatsApp para coordinar el envío. También puedes elegir link de pago por WhatsApp, OXXO o SPEI.`
-                    : `Agrega tus productos al carrito y revisa el total y el envío. Escríbenos por WhatsApp para recibir un link de pago con tarjeta, una opción de OXXO o los datos SPEI con 5% de descuento adicional.`
+                    ? `Agrega tus productos al carrito, revisa el total y el envío y paga con tarjeta en el checkout seguro de Stripe. Después puedes enviar el folio por WhatsApp para coordinar el envío.`
+                    : `Agrega tus productos al carrito y revisa el total y el envío. Escríbenos por WhatsApp para solicitar un link de pago con tarjeta.`
                   : faq.answer;
                 return (
                   <div key={idx} className="py-5">
@@ -1286,7 +1292,7 @@ export default function App() {
                 </h3>
                 <p className="text-xs text-[#C4BED4]">
                   Atención inmediata en el <strong className="text-white">479 229 3687</strong> ·
-                  {merchantConfig.hasStripeCheckout ? 'Paga con tarjeta en línea o elige OXXO/SPEI; WhatsApp está disponible si necesitas ayuda.' : 'Recibe tu link de pago, ficha OXXO o SPEI (-5% extra) por WhatsApp.'}
+                  {merchantConfig.hasStripeCheckout ? 'Paga con tarjeta en el checkout de Stripe; WhatsApp está disponible si necesitas ayuda.' : 'Solicita un link de pago con tarjeta por WhatsApp.'}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3 shrink-0">
@@ -1341,8 +1347,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-xs text-[#8E87A0] leading-relaxed">
-                Compra en línea o por WhatsApp 479 229 3687 (Link de pago, OXXO o
-                SPEI). Pedidos de 1 sola pieza o menores a $899 MXN pagan $99 MXN de
+                Compra en línea o por WhatsApp 479 229 3687. Pedidos de 1 sola pieza o menores a $899 MXN pagan $99 MXN de
                 envío; envío gratis en compras desde $899 MXN.
               </p>
             </div>

@@ -27,6 +27,7 @@ export interface MerchantConfigClient {
   bankName: string;
   clabe: string;
   accountHolder: string;
+  hasSpeiAccount?: boolean;
   cardNumberRef: string;
   whatsappNumber: string;
   instagramUrl?: string;
@@ -471,7 +472,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 : 'Finalizar Pedido Directo por WhatsApp'}
             </h2>
             <p className="text-[11px] sm:text-xs text-[#A3E635]">
-              WhatsApp 479 229 3687 · Tarjeta, OXXO o SPEI
+              WhatsApp 479 229 3687 · Atención a tu pedido
             </p>
           </div>
           <button
@@ -826,7 +827,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <label className="block text-xs font-bold text-white">
                   1. Elige cómo deseas pagar
                 </label>
-                <div className={`grid grid-cols-1 ${merchantConfig.hasStripeCheckout ? 'sm:grid-cols-4' : 'sm:grid-cols-3'} gap-2`}>
+                <div className={`grid grid-cols-1 ${merchantConfig.hasStripeCheckout && merchantConfig.hasSpeiAccount ? 'sm:grid-cols-4' : merchantConfig.hasStripeCheckout || merchantConfig.hasSpeiAccount ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-2`}>
                   {merchantConfig.hasStripeCheckout && (
                     <button
                       type="button"
@@ -893,28 +894,30 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </div>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('spei')}
-                    className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
-                      paymentMethod === 'spei'
-                        ? 'bg-[#171E12] border-[#A3E635] text-white'
-                        : 'bg-[#14111D] border-[#262136] text-[#A19BB2] hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <Building2 className="w-4 h-4 text-[#A3E635]" />
-                      <span className="font-mono text-[10px] font-bold text-[#A3E635]">
-                        -{merchantConfig.speiDiscountPercent || 5}% EXTRA
-                      </span>
-                    </div>
-                    <div className="text-xs font-bold text-white mt-1.5">
-                      Transferencia SPEI
-                    </div>
-                    <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
-                      Descuento adicional incluido en tu total
-                    </div>
-                  </button>
+                  {merchantConfig.hasSpeiAccount && (
+                    <button
+                      type="button"
+                      onClick={() => setPaymentMethod('spei')}
+                      className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
+                        paymentMethod === 'spei'
+                          ? 'bg-[#171E12] border-[#A3E635] text-white'
+                          : 'bg-[#14111D] border-[#262136] text-[#A19BB2] hover:text-white'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <Building2 className="w-4 h-4 text-[#A3E635]" />
+                        <span className="font-mono text-[10px] font-bold text-[#A3E635]">
+                          -{merchantConfig.speiDiscountPercent || 5}% EXTRA
+                        </span>
+                      </div>
+                      <div className="text-xs font-bold text-white mt-1.5">
+                        Transferencia SPEI
+                      </div>
+                      <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
+                        Descuento adicional incluido en tu total
+                      </div>
+                    </button>
+                  )}
                 </div>
               </div>
 
