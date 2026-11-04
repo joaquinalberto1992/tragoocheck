@@ -188,27 +188,18 @@ export const ReactionSimulator: React.FC<ReactionSimulatorProps> = ({ onSelectKi
               <div className="relative h-56 rounded-xl bg-[#0B0910] border border-[#231E30] flex flex-col items-center justify-center p-6 overflow-hidden">
                 {testFormat === 'sticker' ? (
                   <div className="flex flex-col items-center">
-                    {/* Fingernail Silhouette + Circular Reactive Sticker */}
+                    {/* Fingernail silhouette + tiny heart sticker matching the real product */}
                     <div className="relative w-28 h-36 rounded-t-full bg-[#241E2E] border-2 border-[#3A314A] flex items-center justify-center shadow-inner">
-                      {/* Circular Sticker */}
-                      <div
-                        className="relative w-16 h-16 rounded-full border-2 border-black/30 shadow-md transition-colors duration-300 overflow-hidden flex flex-col"
-                        style={{ backgroundColor: '#FACC15' }}
-                      >
-                        {/* Top half reacts like in the video! */}
-                        <div
-                          className={`w-full h-1/2 transition-colors duration-500 ${
-                            showColorShift ? 'bg-[#15803D]' : 'bg-[#FACC15]'
-                          }`}
-                        />
-                        <div className="w-full h-1/2 bg-[#EAB308] flex items-center justify-center">
-                          <span className="text-[9px] font-mono font-bold text-black/70">TRAGOO</span>
-                        </div>
-
-                        {/* Water droplet effect */}
+                      <div className="relative h-6 w-6 drop-shadow-md" aria-label="Sticker pequeño en forma de corazón">
+                        <svg viewBox="0 0 32 32" className="h-full w-full" aria-hidden="true">
+                          <path d="M16 28S3 20.3 3 12a7 7 0 0 1 13-4 7 7 0 0 1 13 4c0 8.3-13 16-13 16Z" fill="#EAB308" />
+                          {showColorShift && (
+                            <path d="M16 8A7 7 0 0 0 3 12c0 8.3 13 16 13 16Z" fill="#15803D" />
+                          )}
+                        </svg>
                         {(isTesting || completed) && (
                           <div
-                            className={`absolute inset-0 m-auto w-5 h-5 rounded-full border transition-opacity duration-300 ${
+                            className={`absolute inset-0 m-auto h-2 w-2 rounded-full border transition-opacity duration-300 ${
                               showColorShift
                                 ? 'bg-[#166534]/60 border-white/50'
                                 : 'bg-white/30 border-white/60'
@@ -219,8 +210,11 @@ export const ReactionSimulator: React.FC<ReactionSimulatorProps> = ({ onSelectKi
                     </div>
                     <span className="text-xs text-[#A19BB2] mt-3">
                       {showColorShift
-                        ? 'Cambio de amarillo a verde oscuro detectado'
-                        : 'Color base amarillo sin alteración'}
+                        ? 'Ejemplo visual de cambio de color'
+                        : 'Sticker real en tamaño aproximado'}
+                    </span>
+                    <span className="mt-2 max-w-xs text-center text-[10px] leading-relaxed text-[#817A91]">
+                      Simulación ilustrativa. Sigue las instrucciones del producto; un resultado no confirma que una bebida sea segura.
                     </span>
                   </div>
                 ) : (

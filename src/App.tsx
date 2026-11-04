@@ -991,7 +991,7 @@ export default function App() {
               <div className="lg:col-span-6 space-y-6">
                 <div className="space-y-1.5">
                   <div className="text-xs font-semibold text-[#A3E635]">
-                    Reverso Oficial del Empaque · Stickers de Detección para Uñas
+                    Formato real de la sticker para uñas
                   </div>
                   <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
                     CÓMO APLICAR:
@@ -1098,7 +1098,7 @@ export default function App() {
                 <div className="rounded-2xl overflow-hidden border border-[#2E2840] bg-[#E2E2E2]">
                   <img
                     src={KIT_STICKERS_IMAGE}
-                    alt="Frente del empaque Tragoo Check de stickers para uñas"
+                    alt="Sticker pequeño en forma de corazón colocado sobre una uña, en escala discreta"
                     referrerPolicy="no-referrer"
                     className="w-full h-auto object-cover"
                   />

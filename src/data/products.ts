@@ -35,7 +35,7 @@ import heroProductImage from '../assets/images/tragoo-kit-noche-completa-branded
 import heroLifestyleImage from '../assets/images/hero_drink_test_1792021357545.jpg';
 import wholesaleBoxImage from '../assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg';
 import wholesaleMasterImage from '../assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg';
-import kitStickersImage from '../assets/images/tragoo_kit_stickers_unas_1792022749823.jpg';
+import kitStickersImage from '../assets/images/tragoo-sticker-corazon-closeup.png';
 import kitStripsImage from '../assets/images/tragoo_kit_tiras_reactivas_1792022751432.jpg';
 import duoPackImage from '../assets/images/tragoo_pack_duo_amigas_1792022753318.jpg';
 import squadPackImage from '../assets/images/tragoo_pack_squad_5x_1792022755033.jpg';
@@ -129,7 +129,7 @@ export const PRODUCT_KITS: ProductKit[] = [
     category: 'individual',
     name: 'Kit Stickers Para Uñas (10 pzas)',
     subtitle:
-      '10 stickers de detección para uñas en empaque Tragoo Check. Si la mitad del sticker se vuelve verde, NO TOMES.',
+      '10 stickers pequeños en forma de corazón, diseñados para colocarse discretamente sobre una uña. Sigue las instrucciones incluidas.',
     kicker: 'Individual · +$99 envío (Envío gratis desde $899)',
     price: 249,
     compareAtPrice: 299,
@@ -141,9 +141,9 @@ export const PRODUCT_KITS: ProductKit[] = [
     substancesDetected: 'GHB (ácido gamma-hidroxibutírico)',
     reactionTime: '10 a 15 segundos',
     includedItems: [
-      '10 stickers reactivos con adhesivo hipoalergénico para uña (un solo uso)',
+      '10 stickers pequeños en forma de corazón para uñas (un solo uso)',
       'Tarjeta negra impermeable portastickers + bolsa doy-pack Tragoo Check',
-      'Indicador colorimétrico en corazón; interpreta el resultado según las instrucciones del fabricante',
+      'Indicador colorimétrico; interpreta el resultado según las instrucciones del fabricante',
     ],
     idealFor:
       'Llevar puesto en la uña antes de salir y checar cualquier trago con 1 gota.',

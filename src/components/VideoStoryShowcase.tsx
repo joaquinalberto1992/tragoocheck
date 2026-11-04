@@ -56,7 +56,7 @@ export const WOMEN_PERSUASIVE_SLIDES: PersuasiveSlide[] = [
   },
   {
     id: 'slide-4',
-    slogan: 'SI LA MITAD DEL STICKER SE VUELVE VERDE, NO TOMES.',
+    slogan: 'REVISA EL RESULTADO SEGÚN EL EMPAQUE.',
     phrase:
       'Sigue las instrucciones del fabricante. Un cambio de color puede indicar una reacción, pero ningún resultado descarta todas las sustancias ni sustituye pedir ayuda.',
     subtext: 'Frase 4 de 5 · Lectura pausada (5.8 seg)',
