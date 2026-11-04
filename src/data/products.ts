@@ -1,4 +1,4 @@
-export type ProductCategory = 'individual' | 'promocion' | 'mayoreo';
+export type ProductCategory = 'individual' | 'promocion' | 'mayoreo' | 'familia';
 
 export interface ProductKit {
   id: string;
@@ -45,6 +45,7 @@ import braceletTrioImage from '../assets/images/pulseras-trio-amigas.jpg';
 import braceletGroupImage from '../assets/images/pulseras-grupo-cinco.png';
 import braceletRefillsImage from '../assets/images/repuestos-pulseras-30.jpg';
 import testingStrawsImage from '../assets/images/popotes-prueba.jpg';
+import sosFamilyImage from '../assets/images/tragoo-sos-family.jpg';
 
 export const HERO_PRODUCT_IMAGE = heroProductImage;
 export const HERO_LIFESTYLE_IMAGE = heroLifestyleImage;
@@ -572,18 +573,49 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
   },
 ];
 
+export const FAMILY_PRODUCTS: ProductKit[] = [
+  {
+    id: 'sos-family',
+    category: 'familia',
+    name: 'SOS Family — Pulsera de emergencia',
+    subtitle:
+      'Una opción de alerta para acompañar a personas adultas mayores y mantener a la familia más cerca. El empaque indica botón SOS, avisos a familiares y ubicación compartida.',
+    kicker: 'Tragoo Check Family · Precio especial',
+    price: 699,
+    unitPriceNumeric: 699,
+    unitPriceLabel: '1 pulsera SOS · $699 MXN',
+    kitEquivalentCount: 0,
+    image: sosFamilyImage,
+    gallery: [{ src: sosFamilyImage, alt: 'Pulsera SOS Family Tragoo Check, empaque, funciones indicadas y contenido del paquete' }],
+    contentsSummary: '1 pulsera SOS, cable USB de carga y manual de uso',
+    substancesDetected: '',
+    reactionTime: '',
+    includedItems: [
+      'Pulsera SOS con botón de emergencia',
+      'Cable USB de carga',
+      'Manual de uso',
+      'El empaque indica avisos a familiares y ubicación compartida',
+    ],
+    idealFor:
+      'Familias que buscan una forma sencilla de pedir apoyo para una persona adulta mayor. Para niñas y niños, úsala solo con supervisión adulta.',
+    stockCount: null,
+    featured: true,
+  },
+];
+
 export const ALL_PRODUCTS: ProductKit[] = [
   ...PRODUCT_KITS,
   ...PROMO_BUNDLES,
   ...WHOLESALE_KITS,
   ...BRACELET_PRODUCTS,
+  ...FAMILY_PRODUCTS,
 ];
 
 export const FAQS = [
   {
     question: '¿Cómo realizo mi pedido y cuáles son las formas de pago?',
     answer:
-      '¡Es súper rápido! Elige tus kits en la página, llena tus datos de envío y toca "Enviar Pedido a WhatsApp". Tu pedido se enviará directo a nuestro WhatsApp oficial 479 229 3687, donde te daremos al instante tu Link de Pago con Tarjeta, tu referencia para Pago en Efectivo en OXXO o los datos de Transferencia SPEI (-5% de descuento extra) junto con la confirmación de tu envío.',
+      'Agrega tus productos al carrito y revisa el total y el envío. Cuando el pago directo esté activo, puedes elegir tarjeta en el checkout seguro de Stripe; también están disponibles el link por WhatsApp, OXXO y SPEI. Tras pagar con Stripe, se abre WhatsApp con el folio para coordinar el envío.',
   },
   {
     question: '¿Cómo se aplica el sticker y qué significa el resultado?',

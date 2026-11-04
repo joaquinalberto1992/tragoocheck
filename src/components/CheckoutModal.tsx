@@ -169,6 +169,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [confirmedOrder, setConfirmedOrder] = useState<ConfirmedOrder | null>(null);
 
+  useEffect(() => {
+    if (isOpen) {
+      setPaymentMethod(merchantConfig.hasStripeCheckout ? 'stripe' : 'link_pago');
+    }
+  }, [isOpen, merchantConfig.hasStripeCheckout]);
+
   if (!isOpen) return null;
 
   const subtotal = Math.round(
@@ -926,7 +932,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
               <div className="rounded-xl border border-[#262136] bg-[#14111D] px-3.5 py-3 text-[11px] leading-relaxed text-[#C4BED4]">
                 {paymentMethod === 'stripe'
-                  ? 'Pagarás en el checkout alojado por Stripe. Al confirmarse el pago, se abrirá WhatsApp con tu folio y el pedido listo para enviar.'
+                  ? 'Pagarás en el checkout alojado por Stripe. Al confirmarse el pago, se abrirá WhatsApp con tu folio y el pedido listo para enviar. No almacenamos los datos de tu tarjeta.'
                   : 'Al continuar se abrirá WhatsApp con el resumen. Aún no pagas: confirma disponibilidad y método; después compartes tus datos de entrega por el chat.'}
               </div>
 
@@ -937,7 +943,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 className="space-y-3 pt-1"
               >
                 <div className="text-xs font-bold text-white">
-                  2. Nombre para identificar tu pedido (opcional)
+                  {paymentMethod === 'stripe' ? '2. Datos de contacto y envío' : '2. Nombre para identificar tu pedido (opcional)'}
                 </div>
                 <label className="sr-only" htmlFor="checkout-customer-name">
                   Nombre para identificar tu pedido (opcional)
@@ -945,14 +951,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <input
                   id="checkout-customer-name"
                   type="text"
+                  required={paymentMethod === 'stripe'}
                   autoComplete="name"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder="Tu nombre (opcional)"
+                  placeholder={paymentMethod === 'stripe' ? 'Nombre completo para el envío' : 'Tu nombre (opcional)'}
                   className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
                 />
                 <div className="rounded-lg border border-[#262136] bg-[#14111D] px-3 py-2.5 text-[11px] leading-relaxed text-[#C4BED4]">
-                  No necesitas escribir aquí tu teléfono ni tu dirección. Se abrirá WhatsApp con el folio, productos, descuentos y total; primero confirmas el pedido y luego compartes tus datos de entrega por el chat.
+                  {paymentMethod === 'stripe'
+                    ? 'El pago se procesa en la página segura de Stripe. Tragoo Check no recibe ni almacena los datos de tu tarjeta.'
+                    : 'No necesitas escribir aquí tu teléfono ni tu dirección. Se abrirá WhatsApp con el folio, productos, descuentos y total; primero confirmas el pedido y luego compartes tus datos de entrega por el chat.'}
                 </div>
                 {paymentMethod === 'stripe' && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">

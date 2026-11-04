@@ -24,6 +24,7 @@ export const CATALOG: Record<string, { name: string; price: number }> = {
   'pulsera-individual': { name: 'Pulsera Individual', price: 599 },
   'pulseras-trio': { name: 'Pack Trío de Pulseras', price: 1499 },
   'pulseras-grupo': { name: 'Pack Grupo de Pulseras', price: 2299 },
+  'sos-family': { name: 'SOS Family — Pulsera de emergencia', price: 699 },
   'regalo-stickers-5': { name: 'Regalo: tarjeta extra de 5 stickers', price: 0 },
 };
 

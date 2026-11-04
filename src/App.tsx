@@ -27,6 +27,7 @@ import {
 import {
   PRODUCT_KITS,
   PROMO_BUNDLES,
+  FAMILY_PRODUCTS,
   ALL_PRODUCTS,
   ACTIVE_COUPONS,
   HERO_PRODUCT_IMAGE,
@@ -103,9 +104,6 @@ export default function App() {
           setMerchantConfig((previous) => ({
             ...previous,
             ...data,
-            // Keep automatic Stripe checkout paused until the merchant is ready.
-            hasLiveStripeKey: false,
-            hasStripeCheckout: false,
             stripePaymentLinks: {},
           }));
         }
@@ -301,6 +299,12 @@ export default function App() {
               Promociones
             </a>
             <a
+              href="#familia"
+              className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+            >
+              Family
+            </a>
+            <a
               href="#mayoreo"
               className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
@@ -328,7 +332,7 @@ export default function App() {
               className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-lg bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
             >
               <MessageCircle className="w-3.5 h-3.5" />
-              <span>{cartCount ? `Pedir por WhatsApp · (${cartCount})` : 'Ver kits y precios'}</span>
+              <span>{cartCount ? `Ir al pago · (${cartCount})` : 'Ver kits y precios'}</span>
             </button>
             <button
               type="button"
@@ -347,6 +351,7 @@ export default function App() {
             {[
               ['Kits', '#kits'],
               ['Promociones', '#promociones'],
+              ['Tragoo Check Family', '#familia'],
               ['Mayoreo', '#mayoreo'],
               ['Simulador', '#simulador'],
               ['Preguntas', '#preguntas'],
@@ -442,12 +447,10 @@ export default function App() {
                     <strong className="text-white">tiras reactivas</strong> con
                     estuche llavero mini-tumbler, diseñadas para indicar la posible
                     presencia de algunas sustancias según el tipo de prueba y sus
-                    instrucciones. Envía tu pedido
-                    directo a nuestro WhatsApp y recibe tu{' '}
-                    <strong className="text-white">
-                      Link de Pago, ficha OXXO o SPEI (-5%)
-                    </strong>
-                    .
+                    instrucciones.{' '}
+                    {merchantConfig.hasStripeCheckout
+                      ? 'Paga con tarjeta en línea mediante Stripe, o elige OXXO o SPEI; también te atendemos por WhatsApp.'
+                      : 'Envía tu pedido por WhatsApp para solicitar link de pago con tarjeta, OXXO o SPEI (-5%).'}
                   </p>
                   <p className="max-w-2xl text-sm leading-relaxed text-[#A3E635]">
                     Creemos que contar con más información y herramientas de autocuidado puede ayudar a las personas a cuidarse y acompañarse mejor.
@@ -462,8 +465,8 @@ export default function App() {
                       onClick={() => handleBuyNow(PRODUCT_KITS[0])}
                       className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-sm transition-colors cursor-pointer whitespace-nowrap shrink-0 shadow-lg shadow-[#A3E635]/10"
                     >
-                      <MessageCircle className="w-4 h-4 shrink-0" />
-                      <span>Pedir Kit Noche Completa · $449 MXN</span>
+                      <CreditCard className="w-4 h-4 shrink-0" />
+                      <span>Comprar Kit Noche Completa · $449 MXN</span>
                       <ArrowRight className="w-4 h-4 shrink-0" />
                     </button>
 
@@ -482,12 +485,12 @@ export default function App() {
                     <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed text-[#C4BED4]">
                       <span><strong className="text-[#A3E635]">1.</strong> Elige tus productos</span>
                       <ArrowRight aria-hidden="true" className="hidden h-3.5 w-3.5 text-[#746C87] sm:block" />
-                      <span><strong className="text-[#A3E635]">2.</strong> Envía el pedido por WhatsApp</span>
+                      <span><strong className="text-[#A3E635]">2.</strong> Revisa y completa tu pedido</span>
                       <ArrowRight aria-hidden="true" className="hidden h-3.5 w-3.5 text-[#746C87] sm:block" />
-                      <span><strong className="text-[#A3E635]">3.</strong> Recibe tu opción de pago</span>
+                      <span><strong className="text-[#A3E635]">3.</strong> Elige cómo pagar</span>
                     </div>
                     <p className="mt-1.5 text-[11px] text-[#8E87A0]">
-                      Link de pago, OXXO o SPEI; confirmas los detalles por WhatsApp.
+                      {merchantConfig.hasStripeCheckout ? 'Tarjeta en línea con Stripe, OXXO o SPEI; WhatsApp sigue disponible.' : 'Link de pago con tarjeta, OXXO o SPEI por WhatsApp.'}
                     </p>
                   </div>
 
@@ -619,13 +622,12 @@ export default function App() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-2">
               <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30]">
                 <div className="font-mono text-base sm:text-lg font-bold text-[#A3E635] tabular-nums">
-                  WhatsApp 479 229 3687
+                  {merchantConfig.hasStripeCheckout ? 'Pago con tarjeta en línea' : 'WhatsApp 479 229 3687'}
                 </div>
                 <div className="text-xs text-[#C4BED4] mt-0.5">
-                  Envía tu pedido directo por WhatsApp para solicitar tu{' '}
-                  <strong className="text-white">
-                    Link de Pago o ficha OXXO
-                  </strong>
+                  {merchantConfig.hasStripeCheckout
+                    ? 'Checkout de Stripe para tarjeta; WhatsApp, OXXO y SPEI como alternativas.'
+                    : 'Escríbenos para elegir link de pago, OXXO o SPEI.'}
                 </div>
               </div>
 
@@ -682,7 +684,7 @@ export default function App() {
                 </h2>
               </div>
               <span className="text-xs text-[#A19BB2]">
-                Toca cualquier cupón para aplicarlo automáticamente en tu pedido de WhatsApp
+                Toca cualquier cupón para aplicarlo automáticamente al finalizar tu pedido
               </span>
             </div>
 
@@ -722,6 +724,76 @@ export default function App() {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+        </section>
+
+
+        <section id="familia" className="border-t border-[#231E30] bg-gradient-to-br from-[#17101F] via-[#130F1B] to-[#1D1428] py-12 sm:py-16 scroll-mt-20">
+          <div className="max-w-[1160px] mx-auto px-4 sm:px-6">
+            <div className="mb-6 sm:mb-8 max-w-2xl">
+              <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#DDA8FF]">Tragoo Check Family</div>
+              <h2 className="mt-2 text-2xl sm:text-4xl font-extrabold tracking-tight text-white [text-wrap:balance]">Más cerca de quienes quieres</h2>
+              <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#D5CDE0]">Una propuesta de apoyo familiar para personas adultas mayores y para salidas acompañadas con niñas y niños. Diseñada para dar más tranquilidad en el día a día.</p>
+            </div>
+
+            {FAMILY_PRODUCTS.map((product) => (
+              <article key={product.id} className="overflow-hidden rounded-3xl border border-[#4B3463] bg-[#F9F5FF] text-[#21172B] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+                <div className="grid md:grid-cols-[1.05fr_0.95fr]">
+                  <div className="relative min-h-[260px] sm:min-h-[360px] bg-[#160F1D]">
+                    <img src={product.image} alt="Pulsera SOS Family Tragoo Check para personas adultas mayores, empaque y contenido" className="absolute inset-0 h-full w-full object-contain" loading="lazy" />
+                  </div>
+                  <div className="flex flex-col justify-center p-5 sm:p-8 lg:p-10">
+                    <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#F1DDFE] px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#67249A]">
+                      <span aria-hidden="true">💜</span> Tranquilidad para la familia
+                    </div>
+                    <h3 className="mt-4 text-2xl sm:text-3xl font-extrabold leading-tight">SOS Family</h3>
+                    <p className="mt-3 text-sm leading-relaxed text-[#54485E]">{product.subtitle}</p>
+
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {product.includedItems.slice(0, 3).map((item) => (
+                        <div key={item} className="flex items-start gap-2 rounded-xl border border-[#E8DDF0] bg-white/80 p-3 text-xs leading-relaxed text-[#413549]">
+                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#7C2EAF]" />{item}
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-5 rounded-xl border border-[#E8DDF0] bg-white/70 p-3 text-xs leading-relaxed text-[#5C5263]">
+                      Para menores, requiere acompañamiento de una persona adulta. Consulta antes de comprar los requisitos de conexión, cobertura y configuración del dispositivo.
+                    </div>
+
+                    <div className="mt-6 flex flex-wrap items-end gap-x-3 gap-y-2">
+                      <span className="text-3xl font-black tabular-nums text-[#24172F]">{'$'}{product.price.toLocaleString('es-MX')}</span>
+                      <span className="pb-1 text-sm font-semibold text-[#655A6B]">MXN</span>
+                      <span className="mb-1 rounded-full bg-[#A3E635] px-2.5 py-1 text-[10px] font-extrabold text-[#18220B]">50% OFF ESTE MES</span>
+                    </div>
+                    <p className="mt-1 text-[11px] text-[#655A6B]">Envío $99 MXN; gratis en pedidos desde $899 MXN.</p>
+
+                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      <button type="button" onClick={() => handleBuyNow(product)} className="rounded-xl bg-[#67249A] px-4 py-3 text-sm font-extrabold text-white transition-colors hover:bg-[#7C2EAF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#67249A]">
+                        Comprar SOS Family · {'$'}{product.price.toLocaleString('es-MX')} MXN
+                      </button>
+                      <button type="button" onClick={() => handleAddToCart(product)} className="rounded-xl border border-[#D6C4E2] bg-white px-4 py-3 text-sm font-bold text-[#4C2867] transition-colors hover:bg-[#F1E8F8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#67249A]">
+                        Agregar al carrito
+                      </button>
+                    </div>
+                    <p className="mt-3 text-[11px] leading-relaxed text-[#766C7E]">La imagen del empaque presenta botón SOS, avisos a familiares y ubicación compartida. Confirma los requisitos de servicio con nosotros antes de usarlo.</p>
+                  </div>
+                </div>
+              </article>
+            ))}
+
+            <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-[#48335B] bg-[#1C1425] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+              <div className="flex items-start gap-3">
+                <span className="text-3xl" aria-hidden="true">🧸</span>
+                <div>
+                  <div className="text-xs font-extrabold uppercase tracking-wider text-[#DDA8FF]">Tragoo Check Kids · Próximamente</div>
+                  <p className="mt-1 text-xs leading-relaxed text-[#D5CDE0]">Estamos preparando una alarma infantil tipo osito con cordón de jalón. Publicaremos precio y características cuando confirmemos la ficha del producto.</p>
+                </div>
+              </div>
+              <a href={"https://wa.me/" + cleanWhatsAppPhone + "?text=" + encodeURIComponent('Hola Tragoo Check. Quiero recibir información cuando esté disponible la alarma infantil Tragoo Check Kids tipo osito.')} target="_blank" rel="noopener noreferrer" className="inline-flex shrink-0 items-center justify-center rounded-xl border border-[#72518C] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#342240] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DDA8FF]">
+                Avísenme por WhatsApp
+              </a>
             </div>
           </div>
         </section>
@@ -865,9 +937,9 @@ export default function App() {
                       onClick={() => handleBuyNow(kit)}
                       className="w-full py-3 px-4 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
                     >
-                      <MessageCircle className="w-3.5 h-3.5 shrink-0" />
+                      <CreditCard className="w-3.5 h-3.5 shrink-0" />
                       <span>
-                        Pedir por WhatsApp · ${kit.price.toLocaleString('es-MX')} MXN
+                        Comprar ahora · ${kit.price.toLocaleString('es-MX')} MXN
                       </span>
                     </button>
                     <button
@@ -887,10 +959,10 @@ export default function App() {
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="text-xs font-semibold text-[#A3E635]">
-                    Opciones de pago y atención por WhatsApp · 479 229 3687
+                    {merchantConfig.hasStripeCheckout ? 'Compra en línea o recibe atención por WhatsApp · 479 229 3687' : 'Opciones de pago y atención por WhatsApp · 479 229 3687'}
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-white">
-                    Envía tu pedido con folio y total; confirma los datos antes de pagar:
+                    Completa tu compra y revisa el total y el envío antes de pagar.
                   </h3>
                 </div>
 
@@ -900,8 +972,8 @@ export default function App() {
                     onClick={handleOpenOrder}
                     className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] text-xs font-bold transition-colors cursor-pointer"
                   >
-                    <MessageCircle className="w-4 h-4" />
-                    <span>Abrir Carrito y Enviar a WhatsApp ({cartCount})</span>
+                    <CreditCard className="w-4 h-4" />
+                    <span>Abrir carrito y elegir pago ({cartCount})</span>
                   </button>
 
                   <button
@@ -924,11 +996,22 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+              <div className={`grid grid-cols-1 ${merchantConfig.hasStripeCheckout ? 'md:grid-cols-4' : 'md:grid-cols-3'} gap-3.5`}>
+                {merchantConfig.hasStripeCheckout && (
+                  <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30] space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs font-bold text-white">
+                      <CreditCard className="w-4 h-4 text-[#A3E635]" />
+                      <span>1. Tarjeta en línea · Stripe</span>
+                    </div>
+                    <p className="text-xs text-[#C4BED4] leading-relaxed">
+                      Paga en el checkout seguro de Stripe. Al confirmarse, se abre WhatsApp con el folio del pedido.
+                    </p>
+                  </div>
+                )}
                 <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30] space-y-1.5">
                   <div className="flex items-center gap-2 text-xs font-bold text-white">
                     <CreditCard className="w-4 h-4 text-[#A3E635]" />
-                    <span>1. Link de Pago con Tarjeta</span>
+                    <span>{merchantConfig.hasStripeCheckout ? '2. Link de Pago por WhatsApp' : '1. Link de Pago con Tarjeta'}</span>
                   </div>
                   <p className="text-xs text-[#C4BED4] leading-relaxed">
                     Al enviar tu pedido a nuestro WhatsApp{' '}
@@ -941,7 +1024,7 @@ export default function App() {
                 <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30] space-y-1.5">
                   <div className="flex items-center gap-2 text-xs font-bold text-white">
                     <Store className="w-4 h-4 text-[#A3E635]" />
-                    <span>2. Pago en Efectivo en OXXO</span>
+                    <span>{merchantConfig.hasStripeCheckout ? '3. Pago en Efectivo en OXXO' : '2. Pago en Efectivo en OXXO'}</span>
                   </div>
                   <p className="text-xs text-[#C4BED4] leading-relaxed">
                     ¿Prefieres pagar en efectivo? Selecciona{' '}
@@ -954,7 +1037,7 @@ export default function App() {
                 <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30] space-y-1.5">
                   <div className="flex items-center gap-2 text-xs font-bold text-white">
                     <Building2 className="w-4 h-4 text-[#A3E635]" />
-                    <span>3. Transferencia SPEI (-5% Extra)</span>
+                    <span>{merchantConfig.hasStripeCheckout ? '4. Transferencia SPEI (-5% Extra)' : '3. Transferencia SPEI (-5% Extra)'}</span>
                   </div>
                   <p className="text-xs text-[#C4BED4] leading-relaxed">
                     Obtén <strong className="text-[#A3E635]">5% de descuento adicional</strong>{' '}
@@ -1124,7 +1207,7 @@ export default function App() {
                   <p className="text-xs text-[#C4BED4] leading-relaxed">
                     Agrega el icono oficial de <strong className="text-white">Tragoo Check</strong>{' '}
                     a tu pantalla de inicio en <strong className="text-white">Android o iPhone</strong>{' '}
-                    para pedir kits por WhatsApp o consultar la escala de colores en 15 segundos.
+                    para comprar kits o consultar la escala de colores en 15 segundos.
                   </p>
                 </div>
               </div>
@@ -1163,6 +1246,11 @@ export default function App() {
             <div className="divide-y divide-[#231E30] border-t border-b border-[#231E30]">
               {FAQS.map((faq, idx) => {
                 const isOpen = openFaqIndex === idx;
+                const answer = idx === 0
+                  ? merchantConfig.hasStripeCheckout
+                    ? `Agrega tus productos al carrito, revisa el total y el envío y paga con tarjeta en el checkout seguro de Stripe. Después puedes enviar el folio por WhatsApp para coordinar el envío. También puedes elegir link de pago por WhatsApp, OXXO o SPEI.`
+                    : `Agrega tus productos al carrito y revisa el total y el envío. Escríbenos por WhatsApp para recibir un link de pago con tarjeta, una opción de OXXO o los datos SPEI con 5% de descuento adicional.`
+                  : faq.answer;
                 return (
                   <div key={idx} className="py-5">
                     <button
@@ -1183,7 +1271,7 @@ export default function App() {
                     </button>
                     {isOpen && (
                       <p className="mt-3 text-xs sm:text-sm text-[#C4BED4] leading-relaxed pr-4 sm:pr-8">
-                        {faq.answer}
+                        {answer}
                       </p>
                     )}
                   </div>
@@ -1194,11 +1282,11 @@ export default function App() {
             <div className="p-6 sm:p-8 rounded-2xl bg-[#14111D] border border-[#262136] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div className="space-y-1">
                 <h3 className="text-lg font-bold text-white">
-                  ¿Lista para enviar tu pedido directo por WhatsApp?
+                  ¿Lista para completar tu pedido?
                 </h3>
                 <p className="text-xs text-[#C4BED4]">
                   Atención inmediata en el <strong className="text-white">479 229 3687</strong> ·
-                  Recibe tu Link de Pago, ficha OXXO o SPEI (-5% extra).
+                  {merchantConfig.hasStripeCheckout ? 'Paga con tarjeta en línea o elige OXXO/SPEI; WhatsApp está disponible si necesitas ayuda.' : 'Recibe tu link de pago, ficha OXXO o SPEI (-5% extra) por WhatsApp.'}
                 </p>
               </div>
               <div className="flex flex-wrap items-center gap-3 shrink-0">
@@ -1207,7 +1295,7 @@ export default function App() {
                   onClick={handleOpenOrder}
                   className="px-5 py-3 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
-                  Enviar Pedido ({cartCount})
+                  Abrir carrito ({cartCount})
                 </button>
                 <a
                   href={`https://wa.me/${cleanWhatsAppPhone}?text=${encodeURIComponent(
@@ -1253,7 +1341,7 @@ export default function App() {
                 </span>
               </div>
               <p className="text-xs text-[#8E87A0] leading-relaxed">
-                Pedidos directos al WhatsApp 479 229 3687 (Link de pago, OXXO o
+                Compra en línea o por WhatsApp 479 229 3687 (Link de pago, OXXO o
                 SPEI). Pedidos de 1 sola pieza o menores a $899 MXN pagan $99 MXN de
                 envío; envío gratis en compras desde $899 MXN.
               </p>
@@ -1286,7 +1374,7 @@ export default function App() {
         >
           <MessageCircle className="w-4 h-4 shrink-0" />
           <span className="truncate">
-            {cartCount ? `Enviar Pedido a WhatsApp (${cartCount}) · $${cartTotalEstimate.toLocaleString('es-MX')}` : 'Ver kits y precios'}
+            {cartCount ? `Ir al pago (${cartCount}) · $${cartTotalEstimate.toLocaleString('es-MX')}` : 'Ver kits y precios'}
           </span>
         </button>
       </div>
