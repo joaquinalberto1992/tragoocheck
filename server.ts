@@ -5,6 +5,11 @@ import { createServer as createViteServer } from 'vite';
 import dotenv from 'dotenv';
 import { POST as stripeCheckoutPost } from './api/checkout/stripe.js';
 import { GET as stripeCheckoutConfirmGet } from './api/checkout/confirm.js';
+import { POST as stripeWebhookPost } from './api/stripe/webhook.js';
+import {
+  getStripeKeyMode,
+  isStripeConfiguredForEnvironment,
+} from './api/_shared.js';
 
 dotenv.config();
 
@@ -201,7 +206,15 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json({ limit: '50mb' }));
+  app.use(express.json({
+    limit: '50mb',
+    verify: (rawRequest, _res, buffer) => {
+      const req = rawRequest as express.Request & { rawBody?: Buffer };
+      if (req.originalUrl.startsWith('/api/stripe/webhook')) {
+        req.rawBody = Buffer.from(buffer);
+      }
+    },
+  }));
 
   const publicDir = path.resolve(process.cwd(), 'public');
   app.use(
@@ -291,12 +304,14 @@ async function startServer() {
   app.get('/api/config', (_req, res) => {
     const data = loadStoreData();
     const activeStripeKey = process.env.STRIPE_SECRET_KEY || '';
-    const hasLiveStripeKey = Boolean(activeStripeKey && activeStripeKey.startsWith('sk_live_'));
+    const keyMode = getStripeKeyMode(activeStripeKey);
     const safeConfig = {
       ...data.config,
       stripeSecretKeyOverride: data.config.stripeSecretKeyOverride ? '••••••••' : '',
-      hasLiveStripeKey,
-      hasStripeCheckout: Boolean(activeStripeKey && activeStripeKey.startsWith('sk_')),
+      hasLiveStripeKey: keyMode === 'live',
+      hasStripeCheckout: isStripeConfiguredForEnvironment(activeStripeKey),
+      stripeMode: isStripeConfiguredForEnvironment(activeStripeKey) ? keyMode : 'off',
+      hasStripeWebhook: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
     };
     res.json(safeConfig);
   });
@@ -339,8 +354,12 @@ async function startServer() {
     res.json({
       ...data.config,
       stripeSecretKeyOverride: data.config.stripeSecretKeyOverride ? '••••••••' : '',
-      hasLiveStripeKey: Boolean(activeStripeKey && activeStripeKey.startsWith('sk_live_')),
-      hasStripeCheckout: Boolean(activeStripeKey && activeStripeKey.startsWith('sk_')),
+      hasLiveStripeKey: getStripeKeyMode(activeStripeKey) === 'live',
+      hasStripeCheckout: isStripeConfiguredForEnvironment(activeStripeKey),
+      stripeMode: isStripeConfiguredForEnvironment(activeStripeKey)
+        ? getStripeKeyMode(activeStripeKey)
+        : 'off',
+      hasStripeWebhook: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
     });
   });
 
@@ -450,6 +469,30 @@ async function startServer() {
       res.status(response.status).json(await response.json());
     } catch (error: any) {
       res.status(500).json({ error: error?.message || 'Error al comprobar el pago' });
+    }
+  });
+
+  app.post('/api/stripe/webhook', async (req, res) => {
+    try {
+      const rawBody = (req as express.Request & { rawBody?: Buffer }).rawBody;
+      if (!rawBody) {
+        res.status(400).json({ error: 'Falta el cuerpo original del webhook.' });
+        return;
+      }
+      const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
+      const webRequest = new Request(`${origin}/api/stripe/webhook`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': req.get('content-type') || 'application/json',
+          'stripe-signature': req.get('stripe-signature') || '',
+        },
+        body: rawBody.toString('utf8'),
+      });
+      const response = await stripeWebhookPost(webRequest);
+      res.status(response.status).json(await response.json());
+    } catch (error: any) {
+      console.error('Stripe webhook error:', error?.name || 'UnknownError');
+      res.status(500).json({ error: 'Error al procesar el webhook de Stripe.' });
     }
   });
 

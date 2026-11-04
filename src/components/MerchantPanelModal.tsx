@@ -79,10 +79,6 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
   const [speiDiscountPercent, setSpeiDiscountPercent] = useState(
     String(config.speiDiscountPercent || 5)
   );
-  const [stripeSecretKey, setStripeSecretKey] = useState('');
-  const [paymentLinks, setPaymentLinks] = useState<Record<string, string>>(
-    config.stripePaymentLinks || {}
-  );
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [copiedDns, setCopiedDns] = useState<string | null>(null);
@@ -99,7 +95,6 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
       String(Math.max(899, config.freeShippingThreshold || 899))
     );
     setSpeiDiscountPercent(String(config.speiDiscountPercent || 5));
-    setPaymentLinks(config.stripePaymentLinks || {});
   }, [config]);
 
   useEffect(() => {
@@ -139,26 +134,27 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
         shippingFee: Number(shippingFee) || 99,
         freeShippingThreshold: Math.max(899, Number(freeShippingThreshold) || 899),
         speiDiscountPercent: Number(speiDiscountPercent) || 5,
-        stripePaymentLinks: paymentLinks,
       };
-      if (stripeSecretKey.trim()) {
-        payload.stripeSecretKeyOverride = stripeSecretKey.trim();
-      }
 
       const res = await fetch('/api/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
-      const updated = await res.json();
+      const updated = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(
+          updated.error ||
+            'El servidor no permite guardar desde este panel. Las claves de Stripe se configuran en Variables de Entorno de Vercel.'
+        );
+      }
       onConfigUpdated(updated);
-      setStripeSecretKey('');
       setSaveMessage(
         'Configuración de cobros, envíos ($899 MXN) y dominio guardada correctamente.'
       );
       setTimeout(() => setSaveMessage(null), 4000);
     } catch (err) {
-      setSaveMessage('Error al guardar la configuración.');
+      setSaveMessage(err instanceof Error ? err.message : 'Error al guardar la configuración.');
     } finally {
       setIsSaving(false);
     }
@@ -957,56 +953,27 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-sm font-bold text-white">
                     <CreditCard className="w-4 h-4 text-[#A3E635]" />
-                    <span>Integración con Stripe (Checkout Automático o Links de Pago)</span>
+                    <span>Pagos seguros con Stripe</span>
                   </div>
-                  <span className="text-xs text-[#A3E635]">
+                  <span className={`text-xs font-semibold ${config.hasLiveStripeKey ? 'text-[#A3E635]' : 'text-amber-300'}`}>
                     {config.hasLiveStripeKey
-                      ? 'Stripe API Conectada'
-                      : 'Pasarela integrada activa'}
+                      ? 'Clave de producción detectada'
+                      : config.hasStripeCheckout
+                        ? 'Modo de prueba activo'
+                        : 'Pendiente de activar'}
                   </span>
                 </div>
 
-                <div>
-                  <label className="block text-xs text-[#A19BB2] mb-1">
-                    Clave Secreta de Stripe (`sk_live_...` o `sk_test_...`)
-                  </label>
-                  <input
-                    type="password"
-                    value={stripeSecretKey}
-                    onChange={(e) => setStripeSecretKey(e.target.value)}
-                    placeholder={
-                      config.hasLiveStripeKey
-                        ? 'Clave sk_... ya configurada (escribe para reemplazar)'
-                        : 'Pega aquí tu sk_live_... o sk_test_... para redirigir a Stripe Checkout oficial'
-                    }
-                    className="w-full px-3.5 py-2 rounded-lg bg-[#0B0910] border border-[#2E2840] font-mono text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                  />
-                </div>
-
-                <div className="space-y-2.5 pt-2">
-                  <div className="text-xs font-medium text-white">
-                    O pega tus Links de Pago directo de Stripe (`https://buy.stripe.com/...`) por producto:
-                  </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {ALL_PRODUCTS.map((prod) => (
-                      <div key={prod.id}>
-                        <label className="block text-[11px] text-[#A19BB2] mb-1">
-                          {prod.name} (${prod.price.toLocaleString('es-MX')} MXN)
-                        </label>
-                        <input
-                          type="url"
-                          value={paymentLinks[prod.id] || ''}
-                          onChange={(e) =>
-                            setPaymentLinks({
-                              ...paymentLinks,
-                              [prod.id]: e.target.value,
-                            })
-                          }
-                          placeholder="https://buy.stripe.com/..."
-                          className="w-full px-3 py-1.5 rounded-lg bg-[#0B0910] border border-[#2E2840] font-mono text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                        />
-                      </div>
-                    ))}
+                <div className="space-y-2 text-xs leading-relaxed text-[#C4BED4]">
+                  <p>
+                    La persona paga en la página segura de Stripe. El servidor valida el importe, aplica los cupones y confirma el estado del pago antes de mostrar el folio.
+                  </p>
+                  <p>
+                    Por seguridad, la clave secreta se guarda en <strong className="text-white">Vercel → Settings → Environment Variables</strong>; no se pega en este panel ni en el navegador.
+                  </p>
+                  <div className="flex flex-wrap gap-x-5 gap-y-1 pt-1">
+                    <span>Webhook: <strong className={config.hasStripeWebhook ? 'text-[#A3E635]' : 'text-amber-300'}>{config.hasStripeWebhook ? 'configurado' : 'pendiente de configurar'}</strong></span>
+                    <span>Google Pay: actívalo en Métodos de pago de Stripe y registra tragoocheck.shop y www.tragoocheck.shop.</span>
                   </div>
                 </div>
               </div>

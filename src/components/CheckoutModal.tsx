@@ -37,6 +37,8 @@ export interface MerchantConfigClient {
   speiDiscountPercent: number;
   hasLiveStripeKey?: boolean;
   hasStripeCheckout?: boolean;
+  hasStripeWebhook?: boolean;
+  stripeMode?: 'test' | 'live' | 'off';
   stripePaymentLinks?: Record<string, string>;
 }
 
@@ -387,24 +389,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           throw new Error(checkout.error || 'No se pudo iniciar el pago con tarjeta.');
         }
 
-        const paidOrder: ConfirmedOrder = {
-          ...orderPayload,
-          folio: checkout.folio,
-          subtotal,
-          couponCode: couponDiscount > 0 ? appliedCoupon?.code : undefined,
-          couponDiscount,
-          discount: couponDiscount,
-          shipping,
-          total: checkout.total,
-          paymentMethod: 'stripe',
-          paymentStatus: 'pagado',
-        };
-        const waUrl = buildWhatsAppUrl(paidOrder);
         sessionStorage.setItem(
           'tragoo-pending-stripe',
           JSON.stringify({
             folio: checkout.folio,
-            whatsappUrl: waUrl,
             couponCode: couponDiscount > 0 ? appliedCoupon?.code : undefined,
             items: cart.map(({ product, quantity }) => ({ id: product.id, quantity })),
           })
@@ -855,7 +843,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       </div>
                       <div className="text-xs font-bold text-white mt-1.5">Pagar ahora</div>
                       <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
-                        Tarjeta en checkout de Stripe
+                        Checkout seguro; opciones según tu dispositivo
                       </div>
                     </button>
                   )}
@@ -1069,7 +1057,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               disabled={isSubmitting}
               className="w-full py-3.5 px-5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg shadow-[#A3E635]/15"
             >
-              <MessageCircle className="w-4 h-4 shrink-0" />
+              {paymentMethod === 'stripe' ? (
+                <CreditCard className="w-4 h-4 shrink-0" />
+              ) : (
+                <MessageCircle className="w-4 h-4 shrink-0" />
+              )}
               <span>
                 {isSubmitting
                   ? paymentMethod === 'stripe'

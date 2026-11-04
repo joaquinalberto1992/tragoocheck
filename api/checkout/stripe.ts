@@ -25,24 +25,39 @@ export async function POST(request: Request): Promise<Response> {
       return json({ error: 'Completa tus datos de envío antes de pagar.' }, 400);
     }
 
-    const productDescription = quote.lines
-      .map((line) => `${line.quantity} × ${line.name}`)
-      .concat(quote.subtotal >= 1100 ? ['Regalo: tarjeta extra de 5 stickers'] : [])
-      .join(' · ');
-    const couponDescription = quote.couponDiscount
-      ? `Cupón ${quote.couponCode}: -$${quote.couponDiscount.toLocaleString('es-MX')} MXN`
-      : '';
-    const lineItems = [{
-      price_data: {
-        currency: 'mxn',
-        product_data: {
-          name: 'Pedido Tragoo Check',
-          description: [productDescription, couponDescription].filter(Boolean).join(' | ').slice(0, 450),
+    let allocatedDiscount = 0;
+    const lineItems = quote.lines.map((line, index) => {
+      const grossLineTotal = line.price * line.quantity;
+      const discountShare = index === quote.lines.length - 1
+        ? quote.couponDiscount - allocatedDiscount
+        : quote.subtotal > 0
+          ? Math.floor((quote.couponDiscount * grossLineTotal) / quote.subtotal)
+          : 0;
+      allocatedDiscount += discountShare;
+
+      const productDescription = [
+        `${line.quantity} ${line.quantity === 1 ? 'pieza' : 'piezas'}`,
+        discountShare > 0
+          ? `Cupón ${quote.couponCode}: ahorro $${discountShare.toLocaleString('es-MX')} MXN`
+          : '',
+        index === quote.lines.length - 1 && quote.subtotal >= 1100
+          ? 'Incluye tarjeta extra de 5 stickers de regalo'
+          : '',
+      ].filter(Boolean).join(' · ');
+
+      return {
+        price_data: {
+          currency: 'mxn',
+          product_data: {
+            name: line.quantity > 1 ? `${line.name} × ${line.quantity}` : line.name,
+            description: productDescription,
+          },
+          unit_amount: (grossLineTotal - discountShare) * 100,
         },
-        unit_amount: Math.round((quote.subtotal - quote.couponDiscount) * 100),
-      },
-      quantity: 1,
-    }];
+        quantity: 1,
+      };
+    });
+
     if (quote.shipping > 0) {
       lineItems.push({
         price_data: {
@@ -57,6 +72,8 @@ export async function POST(request: Request): Promise<Response> {
     const itemsMetadata = quote.lines.map((line) => `${line.id}:${line.quantity}`).join(',');
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
+      locale: 'es',
+      submit_type: 'pay',
       line_items: lineItems,
       billing_address_collection: 'auto',
       client_reference_id: folio,

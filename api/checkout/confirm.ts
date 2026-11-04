@@ -12,7 +12,7 @@ export async function GET(request: Request): Promise<Response> {
   try {
     const stripe = await stripeClient();
     const session = await stripe.checkout.sessions.retrieve(sessionId);
-    if (session.payment_status !== 'paid') {
+    if (session.mode !== 'payment' || session.status !== 'complete' || session.payment_status !== 'paid') {
       return json({ paid: false, error: 'Stripe todavía no confirma el pago.' }, 402);
     }
 

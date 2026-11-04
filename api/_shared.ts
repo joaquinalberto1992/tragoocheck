@@ -2,6 +2,25 @@ import type Stripe from 'stripe';
 
 export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '524792293687';
 
+export type StripeKeyMode = 'test' | 'live' | null;
+
+export function getStripeKeyMode(key = process.env.STRIPE_SECRET_KEY || ''): StripeKeyMode {
+  if (key.startsWith('sk_test_') || key.startsWith('rk_test_')) return 'test';
+  if (key.startsWith('sk_live_') || key.startsWith('rk_live_')) return 'live';
+  return null;
+}
+
+export function isStripeConfiguredForEnvironment(
+  key = process.env.STRIPE_SECRET_KEY || '',
+  vercelEnvironment = process.env.VERCEL_ENV || '',
+): boolean {
+  const mode = getStripeKeyMode(key);
+  if (!mode) return false;
+
+  // Production must never run on a test key. Preview/local must never charge real cards.
+  return vercelEnvironment === 'production' ? mode === 'live' : mode === 'test';
+}
+
 export const CATALOG: Record<string, { name: string; price: number }> = {
   'kit-noche-completa': { name: 'Kit Noche Completa (1 Pieza)', price: 449 },
   'kit-stickers': { name: 'Kit Stickers Para Uñas (10 pzas)', price: 249 },
@@ -36,10 +55,7 @@ const COUPONS: Record<string, { percent: number; minimum: number }> = {
 
 export async function stripeClient(): Promise<Stripe> {
   const key = process.env.STRIPE_SECRET_KEY;
-  if (!key?.startsWith('sk_')) throw new Error('STRIPE_NOT_CONFIGURED');
-  if (process.env.VERCEL_ENV === 'production' && !key.startsWith('sk_live_')) {
-    throw new Error('STRIPE_NOT_CONFIGURED');
-  }
+  if (!key || !isStripeConfiguredForEnvironment(key)) throw new Error('STRIPE_NOT_CONFIGURED');
   const StripeConstructor = (await import('stripe')).default;
   return new StripeConstructor(key);
 }
