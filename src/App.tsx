@@ -51,7 +51,7 @@ import {
   WomenSloganBanner,
   HeroVideoPlayer,
 } from './components/VideoStoryShowcase';
-import squadPackImage from './assets/images/tragoo_pack_squad_5x_1792022755033.jpg';
+import squadPackImage from './assets/images/tragoo-pack-kit-noche-completa-5-clean.webp';
 
 const DEFAULT_CONFIG: MerchantConfigClient = {
   bankName: '',

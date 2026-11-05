@@ -32,14 +32,14 @@ export interface PromoCoupon {
 }
 
 // Import assets through Vite so their URLs point to the built files in `dist`.
-import heroProductImage from '../assets/images/tragoo-kit-noche-completa-branded-tumbler-v2.png';
+import heroProductImage from '../assets/images/tragoo-kit-noche-completa-logo-clean.webp';
 import heroLifestyleImage from '../assets/images/hero_drink_test_1792021357545.jpg';
 import wholesaleBoxImage from '../assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg';
 import wholesaleMasterImage from '../assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg';
 import kitStickersImage from '../assets/images/tragoo-sticker-corazon-closeup-clean.webp';
 import kitStripsImage from '../assets/images/tragoo-kit-tiras-reactivas-clean.webp';
-import duoPackImage from '../assets/images/tragoo_pack_duo_amigas_1792022753318.jpg';
-import squadPackImage from '../assets/images/tragoo_pack_squad_5x_1792022755033.jpg';
+import duoPackImage from '../assets/images/tragoo-pack-kit-noche-completa-2-clean.webp';
+import squadPackImage from '../assets/images/tragoo-pack-kit-noche-completa-5-clean.webp';
 import packKits3Image from '../assets/images/tragoo-pack-kits-3-clean.webp';
 import packKits4Image from '../assets/images/tragoo-pack-kits-4-clean.webp';
 import packKits6Image from '../assets/images/tragoo-pack-kits-6-clean.webp';
@@ -54,7 +54,8 @@ import cupCoverImage from '../assets/images/tragoo-protector-reusable-clean.webp
 import cupCoverLedImage from '../assets/images/tragoo-protector-led-clean.webp';
 import heartBraceletImage from '../assets/images/tragoo-pulsera-corazon-clean.webp';
 import nailStickers30Image from '../assets/images/tragoo-stickers-corazon-30-clean.webp';
-import sosFamilyModelsImage from '../assets/images/tragoo-sos-family-clean.webp';
+import sosFamilyBluetoothImage from '../assets/images/tragoo-sos-family-bluetooth-pack-clean.webp';
+import sosFamilyGpsImage from '../assets/images/tragoo-sos-family-gps-pack-clean.webp';
 import christmasSmartCupImage from '../assets/images/tragoo-navidad-vaso-led-individual.png';
 import christmasCupSizesImage from '../assets/images/tragoo-navidad-vasos-led-colores.png';
 
@@ -675,8 +676,8 @@ export const FAMILY_PRODUCTS: ProductKit[] = [
     unitPriceNumeric: 499,
     unitPriceLabel: '1 pulsera SOS Bluetooth · $499 MXN',
     kitEquivalentCount: 0,
-    image: sosFamilyModelsImage,
-    gallery: [{ src: sosFamilyModelsImage, alt: 'Pulsera negra SOS Family sobre fondo blanco' }],
+    image: sosFamilyBluetoothImage,
+    gallery: [{ src: sosFamilyBluetoothImage, alt: 'Empaque Tragoo Check SOS Family Bluetooth y pulsera negra sobre fondo blanco, con foto de madre e hija' }],
     contentsSummary: '1 pulsera SOS Bluetooth · app Tragoo Check',
     substancesDetected: '',
     reactionTime: '',
@@ -702,8 +703,8 @@ export const FAMILY_PRODUCTS: ProductKit[] = [
     unitPriceNumeric: 1499,
     unitPriceLabel: '1 pulsera GPS/SIM · $1,499 MXN',
     kitEquivalentCount: 0,
-    image: sosFamilyModelsImage,
-    gallery: [{ src: sosFamilyModelsImage, alt: 'Pulsera negra SOS Family sobre fondo blanco' }],
+    image: sosFamilyGpsImage,
+    gallery: [{ src: sosFamilyGpsImage, alt: 'Empaque Tragoo Check SOS Family GPS/SIM con pulsera blanca sobre fondo blanco y foto de madre e hija' }],
     contentsSummary: '1 pulsera SOS GPS/SIM · plan de servicio desde $99 MXN/mes',
     substancesDetected: '',
     reactionTime: '',
