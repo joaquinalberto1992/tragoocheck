@@ -66,9 +66,11 @@ export const CATALOG: Record<string, { name: string; price: number }> = {
   'regalo-stickers-5': { name: 'Regalo: tarjeta extra de 5 stickers', price: 0 },
 };
 
-const COUPONS: Record<string, { percent: number; minimum: number }> = {
-  HOY10: { percent: 10, minimum: 449 },
-  AMIGAS15: { percent: 15, minimum: 1100 },
+const NOVEMBER_COUPON_EXPIRY = Date.parse('2026-12-01T06:00:00.000Z');
+
+const COUPONS: Record<string, { percent: number; minimum: number; expiresAt?: number }> = {
+  HOY10: { percent: 10, minimum: 449, expiresAt: NOVEMBER_COUPON_EXPIRY },
+  AMIGAS15: { percent: 15, minimum: 1100, expiresAt: NOVEMBER_COUPON_EXPIRY },
   SOCIOB2B: { percent: 8, minimum: 4350 },
 };
 
@@ -157,7 +159,9 @@ export function quoteCheckout(input: unknown): CheckoutQuote {
 
   const couponCode = typeof body.couponCode === 'string' ? body.couponCode.trim().toUpperCase() : '';
   const coupon = couponCode ? COUPONS[couponCode] : undefined;
-  if (couponCode && !coupon) throw new Error('El código de descuento no es válido.');
+  if (couponCode && (!coupon || (coupon.expiresAt && Date.now() >= coupon.expiresAt))) {
+    throw new Error('El código de descuento no es válido o ya venció.');
+  }
   if (coupon && subtotal < coupon.minimum) {
     throw new Error(`El cupón ${couponCode} aplica a partir de $${coupon.minimum.toLocaleString('es-MX')} MXN en productos.`);
   }

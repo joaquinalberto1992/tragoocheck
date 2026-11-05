@@ -132,7 +132,7 @@ export const WomenSloganBanner: React.FC<WomenSloganBannerProps> = ({
     <div
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
-      className="relative rounded-2xl bg-gradient-to-r from-[#181226] via-[#14111D] to-[#171F12] border border-[#2E2840] overflow-hidden shadow-xl"
+      className="relative rounded-2xl bg-gradient-to-r from-[#F7F2FA] via-white to-[#F4F8EC] border border-[#E4DCE9] overflow-hidden shadow-sm"
     >
       {/* Story-style Top Progress Bars (5-6s per phrase) */}
       <div className="grid grid-cols-5 gap-1.5 px-5 pt-3.5">
@@ -144,7 +144,7 @@ export const WomenSloganBanner: React.FC<WomenSloganBannerProps> = ({
               key={s.id}
               type="button"
               onClick={() => handleGoTo(idx)}
-              className="h-1.5 rounded-full bg-[#262136] overflow-hidden cursor-pointer"
+              className="h-1.5 rounded-full bg-[#E7E2EA] overflow-hidden cursor-pointer"
               aria-label={`Ir a frase ${idx + 1}`}
             >
               <div
@@ -159,17 +159,17 @@ export const WomenSloganBanner: React.FC<WomenSloganBannerProps> = ({
       <div className="p-5 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
         <div className="space-y-2 max-w-3xl">
           <div className="flex flex-wrap items-center gap-2 text-xs">
-            <span className="inline-flex items-center gap-1.5 font-mono font-bold text-[#A3E635] uppercase tracking-wider">
+            <span className="inline-flex items-center gap-1.5 font-mono font-bold text-[#466B00] uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
               {activeSlide.slogan}
             </span>
-            <span className="text-[#524A68]">·</span>
-            <span className="text-[11px] text-[#8E87A0] font-mono">
+            <span className="text-[#766D80]">·</span>
+            <span className="text-[11px] text-[#665D70] font-mono">
               {(activeSlide.durationMs / 1000).toFixed(1)}s de lectura
             </span>
           </div>
 
-          <p className="text-sm sm:text-base md:text-lg font-medium text-white leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg font-medium text-[#201927] leading-relaxed">
             “{activeSlide.phrase}”
           </p>
         </div>
@@ -184,11 +184,11 @@ export const WomenSloganBanner: React.FC<WomenSloganBannerProps> = ({
             <ArrowRight className="w-3.5 h-3.5" />
           </button>
 
-          <div className="inline-flex items-center gap-1 bg-[#0B0910] border border-[#262136] rounded-xl p-1">
+          <div className="inline-flex items-center gap-1 bg-white border border-[#E7E2EA] rounded-xl p-1">
             <button
               type="button"
               onClick={handlePrev}
-              className="p-1.5 rounded-lg text-[#C4BED4] hover:text-white hover:bg-[#1E192B] cursor-pointer"
+              className="p-1.5 rounded-lg text-[#51495B] hover:text-[#201927] hover:bg-[#F2EEF5] cursor-pointer"
               aria-label="Frase anterior"
             >
               <ChevronLeft className="w-4 h-4" />
@@ -196,7 +196,7 @@ export const WomenSloganBanner: React.FC<WomenSloganBannerProps> = ({
             <button
               type="button"
               onClick={() => setIsPaused(!isPaused)}
-              className="p-1.5 rounded-lg text-[#A3E635] hover:bg-[#1E192B] cursor-pointer"
+              className="p-1.5 rounded-lg text-[#466B00] hover:bg-[#F2EEF5] cursor-pointer"
               aria-label={isPaused ? 'Reanudar frases' : 'Pausar lectura'}
               aria-pressed={isPaused}
               title={isPaused ? 'Reanudar' : 'Pausar lectura'}
@@ -210,7 +210,7 @@ export const WomenSloganBanner: React.FC<WomenSloganBannerProps> = ({
             <button
               type="button"
               onClick={handleNext}
-              className="p-1.5 rounded-lg text-[#C4BED4] hover:text-white hover:bg-[#1E192B] cursor-pointer"
+              className="p-1.5 rounded-lg text-[#51495B] hover:text-[#201927] hover:bg-[#F2EEF5] cursor-pointer"
               aria-label="Siguiente frase"
             >
               <ChevronRight className="w-4 h-4" />

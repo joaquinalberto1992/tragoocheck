@@ -28,6 +28,7 @@ export interface PromoCoupon {
   discountPercent: number;
   minPurchase: number;
   description: string;
+  expiresAt?: string;
 }
 
 // Import assets through Vite so their URLs point to the built files in `dist`.
@@ -61,6 +62,8 @@ export const INSTAGRAM_URL = 'https://www.instagram.com/tragoocheck/';
 export const INSTAGRAM_HANDLE = '@tragoocheck';
 export const OFFICIAL_DOMAIN = 'tragoocheck.shop';
 
+const NOVEMBER_COUPON_EXPIRY = '2026-12-01T06:00:00.000Z';
+
 export const ACTIVE_COUPONS: PromoCoupon[] = [
   {
     code: 'HOY10',
@@ -68,7 +71,8 @@ export const ACTIVE_COUPONS: PromoCoupon[] = [
     discountPercent: 10,
     minPurchase: 449,
     description:
-      '10% de descuento en pedidos desde $449 MXN.',
+      '10% de descuento en pedidos desde $449 MXN. Válido hasta el 30 de noviembre de 2026.',
+    expiresAt: NOVEMBER_COUPON_EXPIRY,
   },
   {
     code: 'AMIGAS15',
@@ -76,7 +80,8 @@ export const ACTIVE_COUPONS: PromoCoupon[] = [
     discountPercent: 15,
     minPurchase: 1100,
     description:
-      '15% de descuento especial al armar tu pedido grupal de amigas o pack de festival.',
+      '15% de descuento especial al armar tu pedido grupal de amigas o pack de festival. Válido hasta el 30 de noviembre de 2026.',
+    expiresAt: NOVEMBER_COUPON_EXPIRY,
   },
   {
     code: 'SOCIOB2B',
@@ -86,7 +91,7 @@ export const ACTIVE_COUPONS: PromoCoupon[] = [
     description:
       '8% de bonificación adicional sobre precios de mayoreo para bares, antros y distribuidores.',
   },
-];
+].filter((coupon) => !coupon.expiresAt || Date.now() < Date.parse(coupon.expiresAt));
 
 // STRICTLY DECREASING UNIT PRICE PROGRESSION FOR KIT NOCHE COMPLETA:
 // 1 pieza: $449.00 c/u (+ $99 envío por ser < $899 MXN)

@@ -449,16 +449,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-xs">
-      <div className="relative w-full max-w-xl bg-[#0F0C16] border-l border-[#262136] h-full flex flex-col justify-between overflow-hidden">
+      <div className="relative w-full max-w-xl bg-white border-l border-[#E7E2EA] h-full flex flex-col justify-between overflow-hidden">
         {/* Top Drawer Header */}
-        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-[#231E30] bg-[#14111D]">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-[#E8E4EB] bg-white">
           <div>
-            <h2 className="text-sm sm:text-base font-bold text-white">
+            <h2 className="text-sm sm:text-base font-bold text-[#201927]">
               {confirmedOrder
                 ? `Pedido Listo · Folio ${confirmedOrder.folio}`
                 : 'Finalizar compra'}
             </h2>
-            <p className="text-[11px] sm:text-xs text-[#A3E635]">
+            <p className="text-[11px] sm:text-xs text-[#466B00]">
               {merchantConfig.hasStripeCheckout
                 ? 'Tarjeta en checkout seguro · Link de pago disponible por WhatsApp'
                 : 'Solicita tu link de pago por WhatsApp'}
@@ -470,7 +470,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               setConfirmedOrder(null);
               onClose();
             }}
-            className="p-2 rounded-lg text-[#A19BB2] hover:text-white hover:bg-[#1E192B] transition-colors cursor-pointer"
+            className="p-2 rounded-lg text-[#625969] hover:text-[#201927] hover:bg-[#F2EEF5] transition-colors cursor-pointer"
             aria-label="Cerrar carrito"
           >
             <X className="w-5 h-5" />
@@ -482,26 +482,26 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           {confirmedOrder ? (
             /* CONFIRMED ORDER STATE -> DIRECT WHATSAPP BUTTON */
             <div className="space-y-5">
-              <div className="p-5 sm:p-6 rounded-2xl bg-[#14111D] border border-[#A3E635]/50 space-y-4">
+              <div className="p-5 sm:p-6 rounded-2xl bg-white border border-[#C7DCA9]/50 space-y-4">
                 <div className="flex items-center justify-between">
-                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#A3E635]">
+                  <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#466B00]">
                     <CheckCircle2 className="w-4 h-4" />
                     Pedido listo para enviar
                   </span>
-                  <span className="font-mono text-xs sm:text-sm font-bold text-white bg-[#1F1A2C] px-3 py-1 rounded-lg border border-[#2E2840]">
+                  <span className="font-mono text-xs sm:text-sm font-bold text-[#201927] bg-[#F2EEF5] px-3 py-1 rounded-lg border border-[#E1DCE6]">
                     Folio: {confirmedOrder.folio}
                   </span>
                 </div>
 
-                <h3 className="text-lg sm:text-xl font-bold text-white">
+                <h3 className="text-lg sm:text-xl font-bold text-[#201927]">
                   ¡Casi listo, {confirmedOrder.customerName.split(' ')[0]}! Envía tu
                   pedido al WhatsApp 479 229 3687
                 </h3>
 
-                <p className="text-xs sm:text-sm text-[#C4BED4] leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#51495B] leading-relaxed">
                   Toca el botón verde de abajo para abrir WhatsApp con tu pedido
                   completo. Ahí mismo te enviaremos de inmediato tu{' '}
-                  <strong className="text-white">
+                  <strong className="text-[#201927]">
                     {confirmedOrder.paymentMethod === 'stripe'
                       ? 'confirmación de pago con tarjeta'
                       : 'link de pago seguro con tarjeta'}
@@ -514,7 +514,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     href={buildWhatsAppUrl(confirmedOrder)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-4 px-5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-extrabold text-sm flex items-center justify-center gap-2 transition-colors shadow-lg shadow-[#A3E635]/20"
+                    className="w-full py-4 px-5 rounded-xl bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] font-extrabold text-sm flex items-center justify-center gap-2 transition-colors shadow-lg shadow-[#A3E635]/20"
                   >
                     <MessageCircle className="w-5 h-5" />
                     <span>
@@ -531,16 +531,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       setCopiedOrderText(true);
                       setTimeout(() => setCopiedOrderText(false), 2500);
                     }}
-                    className="w-full py-2.5 px-4 rounded-xl bg-[#1E192B] hover:bg-[#282138] text-xs font-semibold text-white flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl bg-[#F2EEF5] hover:bg-[#EEEAF1] text-xs font-semibold text-[#201927] flex items-center justify-center gap-2 transition-colors cursor-pointer"
                   >
                     {copiedOrderText ? (
                       <>
-                        <Check className="w-4 h-4 text-[#A3E635]" />
+                        <Check className="w-4 h-4 text-[#466B00]" />
                         <span>Texto del pedido copiado</span>
                       </>
                     ) : (
                       <>
-                        <Copy className="w-4 h-4 text-[#A3E635]" />
+                        <Copy className="w-4 h-4 text-[#466B00]" />
                         <span>Copiar resumen de mi pedido</span>
                       </>
                     )}
@@ -552,19 +552,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       setConfirmedOrder(null);
                       onClose();
                     }}
-                    className="w-full py-2.5 px-4 rounded-xl border border-[#2E2840] text-xs font-medium text-[#C4BED4] hover:text-white transition-colors cursor-pointer"
+                    className="w-full py-2.5 px-4 rounded-xl border border-[#E1DCE6] text-xs font-medium text-[#51495B] hover:text-[#201927] transition-colors cursor-pointer"
                   >
                     Volver a la tienda
                   </button>
                 </div>
               </div>
 
-              <div className="p-4 sm:p-5 rounded-xl bg-[#14111D] border border-[#231E30] space-y-2.5 text-xs">
-                <div className="font-bold text-white text-sm">
+              <div className="p-4 sm:p-5 rounded-xl bg-white border border-[#E8E4EB] space-y-2.5 text-xs">
+                <div className="font-bold text-[#201927] text-sm">
                   Resumen de tu pedido ({confirmedOrder.folio})
                 </div>
                 {confirmedOrder.items.map((item) => (
-                  <div key={item.id} className="flex justify-between text-[#C4BED4]">
+                  <div key={item.id} className="flex justify-between text-[#51495B]">
                     <span>
                       {item.quantity}x {item.name}
                     </span>
@@ -573,7 +573,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </span>
                   </div>
                 ))}
-                <div className="flex justify-between text-[#A19BB2]">
+                <div className="flex justify-between text-[#625969]">
                   <span>Envío Express</span>
                   <span className="font-mono">
                     {confirmedOrder.shipping === 0
@@ -581,9 +581,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       : `$${confirmedOrder.shipping} MXN`}
                   </span>
                 </div>
-                <div className="border-t border-[#231E30] pt-2 flex justify-between font-bold text-white text-sm">
+                <div className="border-t border-[#E8E4EB] pt-2 flex justify-between font-bold text-[#201927] text-sm">
                   <span>Total a pagar</span>
-                  <span className="font-mono text-[#A3E635]">
+                  <span className="font-mono text-[#466B00]">
                     ${confirmedOrder.total.toLocaleString('es-MX')} MXN
                   </span>
                 </div>
@@ -592,26 +592,26 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           ) : cart.length === 0 ? (
             /* EMPTY CART STATE */
             <div className="py-10 text-center space-y-5">
-              <p className="text-[#A19BB2] text-sm">
+              <p className="text-[#625969] text-sm">
                 Tu carrito está vacío. Agrega productos para revisar el total, el envío y pagar.
               </p>
               <div className="grid grid-cols-1 gap-3 text-left">
                 {ALL_PRODUCTS.slice(0, 4).map((kit) => (
                   <div
                     key={kit.id}
-                    className="p-4 rounded-xl bg-[#14111D] border border-[#262136] flex items-center justify-between gap-4"
+                    className="p-4 rounded-xl bg-white border border-[#E7E2EA] flex items-center justify-between gap-4"
                   >
                     <div>
-                      <div className="text-sm font-bold text-white">{kit.name}</div>
-                      <div className="text-xs text-[#A19BB2]">{kit.contentsSummary}</div>
-                      <div className="font-mono text-sm font-semibold text-[#A3E635] mt-1">
+                      <div className="text-sm font-bold text-[#201927]">{kit.name}</div>
+                      <div className="text-xs text-[#625969]">{kit.contentsSummary}</div>
+                      <div className="font-mono text-sm font-semibold text-[#466B00] mt-1">
                         ${kit.price.toLocaleString('es-MX')} MXN
                       </div>
                     </div>
                     <button
                       type="button"
                       onClick={() => onAddProduct(kit)}
-                      className="px-3.5 py-2 rounded-lg bg-[#A3E635] text-[#0B0910] text-xs font-bold hover:bg-[#BEF264] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                      className="px-3.5 py-2 rounded-lg bg-[#A3E635] text-[#0B0910] text-xs font-bold hover:bg-[#B4E75B] transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       Agregar
                     </button>
@@ -623,41 +623,41 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             /* Cart, payment method, and delivery details */
             <>
               {/* Strict $899 MXN Free Shipping Banner */}
-              <div className="p-3.5 rounded-xl bg-[#14111D] border border-[#262136] space-y-2">
+              <div className="p-3.5 rounded-xl bg-white border border-[#E7E2EA] space-y-2">
                 <div className="flex items-center gap-2.5 text-xs">
-                  <Truck className="w-4 h-4 text-[#A3E635] shrink-0" />
+                  <Truck className="w-4 h-4 text-[#466B00] shrink-0" />
                   {qualifiesFreeShipping ? (
-                    <span className="text-white font-medium">
+                    <span className="text-[#201927] font-medium">
                       ¡Pedido de ${effectiveThreshold} MXN o más! Tienes{' '}
-                      <strong className="text-[#A3E635]">Envío Express Gratis</strong>.
+                      <strong className="text-[#466B00]">Envío Express Gratis</strong>.
                     </span>
                   ) : (
-                    <span className="text-[#C4BED4]">
+                    <span className="text-[#51495B]">
                       Pedidos menores a{' '}
-                      <strong className="text-white">${effectiveThreshold} MXN</strong>{' '}
-                      pagan <strong className="text-white">$99 MXN</strong> de envío.
+                      <strong className="text-[#201927]">${effectiveThreshold} MXN</strong>{' '}
+                      pagan <strong className="text-[#201927]">$99 MXN</strong> de envío.
                       Agrega{' '}
-                      <strong className="font-mono text-[#A3E635]">
+                      <strong className="font-mono text-[#466B00]">
                         ${amountForFreeShipping} MXN
                       </strong>{' '}
-                      más para <strong className="text-[#A3E635]">Envío Gratis</strong>.
+                      más para <strong className="text-[#466B00]">Envío Gratis</strong>.
                     </span>
                   )}
                 </div>
 
-                <div className="flex items-center gap-2.5 text-xs border-t border-[#231E30] pt-2">
-                  <Gift className="w-4 h-4 text-[#A855F7] shrink-0" />
+                <div className="flex items-center gap-2.5 text-xs border-t border-[#E8E4EB] pt-2">
+                  <Gift className="w-4 h-4 text-[#7133A0] shrink-0" />
                   {unlocksFreeGift ? (
-                    <span className="text-white font-medium">
+                    <span className="text-[#201927] font-medium">
                       ¡Regalo desbloqueado! Incluimos{' '}
-                      <strong className="text-[#A3E635]">
+                      <strong className="text-[#466B00]">
                         1 Tarjeta Extra de 5 Stickers GRATIS
                       </strong>
                     </span>
                   ) : (
-                    <span className="text-[#A19BB2]">
+                    <span className="text-[#625969]">
                       Entre más piezas agregues,{' '}
-                      <strong className="text-white">
+                      <strong className="text-[#201927]">
                         más baja el precio unitario
                       </strong>{' '}
                       automáticamente.
@@ -676,28 +676,28 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   return (
                     <div
                       key={product.id}
-                      className="p-3 rounded-xl bg-[#14111D] border border-[#262136] flex items-center justify-between gap-3"
+                      className="p-3 rounded-xl bg-white border border-[#E7E2EA] flex items-center justify-between gap-3"
                     >
                       <img
                         src={product.image}
                         alt={product.name}
                         referrerPolicy="no-referrer"
-                        className="w-13 h-13 rounded-lg object-cover border border-[#262136] shrink-0 bg-[#E2E2E2]"
+                        className="w-13 h-13 rounded-lg object-cover border border-[#E7E2EA] shrink-0 bg-white"
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="text-xs sm:text-sm font-bold text-white truncate">
+                        <div className="text-xs sm:text-sm font-bold text-[#201927] truncate">
                           {product.name}
                         </div>
-                        <div className="text-[11px] text-[#A19BB2] truncate">
+                        <div className="text-[11px] text-[#625969] truncate">
                           {hasVolumeDiscount ? (
-                            <span className="text-[#A3E635] font-medium">
+                            <span className="text-[#466B00] font-medium">
                               Precio volumen: ${unitPrice} MXN c/u
                             </span>
                           ) : (
                             product.contentsSummary
                           )}
                         </div>
-                        <div className="font-mono text-xs font-semibold text-[#A3E635] mt-0.5">
+                        <div className="font-mono text-xs font-semibold text-[#466B00] mt-0.5">
                           ${lineTotal.toLocaleString('es-MX')} MXN
                         </div>
                       </div>
@@ -706,7 +706,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         <button
                           type="button"
                           onClick={() => onUpdateQuantity(product.id, -1)}
-                          className="w-7 h-7 rounded bg-[#1E192B] text-white flex items-center justify-center hover:bg-[#2B243D] cursor-pointer"
+                          className="w-7 h-7 rounded bg-[#F2EEF5] text-[#201927] flex items-center justify-center hover:bg-[#EEEAF1] cursor-pointer"
                           aria-label="Disminuir cantidad"
                         >
                           <Minus className="w-3.5 h-3.5" />
@@ -717,7 +717,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         <button
                           type="button"
                           onClick={() => onUpdateQuantity(product.id, 1)}
-                          className="w-7 h-7 rounded bg-[#1E192B] text-white flex items-center justify-center hover:bg-[#2B243D] cursor-pointer"
+                          className="w-7 h-7 rounded bg-[#F2EEF5] text-[#201927] flex items-center justify-center hover:bg-[#EEEAF1] cursor-pointer"
                           aria-label="Aumentar cantidad"
                         >
                           <Plus className="w-3.5 h-3.5" />
@@ -725,7 +725,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         <button
                           type="button"
                           onClick={() => onRemoveItem(product.id)}
-                          className="w-7 h-7 rounded text-[#A19BB2] hover:text-red-400 flex items-center justify-center ml-0.5 cursor-pointer"
+                          className="w-7 h-7 rounded text-[#625969] hover:text-red-400 flex items-center justify-center ml-0.5 cursor-pointer"
                           aria-label="Eliminar producto"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
@@ -737,10 +737,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </div>
 
               {/* Coupon & Active Promotions Box */}
-              <div className="p-3.5 rounded-xl bg-[#14111D] border border-[#262136] space-y-2">
+              <div className="p-3.5 rounded-xl bg-white border border-[#E7E2EA] space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-white flex items-center gap-1.5">
-                    <Tag className="w-3.5 h-3.5 text-[#A3E635]" />
+                  <span className="text-xs font-semibold text-[#201927] flex items-center gap-1.5">
+                    <Tag className="w-3.5 h-3.5 text-[#466B00]" />
                     Cupones de descuento (toca para activar)
                   </span>
                   {appliedCoupon && (
@@ -750,7 +750,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         setAppliedCoupon(null);
                         setCouponFeedback(null);
                       }}
-                      className="text-[11px] text-[#A19BB2] hover:text-white underline cursor-pointer"
+                      className="text-[11px] text-[#625969] hover:text-[#201927] underline cursor-pointer"
                     >
                       Quitar
                     </button>
@@ -767,8 +767,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         onClick={() => handleApplyCouponCode(c.code)}
                         className={`px-2.5 py-1.5 rounded-lg text-[11px] font-mono border transition-colors cursor-pointer ${
                           isSelected
-                            ? 'bg-[#A3E635] text-[#0B0910] border-[#A3E635] font-bold'
-                            : 'bg-[#0B0910] text-[#C4BED4] border-[#2E2840] hover:border-[#A3E635]'
+                            ? 'bg-[#A3E635] text-[#0B0910] border-[#C7DCA9] font-bold'
+                            : 'bg-white text-[#51495B] border-[#E1DCE6] hover:border-[#C7DCA9]'
                         }`}
                       >
                         {c.code} ({c.label})
@@ -778,21 +778,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
 
                 {couponFeedback && (
-                  <div className="text-[11px] text-[#A3E635]">{couponFeedback}</div>
+                  <div className="text-[11px] text-[#466B00]">{couponFeedback}</div>
                 )}
               </div>
 
               {/* Accurate add-on quantity to reach the free-shipping threshold */}
               {!qualifiesFreeShipping && upsellProduct && upsellQuantity > 0 && (
-                <div className="p-3 rounded-xl bg-[#14111D]/80 border border-dashed border-[#362E4C] flex items-center justify-between gap-3">
+                <div className="p-3 rounded-xl bg-white/95 border border-dashed border-[#E1DCE6] flex items-center justify-between gap-3">
                   <div className="text-xs">
-                    <div className="font-semibold text-white flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#A3E635]" />
+                    <div className="font-semibold text-[#201927] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#466B00]" />
                       Suma {upsellQuantity} × {upsellProduct.name} por ${upsellAddedCost.toLocaleString('es-MX')} MXN
                     </div>
-                    <div className="text-[#A19BB2] mt-0.5">
+                    <div className="text-[#625969] mt-0.5">
                       Con este agregado llegas al mínimo de ${effectiveThreshold.toLocaleString('es-MX')} para tener{' '}
-                      <strong className="text-white">Envío Express Gratis</strong>.
+                      <strong className="text-[#201927]">Envío Express Gratis</strong>.
                     </div>
                   </div>
                   <button
@@ -802,7 +802,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         onAddProduct(upsellProduct);
                       }
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-[#1F192E] hover:bg-[#A3E635] text-white hover:text-[#0B0910] text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    className="px-3 py-1.5 rounded-lg bg-[#F2EEF5] hover:bg-[#A3E635] text-[#201927] hover:text-[#0B0910] text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     + Agregar {upsellQuantity}
                   </button>
@@ -811,7 +811,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
               {/* Card payment through Stripe, with WhatsApp payment link as the fallback */}
               <div className="space-y-2.5">
-                <label className="block text-xs font-bold text-white">
+                <label className="block text-xs font-bold text-[#201927]">
                   1. Elige cómo deseas pagar
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -821,16 +821,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       onClick={() => setPaymentMethod('stripe')}
                       className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
                         paymentMethod === 'stripe'
-                          ? 'bg-[#171E12] border-[#A3E635] text-white'
-                          : 'bg-[#14111D] border-[#262136] text-[#A19BB2] hover:text-white'
+                          ? 'bg-[#F2F7E9] border-[#C7DCA9] text-[#201927]'
+                          : 'bg-white border-[#E7E2EA] text-[#625969] hover:text-[#201927]'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <CreditCard className="w-4 h-4 text-[#A3E635]" />
-                        <span className="font-mono text-[10px] font-bold text-[#A3E635]">STRIPE</span>
+                        <CreditCard className="w-4 h-4 text-[#466B00]" />
+                        <span className="font-mono text-[10px] font-bold text-[#466B00]">STRIPE</span>
                       </div>
-                      <div className="text-xs font-bold text-white mt-1.5">Tarjeta en línea · Recomendado</div>
-                      <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
+                      <div className="text-xs font-bold text-[#201927] mt-1.5">Tarjeta en línea · Recomendado</div>
+                      <div className="text-[11px] text-[#625969] mt-0.5 leading-snug">
                         Checkout seguro de Stripe. El pago se confirma al instante.
                       </div>
                     </button>
@@ -840,20 +840,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     onClick={() => setPaymentMethod('link_pago')}
                     className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
                       paymentMethod === 'link_pago'
-                        ? 'bg-[#171E12] border-[#A3E635] text-white'
-                        : 'bg-[#14111D] border-[#262136] text-[#A19BB2] hover:text-white'
+                        ? 'bg-[#F2F7E9] border-[#C7DCA9] text-[#201927]'
+                        : 'bg-white border-[#E7E2EA] text-[#625969] hover:text-[#201927]'
                     }`}
                   >
                     <div className="flex items-center justify-between">
-                      <CreditCard className="w-4 h-4 text-[#A3E635]" />
-                      <span className="font-mono text-[10px] font-bold text-[#A3E635]">
+                      <CreditCard className="w-4 h-4 text-[#466B00]" />
+                      <span className="font-mono text-[10px] font-bold text-[#466B00]">
                         TARJETA
                       </span>
                     </div>
-                    <div className="text-xs font-bold text-white mt-1.5">
+                    <div className="text-xs font-bold text-[#201927] mt-1.5">
                       Link de Pago
                     </div>
-                    <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
+                    <div className="text-[11px] text-[#625969] mt-0.5 leading-snug">
                       Solicita el enlace de pago por WhatsApp
                     </div>
                   </button>
@@ -861,7 +861,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
               </div>
 
-              <div className="rounded-xl border border-[#262136] bg-[#14111D] px-3.5 py-3 text-[11px] leading-relaxed text-[#C4BED4]">
+              <div className="rounded-xl border border-[#E7E2EA] bg-white px-3.5 py-3 text-[11px] leading-relaxed text-[#51495B]">
                 {paymentMethod === 'stripe'
                   ? 'Pagarás en el checkout seguro de Stripe. Al confirmarse el pago, verás el folio y podrás coordinar la entrega por WhatsApp. Los datos de tu tarjeta se capturan en Stripe.'
                   : 'Se abrirá WhatsApp con tu pedido y dirección. Te responderemos con el enlace de pago; el pedido se paga al abrir ese enlace.'}
@@ -873,7 +873,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 onSubmit={handleSendOrderToWhatsApp}
                 className="space-y-3 pt-1"
               >
-                <div className="text-xs font-bold text-white">
+                <div className="text-xs font-bold text-[#201927]">
                   2. Datos de contacto y entrega
                 </div>
                 <label className="sr-only" htmlFor="checkout-customer-name">
@@ -887,9 +887,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="Nombre completo"
-                  className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                  className="w-full px-3 py-2.5 rounded-lg bg-white border border-[#E1DCE6] text-xs text-[#201927] focus:outline-none focus:border-[#C7DCA9]"
                 />
-                <div className="rounded-lg border border-[#262136] bg-[#14111D] px-3 py-2.5 text-[11px] leading-relaxed text-[#C4BED4]">
+                <div className="rounded-lg border border-[#E7E2EA] bg-white px-3 py-2.5 text-[11px] leading-relaxed text-[#51495B]">
                   {paymentMethod === 'stripe'
                     ? 'Usaremos estos datos para preparar el envío. El pago con tarjeta se procesa en Stripe.'
                     : 'Usaremos estos datos para preparar tu pedido y solicitar el enlace de pago por WhatsApp.'}
@@ -903,7 +903,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       placeholder="Tu WhatsApp (10 dígitos)"
                       aria-label="Tu WhatsApp"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                      className="w-full px-3 py-2.5 rounded-lg bg-white border border-[#E1DCE6] text-xs text-[#201927] focus:outline-none focus:border-[#C7DCA9]"
                   />
                     <input
                       type="text"
@@ -913,7 +913,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       onChange={(e) => setShippingAddress(e.target.value)}
                       placeholder="Calle, número, colonia y referencias"
                       aria-label="Dirección de entrega"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635] sm:col-span-2"
+                      className="w-full px-3 py-2.5 rounded-lg bg-white border border-[#E1DCE6] text-xs text-[#201927] focus:outline-none focus:border-[#C7DCA9] sm:col-span-2"
                     />
                     <input
                       type="text"
@@ -923,7 +923,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       onChange={(e) => setCity(e.target.value)}
                       placeholder="Ciudad o municipio"
                       aria-label="Ciudad o municipio"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                      className="w-full px-3 py-2.5 rounded-lg bg-white border border-[#E1DCE6] text-xs text-[#201927] focus:outline-none focus:border-[#C7DCA9]"
                     />
                     <input
                       type="text"
@@ -933,7 +933,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       onChange={(e) => setStateName(e.target.value)}
                       placeholder="Estado"
                       aria-label="Estado"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                      className="w-full px-3 py-2.5 rounded-lg bg-white border border-[#E1DCE6] text-xs text-[#201927] focus:outline-none focus:border-[#C7DCA9]"
                     />
                     <input
                       type="text"
@@ -946,11 +946,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ''))}
                       placeholder="Código Postal"
                       aria-label="Código Postal"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                      className="w-full px-3 py-2.5 rounded-lg bg-white border border-[#E1DCE6] text-xs text-[#201927] focus:outline-none focus:border-[#C7DCA9]"
                     />
                 </div>
-                <div className="space-y-2 rounded-xl border border-[#262136] bg-[#14111D] p-3">
-                  <label className="flex items-start gap-2.5 text-xs font-medium text-white">
+                <div className="space-y-2 rounded-xl border border-[#E7E2EA] bg-white p-3">
+                  <label className="flex items-start gap-2.5 text-xs font-medium text-[#201927]">
                     <input
                       type="checkbox"
                       checked={sendReceiptByEmail}
@@ -968,10 +968,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       onChange={(e) => setCustomerEmail(e.target.value)}
                       placeholder="Correo electrónico"
                       aria-label="Correo para recibir el comprobante"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#0F0C16] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                      className="w-full px-3 py-2.5 rounded-lg bg-white border border-[#E1DCE6] text-xs text-[#201927] focus:outline-none focus:border-[#C7DCA9]"
                     />
                   )}
-                  <p className="text-[10px] leading-relaxed text-[#A19BB2]">
+                  <p className="text-[10px] leading-relaxed text-[#625969]">
                     {paymentMethod === 'stripe'
                       ? 'Stripe enviará el recibo cuando el pago con tarjeta se confirme.'
                       : 'Incluiremos este correo en tu solicitud de pago por WhatsApp.'}
@@ -990,16 +990,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
         {/* Bottom Sticky Totals & WhatsApp Submit Bar */}
         {!confirmedOrder && cart.length > 0 && (
-          <div className="p-4 sm:p-5 border-t border-[#231E30] bg-[#14111D] space-y-3">
+          <div className="p-4 sm:p-5 border-t border-[#E8E4EB] bg-white space-y-3">
             <div className="space-y-1 text-xs">
-              <div className="flex justify-between text-[#A19BB2]">
+              <div className="flex justify-between text-[#625969]">
                 <span>Subtotal</span>
-                <span className="font-mono text-white">
+                <span className="font-mono text-[#201927]">
                   ${subtotal.toLocaleString('es-MX')} MXN
                 </span>
               </div>
               {couponDiscount > 0 && (
-                <div className="flex justify-between text-[#A3E635]">
+                <div className="flex justify-between text-[#466B00]">
                   <span>Cupón ({appliedCoupon?.code})</span>
                   <span className="font-mono">
                     -${couponDiscount.toLocaleString('es-MX')} MXN
@@ -1011,19 +1011,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   El cupón {appliedCoupon.code} se aplicará al llegar a ${appliedCoupon.minPurchase.toLocaleString('es-MX')} MXN en productos.
                 </div>
               )}
-              <div className="flex justify-between text-[#A19BB2]">
+              <div className="flex justify-between text-[#625969]">
                 <span>Envío Express Discreto</span>
-                <span className="font-mono text-white">
+                <span className="font-mono text-[#201927]">
                   {shipping === 0 ? (
-                    <strong className="text-[#A3E635]">GRATIS (≥$899)</strong>
+                    <strong className="text-[#466B00]">GRATIS (≥$899)</strong>
                   ) : (
                     `$${shipping} MXN`
                   )}
                 </span>
               </div>
-              <div className="flex justify-between text-sm font-bold text-white pt-1.5 border-t border-[#231E30]">
+              <div className="flex justify-between text-sm font-bold text-[#201927] pt-1.5 border-t border-[#E8E4EB]">
                 <span>Total a pagar</span>
-                <span className="font-mono text-base text-[#A3E635]">
+                <span className="font-mono text-base text-[#466B00]">
                   ${total.toLocaleString('es-MX')} MXN
                 </span>
               </div>
@@ -1033,7 +1033,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               type="submit"
               form="checkout-form"
               disabled={isSubmitting}
-              className="w-full py-3.5 px-5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg shadow-[#A3E635]/15"
+              className="w-full py-3.5 px-5 rounded-xl bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-colors cursor-pointer shadow-lg shadow-[#A3E635]/15"
             >
               {paymentMethod === 'stripe' ? (
                 <CreditCard className="w-4 h-4 shrink-0" />

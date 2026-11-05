@@ -70,6 +70,9 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
   stripePaymentLinks: {},
 };
 
+const NOVEMBER_PROMO_START = Date.parse('2026-11-01T06:00:00.000Z');
+const NOVEMBER_PROMO_END = Date.parse('2026-12-01T06:00:00.000Z');
+
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [heroView, setHeroView] = useState<
@@ -264,55 +267,58 @@ export default function App() {
   const cleanWhatsAppPhone = normalizeWhatsAppPhone(
     merchantConfig.whatsappNumber
   );
+  const currentTime = Date.now();
+  const isNovemberPromotionActive =
+    currentTime >= NOVEMBER_PROMO_START && currentTime < NOVEMBER_PROMO_END;
 
   return (
-    <div className="min-h-screen bg-[#0B0910] text-[#F8FAFC] flex flex-col pb-24 md:pb-0">
+    <div className="min-h-screen bg-white text-[#201927] flex flex-col pb-24 md:pb-0">
       {/* Strict 3-Zone Top Bar Contract */}
-      <header className="sticky top-0 z-40 bg-[#0B0910]/90 backdrop-blur-md border-b border-[#231E30]">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[#E8E4EB]">
         <div className="max-w-[1160px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4 sm:gap-8">
           {/* Zone 1: Single text element wordmark */}
           <a
             href="#"
-            className="font-display text-lg font-extrabold tracking-tight text-white whitespace-nowrap shrink-0"
+            className="font-display text-lg font-extrabold tracking-tight text-[#201927] whitespace-nowrap shrink-0"
           >
-            Tragoo <span className="text-[#A3E635]">Check</span>
+            Tragoo <span className="text-[#466B00]">Check</span>
           </a>
 
           <div className="flex gap-3 text-xs"><a href="#videos">Videos</a><a href="#novedades">Novedades</a></div>
-          <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-6 text-sm font-medium text-[#C4BED4]">
+          <nav aria-label="Navegación principal" className="hidden md:flex items-center gap-6 text-sm font-medium text-[#51495B]">
             <a
               href="#kits"
-              className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+              className="hover:text-[#201927] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
               Kits
             </a>
             <a
               href="#promociones"
-              className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+              className="hover:text-[#201927] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
               Promociones
             </a>
             <a
               href="#familia"
-              className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+              className="hover:text-[#201927] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
               Family
             </a>
             <a
               href="#mayoreo"
-              className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+              className="hover:text-[#201927] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
               Mayoreo Premium
             </a>
             <a
               href="#simulador"
-              className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+              className="hover:text-[#201927] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
               Simulador 15s
             </a>
             <a
               href="#preguntas"
-              className="hover:text-white hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
+              className="hover:text-[#201927] hover:underline underline-offset-4 transition-colors whitespace-nowrap shrink-0"
             >
               Preguntas
             </a>
@@ -323,7 +329,7 @@ export default function App() {
             <button
               type="button"
               onClick={handleOpenOrder}
-              className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-lg bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-lg bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] font-bold text-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
             >
               <MessageCircle className="w-3.5 h-3.5" />
               <span>{cartCount ? `Ir al pago · (${cartCount})` : 'Ver kits y precios'}</span>
@@ -334,14 +340,14 @@ export default function App() {
               aria-expanded={isMobileMenuOpen}
               aria-controls="mobile-navigation"
               onClick={() => setIsMobileMenuOpen((open) => !open)}
-              className="md:hidden ml-2 p-2 rounded-lg border border-[#2E2840] text-white hover:bg-[#1C1729]"
+              className="md:hidden ml-2 p-2 rounded-lg border border-[#E1DCE6] text-[#201927] hover:bg-[#F4F1F6]"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
         {isMobileMenuOpen && (
-          <nav id="mobile-navigation" aria-label="Navegación móvil" className="md:hidden border-t border-[#231E30] bg-[#0B0910] px-4 py-3 grid grid-cols-2 gap-2 text-sm">
+          <nav id="mobile-navigation" aria-label="Navegación móvil" className="md:hidden border-t border-[#E8E4EB] bg-white px-4 py-3 grid grid-cols-2 gap-2 text-sm">
             {[
               ['Kits', '#kits'],
               ['Promociones', '#promociones'],
@@ -350,25 +356,33 @@ export default function App() {
               ['Simulador', '#simulador'],
               ['Preguntas', '#preguntas'],
             ].map(([label, href]) => (
-              <a key={href} href={href} onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg px-3 py-3 text-[#E4E0EB] hover:bg-[#1C1729]">{label}</a>
+              <a key={href} href={href} onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg px-3 py-3 text-[#51495B] hover:bg-[#F4F1F6]">{label}</a>
             ))}
           </nav>
         )}
       </header>
 
-      <a href="#promociones" className="block bg-[#A3E635] px-4 py-2.5 text-center text-xs sm:text-sm font-extrabold tracking-wide text-[#0B0910] hover:bg-[#BEF264]">
-        CUPONES EN TU PEDIDO · HOY10: 10% DESDE $449 · AMIGAS15: 15% DESDE $1,100 · VER DETALLES
+      <a href="#promociones" aria-label="Ver promociones Tragoo Check de noviembre" className="block border-b border-[#E7DDEE] bg-[#F7F2FA] px-4 py-2.5 text-center text-xs sm:text-sm text-[#3A2845] hover:bg-[#F1EAF6]">
+        <span className="mr-2 inline-flex items-center gap-1.5 rounded-full bg-[#5B2A78] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white">Tragoo Check · Noviembre</span>
+        {isNovemberPromotionActive ? <span className="font-semibold">Promociones del mes: HOY10 ahorra 10% desde $449 · AMIGAS15 ahorra 15% desde $1,100 · Hasta el 30 de noviembre</span> : <span className="font-semibold">Consulta las promociones y condiciones vigentes</span>}
       </a>
+      <div className="border-b border-[#E8E4EB] bg-white px-4 py-2.5">
+        <div className="mx-auto flex max-w-[1160px] flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-medium text-[#51495B] sm:text-xs">
+          <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-[#5B2A78]" />Pago con tarjeta procesado por Stripe</span>
+          <span className="inline-flex items-center gap-1.5"><Globe className="h-4 w-4 text-[#5B2A78]" />Envío $99 · Gratis desde $899 MXN</span>
+          <span className="inline-flex items-center gap-1.5"><MessageCircle className="h-4 w-4 text-[#5B2A78]" />Atención por WhatsApp</span>
+        </div>
+      </div>
 
       {/* Optional Stripe Return Confirmation Banner */}
       {stripeReturnFolio && (
-        <div className="bg-[#172312] border-b border-[#A3E635]/40 px-4 py-3">
+        <div className="bg-[#F2F7E9] border-b border-[#C7DCA9]/40 px-4 py-3">
           <div className="max-w-[1160px] mx-auto flex flex-wrap items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2 text-white">
-              <ShieldCheck className="w-4 h-4 text-[#A3E635]" />
+            <div className="flex items-center gap-2 text-[#201927]">
+              <ShieldCheck className="w-4 h-4 text-[#466B00]" />
               <span>
                 ¡Tu pedido{' '}
-                <strong className="font-mono text-[#A3E635]">
+                <strong className="font-mono text-[#466B00]">
                 {stripeReturnFolio}
                 </strong>{' '}
                 {stripePaymentMessage || 'Pago confirmado.'}
@@ -385,7 +399,7 @@ export default function App() {
             <button
               type="button"
               onClick={() => setStripeReturnFolio(null)}
-              className="text-[#A3E635] hover:underline font-medium cursor-pointer"
+              className="text-[#466B00] hover:underline font-medium cursor-pointer"
             >
               Entendido
             </button>
@@ -405,40 +419,40 @@ export default function App() {
               {/* Left Column */}
               <div className="lg:col-span-6 flex flex-col justify-between space-y-6 py-1 sm:py-2">
                 <div className="space-y-4 sm:space-y-5">
-                  <div className="flex flex-wrap items-center gap-2 text-xs text-[#A3E635] font-medium">
+                  <div className="flex flex-wrap items-center gap-2 text-xs text-[#466B00] font-medium">
                     <span>Tienda Oficial México</span>
-                    <span aria-hidden="true" className="text-[#524A68]">
+                    <span aria-hidden="true" className="text-[#766D80]">
                       ·
                     </span>
                     <a
                       href={activeInstagramUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-[#C4BED4] hover:text-white underline underline-offset-4"
+                      className="inline-flex items-center gap-1 text-[#51495B] hover:text-[#201927] underline underline-offset-4"
                     >
-                      <Instagram className="w-3.5 h-3.5 text-[#A855F7]" />
+                      <Instagram className="w-3.5 h-3.5 text-[#7133A0]" />
                       <span>{INSTAGRAM_HANDLE}</span>
                     </a>
-                    <span aria-hidden="true" className="text-[#524A68]">
+                    <span aria-hidden="true" className="text-[#766D80]">
                       ·
                     </span>
-                    <span className="text-[#C4BED4]">
+                    <span className="text-[#51495B]">
                       WhatsApp 479 229 3687 · Opciones de pago disponibles al pedir
                     </span>
                   </div>
 
                   <h1
-                    className="font-display font-extrabold tracking-tight text-white leading-[1.08] [text-wrap:balance]"
+                    className="font-display font-extrabold tracking-tight text-[#201927] leading-[1.08] [text-wrap:balance]"
                     style={{ fontSize: 'clamp(2.15rem, 4vw, 3.75rem)' }}
                   >
                     Checa antes de{' '}
-                    <span className="text-[#A3E635]">brindar.</span>
+                    <span className="text-[#466B00]">brindar.</span>
                   </h1>
 
-                  <p className="text-sm sm:text-base md:text-lg text-[#C4BED4] leading-relaxed max-w-2xl">
+                  <p className="text-sm sm:text-base md:text-lg text-[#51495B] leading-relaxed max-w-2xl">
                     Pruebas portátiles en{' '}
-                    <strong className="text-white">stickers para uñas</strong> y{' '}
-                    <strong className="text-white">tiras reactivas</strong> con
+                    <strong className="text-[#201927]">stickers para uñas</strong> y{' '}
+                    <strong className="text-[#201927]">tiras reactivas</strong> con
                     estuche llavero mini-tumbler, diseñadas para indicar la posible
                     presencia de algunas sustancias según el tipo de prueba y sus
                     instrucciones.{' '}
@@ -446,7 +460,7 @@ export default function App() {
                       ? 'Paga con tarjeta en el checkout seguro de Stripe; también te atendemos por WhatsApp.'
                       : 'Envía tu pedido por WhatsApp para solicitar un link de pago con tarjeta.'}
                   </p>
-                  <p className="max-w-2xl text-sm leading-relaxed text-[#A3E635]">
+                  <p className="max-w-2xl text-sm leading-relaxed text-[#466B00]">
                     Creemos que contar con más información y herramientas de autocuidado puede ayudar a las personas a cuidarse y acompañarse mejor.
                   </p>
                 </div>
@@ -457,7 +471,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => handleBuyNow(PRODUCT_KITS[0])}
-                      className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-sm transition-colors cursor-pointer whitespace-nowrap shrink-0 shadow-lg shadow-[#A3E635]/10"
+                      className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] font-bold text-sm transition-colors cursor-pointer whitespace-nowrap shrink-0 shadow-lg shadow-[#A3E635]/10"
                     >
                       <CreditCard className="w-4 h-4 shrink-0" />
                       <span>Comprar Kit Noche Completa · $449 MXN</span>
@@ -466,24 +480,24 @@ export default function App() {
 
                     <a
                       href="#mayoreo"
-                      className="inline-flex items-center justify-center px-5 py-3.5 rounded-xl bg-[#14111D] hover:bg-[#1C1729] border border-[#2E2840] text-sm font-semibold text-white transition-colors whitespace-nowrap shrink-0"
+                      className="inline-flex items-center justify-center px-5 py-3.5 rounded-xl bg-white hover:bg-[#F4F1F6] border border-[#E1DCE6] text-sm font-semibold text-[#201927] transition-colors whitespace-nowrap shrink-0"
                     >
                       Mayoreo Premium (Hasta -63%)
                     </a>
                   </div>
 
-                  <div className="rounded-xl border border-[#2E2840] bg-[#14111D] px-4 py-3.5">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-wide text-white">
+                  <div className="rounded-xl border border-[#E1DCE6] bg-white px-4 py-3.5">
+                    <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[#201927]">
                       Compra en 3 pasos
                     </p>
-                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed text-[#C4BED4]">
-                      <span><strong className="text-[#A3E635]">1.</strong> Elige tus productos</span>
-                      <ArrowRight aria-hidden="true" className="hidden h-3.5 w-3.5 text-[#746C87] sm:block" />
-                      <span><strong className="text-[#A3E635]">2.</strong> Revisa y completa tu pedido</span>
-                      <ArrowRight aria-hidden="true" className="hidden h-3.5 w-3.5 text-[#746C87] sm:block" />
-                      <span><strong className="text-[#A3E635]">3.</strong> Elige cómo pagar</span>
+                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed text-[#51495B]">
+                      <span><strong className="text-[#466B00]">1.</strong> Elige tus productos</span>
+                      <ArrowRight aria-hidden="true" className="hidden h-3.5 w-3.5 text-[#756C80] sm:block" />
+                      <span><strong className="text-[#466B00]">2.</strong> Revisa y completa tu pedido</span>
+                      <ArrowRight aria-hidden="true" className="hidden h-3.5 w-3.5 text-[#756C80] sm:block" />
+                      <span><strong className="text-[#466B00]">3.</strong> Elige cómo pagar</span>
                     </div>
-                    <p className="mt-1.5 text-[11px] text-[#8E87A0]">
+                    <p className="mt-1.5 text-[11px] text-[#665D70]">
                       {merchantConfig.hasStripeCheckout ? 'Paga con tarjeta en Stripe; WhatsApp está disponible para coordinar el envío.' : 'Solicita un link de pago con tarjeta por WhatsApp.'}
                     </p>
                   </div>
@@ -494,21 +508,21 @@ export default function App() {
                     {import.meta.env.DEV && <button
                       type="button"
                       onClick={() => setIsMerchantPanelOpen(true)}
-                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#14111D] hover:bg-[#1D182B] border border-[#2E2840] text-xs font-semibold text-[#C4BED4] hover:text-white transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white hover:bg-[#F2EEF5] border border-[#E1DCE6] text-xs font-semibold text-[#51495B] hover:text-[#201927] transition-colors cursor-pointer whitespace-nowrap shrink-0"
                     >
-                      <ClipboardList className="w-3.5 h-3.5 text-[#A3E635]" />
+                      <ClipboardList className="w-3.5 h-3.5 text-[#466B00]" />
                       <span>Panel de Pedidos y Dominio ({orders.length})</span>
                     </button>}
                   </div>
 
-                  <p className="text-xs text-[#8E87A0] leading-relaxed max-w-xl">
-                    <strong className="text-[#C4BED4]">Regla de envíos:</strong>{' '}
+                  <p className="text-xs text-[#665D70] leading-relaxed max-w-xl">
+                    <strong className="text-[#51495B]">Regla de envíos:</strong>{' '}
                     Pedidos de 1 sola pieza o menores a{' '}
-                    <strong className="text-white">$899 MXN</strong> pagan{' '}
-                    <strong className="text-white">$99 MXN</strong> de envío. A
-                    partir de <strong className="text-[#A3E635]">$899 MXN</strong>{' '}
+                    <strong className="text-[#201927]">$899 MXN</strong> pagan{' '}
+                    <strong className="text-[#201927]">$99 MXN</strong> de envío. A
+                    partir de <strong className="text-[#466B00]">$899 MXN</strong>{' '}
                     (Pack Trío 3x, Pack Squad 5x y todas las Cajas de Mayoreo) el{' '}
-                    <strong className="text-[#A3E635]">
+                    <strong className="text-[#466B00]">
                       Envío Express Asegurado es GRATIS
                     </strong>
                     .
@@ -527,7 +541,7 @@ export default function App() {
                     onBuyKit={() => handleBuyNow(PRODUCT_KITS[0])}
                   />
                 ) : (
-                  <div className="relative flex-1 min-h-[320px] sm:min-h-[360px] rounded-2xl overflow-hidden border border-[#262136] bg-[#E2E2E2] flex flex-col justify-end">
+                  <div className="relative flex-1 min-h-[320px] sm:min-h-[360px] rounded-2xl overflow-hidden border border-[#E7E2EA] bg-white flex flex-col justify-end">
                     <img
                       src={activeHeroImage}
                       alt="Empaque oficial Tragoo Check Kit Noche Completa con llavero mini-tumbler"
@@ -535,7 +549,7 @@ export default function App() {
                       className="w-full h-full object-cover"
                     />
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 sm:p-5">
-                      <div className="flex items-center justify-between text-xs text-[#A3E635] font-mono">
+                      <div className="flex items-center justify-between text-xs text-[#466B00] font-mono">
                         <span>
                           {heroView === 'empaque'
                             ? 'KIT NOCHE COMPLETA · BOLSA DOY-PACK + LLAVERO'
@@ -554,16 +568,16 @@ export default function App() {
                     onClick={() => setHeroView('video')}
                     className={`p-2 rounded-xl border text-left flex items-center gap-2 transition-colors cursor-pointer ${
                       heroView === 'video'
-                        ? 'bg-[#171F12] border-[#A3E635] text-white'
-                        : 'bg-[#14111D]/60 border-[#262136] text-[#A19BB2] hover:text-white'
+                        ? 'bg-[#F2F7E9] border-[#C7DCA9] text-[#201927]'
+                        : 'bg-white/80 border-[#E7E2EA] text-[#625969] hover:text-[#201927]'
                     }`}
                   >
-                    <div className="w-9 h-9 rounded-lg bg-[#A3E635]/20 border border-[#A3E635]/50 flex items-center justify-center text-[#A3E635] shrink-0">
+                    <div className="w-9 h-9 rounded-lg bg-[#A3E635]/20 border border-[#C7DCA9]/50 flex items-center justify-center text-[#466B00] shrink-0">
                       <Video className="w-4 h-4" />
                     </div>
                     <div className="min-w-0">
                       <div className="text-xs font-bold truncate">Video Oficial</div>
-                      <div className="text-[10px] text-[#A3E635] truncate">
+                      <div className="text-[10px] text-[#466B00] truncate">
                         Mira cómo se usa
                       </div>
                     </div>
@@ -574,8 +588,8 @@ export default function App() {
                     onClick={() => setHeroView('empaque')}
                     className={`p-2 rounded-xl border text-left flex items-center gap-2 transition-colors cursor-pointer ${
                       heroView === 'empaque'
-                        ? 'bg-[#14111D] border-[#A3E635] text-white'
-                        : 'bg-[#14111D]/60 border-[#262136] text-[#A19BB2] hover:text-white'
+                        ? 'bg-white border-[#C7DCA9] text-[#201927]'
+                        : 'bg-white/80 border-[#E7E2EA] text-[#625969] hover:text-[#201927]'
                     }`}
                   >
                     <img
@@ -594,8 +608,8 @@ export default function App() {
                     onClick={() => setHeroView('squad')}
                     className={`p-2 rounded-xl border text-left flex items-center gap-2 transition-colors cursor-pointer ${
                       heroView === 'squad'
-                        ? 'bg-[#14111D] border-[#A3E635] text-white'
-                        : 'bg-[#14111D]/60 border-[#262136] text-[#A19BB2] hover:text-white'
+                        ? 'bg-white border-[#C7DCA9] text-[#201927]'
+                        : 'bg-white/80 border-[#E7E2EA] text-[#625969] hover:text-[#201927]'
                     }`}
                   >
                     <img
@@ -614,48 +628,48 @@ export default function App() {
 
             {/* Full-Width 4-Column Quantitative Proof & Pricing Rule Bar */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-2">
-              <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30]">
-                <div className="font-mono text-base sm:text-lg font-bold text-[#A3E635] tabular-nums">
+              <div className="p-4 rounded-xl bg-white border border-[#E8E4EB]">
+                <div className="font-mono text-base sm:text-lg font-bold text-[#466B00] tabular-nums">
                   {merchantConfig.hasStripeCheckout ? 'Pago con tarjeta en línea' : 'WhatsApp 479 229 3687'}
                 </div>
-                <div className="text-xs text-[#C4BED4] mt-0.5">
+                <div className="text-xs text-[#51495B] mt-0.5">
                   {merchantConfig.hasStripeCheckout
                     ? 'Checkout de Stripe para tarjeta; WhatsApp para resolver dudas y coordinar el envío.'
                     : 'Escríbenos por WhatsApp para solicitar un link de pago con tarjeta.'}
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30]">
-                <div className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
+              <div className="p-4 rounded-xl bg-white border border-[#E8E4EB]">
+                <div className="font-mono text-base sm:text-lg font-bold text-[#201927] tabular-nums">
                   Envío Gratis ≥ $899
                 </div>
-                <div className="text-xs text-[#C4BED4] mt-0.5">
+                <div className="text-xs text-[#51495B] mt-0.5">
                   Pedidos de 1 pieza o menores a $899 MXN pagan $99 MXN de envío a
                   todo México
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30]">
-                <div className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
+              <div className="p-4 rounded-xl bg-white border border-[#E8E4EB]">
+                <div className="font-mono text-base sm:text-lg font-bold text-[#201927] tabular-nums">
                   $449 → $165 MXN
                 </div>
-                <div className="text-xs text-[#C4BED4] mt-0.5">
+                <div className="text-xs text-[#51495B] mt-0.5">
                   Entre más grande sea tu pedido, menor es el precio unitario por
                   kit garantizado
                 </div>
               </div>
 
-              <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30]">
-                <div className="font-mono text-base sm:text-lg font-bold text-white tabular-nums">
+              <div className="p-4 rounded-xl bg-white border border-[#E8E4EB]">
+                <div className="font-mono text-base sm:text-lg font-bold text-[#201927] tabular-nums">
                   Instalable en Android y iPhone
                 </div>
-                <div className="text-xs text-[#C4BED4] mt-0.5">
+                <div className="text-xs text-[#51495B] mt-0.5">
                   Añade el sitio a tu pantalla de inicio en Android o iPhone y síguenos en{' '}
                   <a
                     href={activeInstagramUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-[#A3E635] underline"
+                    className="text-[#466B00] underline"
                   >
                     @tragoocheck
                   </a>
@@ -666,18 +680,18 @@ export default function App() {
         </section>
 
         {/* ACTIVE PROMOTIONS & COUPONS BAR */}
-        <section id="promociones" className="py-12 border-t border-[#231E30] bg-[#100D18]">
+        <section id="promociones" className="py-12 border-t border-[#E8E4EB] bg-[#F8F7FA]">
           <div className="max-w-[1160px] mx-auto px-4 sm:px-6 space-y-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
               <div className="space-y-1.5">
-                <div className="text-xs font-medium text-[#A3E635]">
-                  Promociones de lanzamiento
+                <div className="text-xs font-bold uppercase tracking-wide text-[#5B2A78]">
+                  {isNovemberPromotionActive ? 'Promociones de noviembre 2026' : 'Promociones vigentes'}
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
-                  Cupones activos hoy y Paquetes Grupales (Envío Gratis desde $899 MXN)
+                <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#201927]">
+                  Ahorra en tus productos favoritos
                 </h2>
               </div>
-              <span className="text-xs text-[#A19BB2]">
+              <span className="text-xs text-[#625969]">
                 Toca cualquier cupón para aplicarlo automáticamente al finalizar tu pedido
               </span>
             </div>
@@ -687,31 +701,31 @@ export default function App() {
               {ACTIVE_COUPONS.map((coupon) => (
                 <div
                   key={coupon.code}
-                  className="p-5 rounded-xl bg-[#14111D] border border-[#262136] flex flex-col justify-between gap-4"
+                  className="p-5 rounded-xl bg-white border border-[#E7E2EA] flex flex-col justify-between gap-4"
                 >
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-mono text-sm font-bold text-[#A3E635] flex items-center gap-1.5">
+                      <span className="font-mono text-sm font-bold text-[#466B00] flex items-center gap-1.5">
                         <Tag className="w-3.5 h-3.5" />
                         {coupon.code}
                       </span>
-                      <span className="text-xs text-white font-semibold">
+                      <span className="text-xs text-[#201927] font-semibold">
                         {coupon.label}
                       </span>
                     </div>
-                    <p className="text-xs text-[#C4BED4] leading-relaxed">
+                    <p className="text-xs text-[#51495B] leading-relaxed">
                       {coupon.description}
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-[#231E30]">
-                    <span className="text-[11px] text-[#8E87A0] font-mono">
+                  <div className="flex items-center justify-between pt-2 border-t border-[#E8E4EB]">
+                    <span className="text-[11px] text-[#665D70] font-mono">
                       Compra mín: ${coupon.minPurchase.toLocaleString('es-MX')} MXN
                     </span>
                     <button
                       type="button"
                       onClick={() => handleActivateCoupon(coupon.code)}
-                      className="text-xs font-bold text-[#A3E635] hover:underline cursor-pointer whitespace-nowrap shrink-0"
+                      className="text-xs font-bold text-[#466B00] hover:underline cursor-pointer whitespace-nowrap shrink-0"
                     >
                       Activar cupón →
                     </button>
@@ -723,17 +737,17 @@ export default function App() {
         </section>
 
 
-        <section id="familia" className="border-t border-[#231E30] bg-gradient-to-br from-[#17101F] via-[#130F1B] to-[#1D1428] py-12 sm:py-16 scroll-mt-20">
+        <section id="familia" className="border-t border-[#E8E4EB] bg-gradient-to-br from-[#F7F2FA] via-white to-[#F4F8EC] py-12 sm:py-16 scroll-mt-20">
           <div className="max-w-[1160px] mx-auto px-4 sm:px-6">
             <div className="mb-6 sm:mb-8 max-w-2xl">
-              <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#DDA8FF]">Tragoo Check Family</div>
-              <h2 className="mt-2 text-2xl sm:text-4xl font-extrabold tracking-tight text-white [text-wrap:balance]">Más cerca de quienes quieres</h2>
-              <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#D5CDE0]">Una propuesta de apoyo familiar para personas adultas mayores y para salidas acompañadas con niñas y niños. Diseñada para dar más tranquilidad en el día a día.</p>
+              <div className="text-xs font-bold uppercase tracking-[0.2em] text-[#6B368B]">Tragoo Check Family</div>
+              <h2 className="mt-2 text-2xl sm:text-4xl font-extrabold tracking-tight text-[#201927] [text-wrap:balance]">Más cerca de quienes quieres</h2>
+              <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#51495B]">Una propuesta de apoyo familiar para personas adultas mayores y para salidas acompañadas con niñas y niños. Diseñada para dar más tranquilidad en el día a día.</p>
             </div>
 
-            <article className="overflow-hidden rounded-3xl border border-[#4B3463] bg-[#F9F5FF] text-[#21172B] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+            <article className="overflow-hidden rounded-3xl border border-[#E1D6E8] bg-[#F9F5FF] text-[#21172B] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
                 <div className="grid md:grid-cols-[1.05fr_0.95fr]">
-                  <div className="relative min-h-[260px] sm:min-h-[360px] bg-[#160F1D]">
+                  <div className="relative min-h-[260px] sm:min-h-[360px] bg-white">
                     <img src={FAMILY_PRODUCTS[0].image} alt="Versiones Bluetooth y GPS/SIM de las pulseras SOS Family Tragoo Check" className="absolute inset-0 h-full w-full object-contain" loading="lazy" />
                   </div>
                   <div className="flex flex-col justify-center p-5 sm:p-8 lg:p-10">
@@ -771,15 +785,15 @@ export default function App() {
                 </div>
             </article>
 
-            <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-[#48335B] bg-[#1C1425] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
+            <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-[#E1D6E8] bg-[#F7F2FA] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <div className="flex items-start gap-3">
                 <span className="text-3xl" aria-hidden="true">🧸</span>
                 <div>
-                  <div className="text-xs font-extrabold uppercase tracking-wider text-[#DDA8FF]">Tragoo Check Kids · Próximamente</div>
-                  <p className="mt-1 text-xs leading-relaxed text-[#D5CDE0]">Estamos preparando una alarma infantil tipo osito con cordón de jalón. Publicaremos precio y características cuando confirmemos la ficha del producto.</p>
+                  <div className="text-xs font-extrabold uppercase tracking-wider text-[#6B368B]">Tragoo Check Kids · Próximamente</div>
+                  <p className="mt-1 text-xs leading-relaxed text-[#51495B]">Estamos preparando una alarma infantil tipo osito con cordón de jalón. Publicaremos precio y características cuando confirmemos la ficha del producto.</p>
                 </div>
               </div>
-              <a href={"https://wa.me/" + cleanWhatsAppPhone + "?text=" + encodeURIComponent('Hola Tragoo Check. Quiero recibir información cuando esté disponible la alarma infantil Tragoo Check Kids tipo osito.')} target="_blank" rel="noopener noreferrer" className="inline-flex shrink-0 items-center justify-center rounded-xl border border-[#72518C] px-4 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#342240] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DDA8FF]">
+              <a href={"https://wa.me/" + cleanWhatsAppPhone + "?text=" + encodeURIComponent('Hola Tragoo Check. Quiero recibir información cuando esté disponible la alarma infantil Tragoo Check Kids tipo osito.')} target="_blank" rel="noopener noreferrer" className="inline-flex shrink-0 items-center justify-center rounded-xl border border-[#D9C7E4] px-4 py-2.5 text-xs font-bold text-[#201927] transition-colors hover:bg-[#EEEAF1] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#DDA8FF]">
                 Avísenme por WhatsApp
               </a>
             </div>
@@ -789,21 +803,21 @@ export default function App() {
         {/* FEATURED CATALOG: INDIVIDUALS + MULTIPACK PROMOTIONS */}
         <VideoGallery />
         <UpcomingProducts onBuy={handleBuyNow} />
-        <section id="kits" className="py-14 md:py-24 border-t border-[#231E30]">
+        <section id="kits" className="py-14 md:py-24 border-t border-[#E8E4EB]">
           <div className="max-w-[1160px] mx-auto px-4 sm:px-6 space-y-10">
             {/* Header + Interactive Category Filter Tabs */}
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
               <div className="space-y-2">
-                <div className="text-xs font-medium text-[#A3E635]">
+                <div className="text-xs font-medium text-[#466B00]">
                   Kits, paquetes y accesorios Tragoo Check
                 </div>
-                <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white [text-wrap:balance]">
+                <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#201927] [text-wrap:balance]">
                   Encuentra lo que necesitas para tu próxima salida.
                 </h2>
               </div>
 
               {/* Responsive filter controls */}
-              <div role="group" aria-label="Filtrar catálogo" className="grid grid-cols-2 xl:grid-cols-4 gap-1 w-full lg:w-auto p-1 bg-[#14111D] border border-[#262136] rounded-xl self-start">
+              <div role="group" aria-label="Filtrar catálogo" className="grid grid-cols-2 xl:grid-cols-4 gap-1 w-full lg:w-auto p-1 bg-white border border-[#E7E2EA] rounded-xl self-start">
                 <button
                   type="button"
                   onClick={() => setCatalogFilter('all')}
@@ -811,7 +825,7 @@ export default function App() {
                   className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
                     catalogFilter === 'all'
                       ? 'bg-[#A3E635] text-[#0B0910] font-bold'
-                      : 'text-[#C4BED4] hover:text-white'
+                      : 'text-[#51495B] hover:text-[#201927]'
                   }`}
                 >
                   Todos ({PRODUCT_KITS.length + PROMO_BUNDLES.length + BRACELET_PRODUCTS.length})
@@ -823,7 +837,7 @@ export default function App() {
                   className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
                     catalogFilter === 'individual'
                       ? 'bg-[#A3E635] text-[#0B0910] font-bold'
-                      : 'text-[#C4BED4] hover:text-white'
+                      : 'text-[#51495B] hover:text-[#201927]'
                   }`}
                 >
                   Individuales ({PRODUCT_KITS.length + BRACELET_PRODUCTS.filter((product) => product.category === 'individual').length})
@@ -835,7 +849,7 @@ export default function App() {
                   className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${
                     catalogFilter === 'promocion'
                       ? 'bg-[#A3E635] text-[#0B0910] font-bold'
-                      : 'text-[#C4BED4] hover:text-white'
+                      : 'text-[#51495B] hover:text-[#201927]'
                   }`}
                 >
                   Paquetes ({PROMO_BUNDLES.length + BRACELET_PRODUCTS.filter((product) => product.category === 'promocion').length})
@@ -844,7 +858,7 @@ export default function App() {
                   type="button"
                   onClick={() => setCatalogFilter('accesorios')}
                   aria-pressed={catalogFilter === 'accesorios'}
-                  className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${catalogFilter === 'accesorios' ? 'bg-[#A3E635] text-[#0B0910] font-bold' : 'text-[#C4BED4] hover:text-white'}`}
+                  className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${catalogFilter === 'accesorios' ? 'bg-[#A3E635] text-[#0B0910] font-bold' : 'text-[#51495B] hover:text-[#201927]'}`}
                 >
                   Accesorios ({BRACELET_PRODUCTS.length})
                 </button>
@@ -856,8 +870,8 @@ export default function App() {
               {displayedRetailProducts.map((kit) => (
                 <article
                   key={kit.id}
-                  className={`rounded-2xl bg-[#14111D] border flex flex-col justify-between overflow-hidden transition-transform duration-150 hover:-translate-y-0.5 ${
-                    kit.featured ? 'border-[#A3E635]' : 'border-[#262136]'
+                  className={`rounded-2xl bg-white border shadow-sm flex flex-col justify-between overflow-hidden transition-transform duration-150 hover:-translate-y-0.5 ${
+                    kit.featured ? 'border-[#C7DCA9]' : 'border-[#E7E2EA]'
                   }`}
                 >
                   <div>
@@ -865,16 +879,16 @@ export default function App() {
 
                     <div className="p-5 sm:p-6 space-y-4">
                       {/* Unboxed Metadata Kicker */}
-                      <div className="text-xs font-medium text-[#A3E635]">
+                      <div className="text-xs font-medium text-[#466B00]">
                         {kit.kicker}
                       </div>
 
                       <div className="space-y-1">
-                        <h3 className="text-lg sm:text-xl font-bold text-white leading-snug">
+                        <h3 className="text-lg sm:text-xl font-bold text-[#201927] leading-snug">
                           {kit.name}
                         </h3>
                         {kit.unitPriceLabel && (
-                          <div className="text-xs text-[#A3E635] font-mono font-semibold">
+                          <div className="text-xs text-[#466B00] font-mono font-semibold">
                             {kit.unitPriceLabel}
                           </div>
                         )}
@@ -882,53 +896,53 @@ export default function App() {
 
                       <div className="flex items-baseline gap-2">
                         {kit.compareAtPrice && (
-                          <span className="font-mono text-xs text-[#7D7691] line-through tabular-nums">
+                          <span className="font-mono text-xs text-[#70677A] line-through tabular-nums">
                             ${kit.compareAtPrice.toLocaleString('es-MX')}
                           </span>
                         )}
-                        <span className="font-mono text-2xl font-extrabold text-white tabular-nums">
+                        <span className="font-mono text-2xl font-extrabold text-[#201927] tabular-nums">
                           ${kit.price.toLocaleString('es-MX')}
                         </span>
-                        <span className="text-xs text-[#A19BB2]">MXN</span>
+                        <span className="text-xs text-[#625969]">MXN</span>
                         {kit.compareAtPrice && kit.compareAtPrice > kit.price && (
-                          <span className="rounded-full bg-[#A3E635]/10 px-2 py-1 text-[10px] font-extrabold text-[#A3E635]">
+                          <span className="rounded-full bg-[#A3E635]/10 px-2 py-1 text-[10px] font-extrabold text-[#466B00]">
                             Ahorra {Math.round(((kit.compareAtPrice - kit.price) / kit.compareAtPrice) * 100)}%
                           </span>
                         )}
                       </div>
 
-                      <p className="text-xs sm:text-sm text-[#C4BED4] leading-relaxed">
+                      <p className="text-xs sm:text-sm text-[#51495B] leading-relaxed">
                         {kit.subtitle}
                       </p>
                       {kit.substancesDetected && (
-                        <div className="inline-flex items-center gap-1.5 rounded-full border border-[#A3E635]/25 bg-[#A3E635]/10 px-2.5 py-1.5 text-[10px] font-semibold text-[#D9F99D]">
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-[#C7DCA9]/25 bg-[#A3E635]/10 px-2.5 py-1.5 text-[10px] font-semibold text-[#426700]">
                           <ShieldCheck className="h-3.5 w-3.5" /> Estudios propios y pruebas con personas reales
                         </div>
                       )}
 
-                      <div className="pt-2 border-t border-[#231E30] space-y-1.5 text-xs">
+                      <div className="pt-2 border-t border-[#E8E4EB] space-y-1.5 text-xs">
                         <div>
-                          <span className="text-[#8E87A0] block">Contenido:</span>
-                          <span className="text-white font-medium">
+                          <span className="text-[#665D70] block">Contenido:</span>
+                          <span className="text-[#201927] font-medium">
                             {kit.contentsSummary}
                           </span>
                         </div>
                         {kit.substancesDetected && (
                         <div>
-                          <span className="text-[#8E87A0] block">
+                          <span className="text-[#665D70] block">
                             Lectura de prueba:
                           </span>
-                          <span className="text-[#C4BED4]">
+                          <span className="text-[#51495B]">
                             {kit.substancesDetected}
                           </span>
                         </div>
                         )}
                       </div>
 
-                      <ul className="space-y-1.5 pt-1 text-xs text-[#A19BB2]">
+                      <ul className="space-y-1.5 pt-1 text-xs text-[#625969]">
                         {kit.includedItems.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2">
-                            <Check className="w-3.5 h-3.5 text-[#A3E635] shrink-0 mt-0.5" />
+                            <Check className="w-3.5 h-3.5 text-[#466B00] shrink-0 mt-0.5" />
                             <span>{item}</span>
                           </li>
                         ))}
@@ -940,7 +954,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => handleBuyNow(kit)}
-                      className="w-full py-3 px-4 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
+                      className="w-full py-3 px-4 rounded-xl bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] font-bold text-xs flex items-center justify-center gap-2 transition-colors cursor-pointer whitespace-nowrap"
                     >
                       <CreditCard className="w-3.5 h-3.5 shrink-0" />
                       <span>
@@ -950,7 +964,7 @@ export default function App() {
                     <button
                       type="button"
                       onClick={() => handleAddToCart(kit, true)}
-                      className="w-full py-2.5 px-4 rounded-xl bg-[#1C1728] hover:bg-[#262036] text-white font-medium text-xs transition-colors cursor-pointer whitespace-nowrap"
+                      className="w-full py-2.5 px-4 rounded-xl bg-[#F4F1F6] hover:bg-[#EEEAF1] text-[#201927] font-medium text-xs transition-colors cursor-pointer whitespace-nowrap"
                     >
                       Agregar al carrito
                     </button>
@@ -960,13 +974,13 @@ export default function App() {
             </div>
 
             {/* Main card checkout with a WhatsApp payment-link alternative */}
-            <div className="p-5 sm:p-6 rounded-2xl bg-[#110E19] border border-[#262136] space-y-5">
+            <div className="p-5 sm:p-6 rounded-2xl bg-[#F8F7FA] border border-[#E7E2EA] space-y-5">
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="space-y-1">
-                  <div className="text-xs font-semibold text-[#A3E635]">
+                  <div className="text-xs font-semibold text-[#466B00]">
                     {merchantConfig.hasStripeCheckout ? 'Pago seguro con tarjeta o link de pago por WhatsApp · 479 229 3687' : 'Solicita tu link de pago por WhatsApp · 479 229 3687'}
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white">
+                  <h3 className="text-lg sm:text-xl font-bold text-[#201927]">
                     Completa tu compra y revisa el total y el envío antes de pagar.
                   </h3>
                 </div>
@@ -975,7 +989,7 @@ export default function App() {
                   <button
                     type="button"
                     onClick={handleOpenOrder}
-                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] text-xs font-bold transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] text-xs font-bold transition-colors cursor-pointer"
                   >
                     <CreditCard className="w-4 h-4" />
                     <span>Abrir carrito y elegir pago ({cartCount})</span>
@@ -986,24 +1000,24 @@ export default function App() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                 {merchantConfig.hasStripeCheckout && (
-                  <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30] space-y-1.5">
-                    <div className="flex items-center gap-2 text-xs font-bold text-white">
-                      <CreditCard className="w-4 h-4 text-[#A3E635]" />
+                  <div className="p-4 rounded-xl bg-white border border-[#E8E4EB] space-y-1.5">
+                    <div className="flex items-center gap-2 text-xs font-bold text-[#201927]">
+                      <CreditCard className="w-4 h-4 text-[#466B00]" />
                       <span>1. Tarjeta en línea · Stripe</span>
                     </div>
-                    <p className="text-xs text-[#C4BED4] leading-relaxed">
+                    <p className="text-xs text-[#51495B] leading-relaxed">
                       Paga en el checkout seguro de Stripe. Al confirmarse, se abre WhatsApp con el folio del pedido.
                     </p>
                   </div>
                 )}
-                <div className="p-4 rounded-xl bg-[#14111D] border border-[#231E30] space-y-1.5">
-                  <div className="flex items-center gap-2 text-xs font-bold text-white">
-                    <CreditCard className="w-4 h-4 text-[#A3E635]" />
+                <div className="p-4 rounded-xl bg-white border border-[#E8E4EB] space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#201927]">
+                    <CreditCard className="w-4 h-4 text-[#466B00]" />
                     <span>{merchantConfig.hasStripeCheckout ? '2. Link de Pago por WhatsApp' : '1. Link de Pago con Tarjeta'}</span>
                   </div>
-                  <p className="text-xs text-[#C4BED4] leading-relaxed">
+                  <p className="text-xs text-[#51495B] leading-relaxed">
                     Al enviar tu pedido a nuestro WhatsApp{' '}
-                    <strong className="text-white">479 229 3687</strong>, te
+                    <strong className="text-[#201927]">479 229 3687</strong>, te
                     compartimos tu link oficial de cobro para pagar con tarjeta de
                     débito o crédito y tu confirmación.
                   </p>
@@ -1026,17 +1040,17 @@ export default function App() {
         {/* OFFICIAL PACKAGING INSTRUCTIONS + SAFETY INFORMATION (EXACT BACK OF POUCH) */}
         <section
           id="como-funciona"
-          className="py-14 md:py-24 border-t border-[#231E30]"
+          className="py-14 md:py-24 border-t border-[#E8E4EB]"
         >
           <div className="max-w-[1160px] mx-auto px-4 sm:px-6">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-start">
               {/* Left 6 Cols: Exact 4 Steps & Verbatim Safety Bullet Points from Back of Pouch */}
               <div className="lg:col-span-6 space-y-6">
                 <div className="space-y-1.5">
-                  <div className="text-xs font-semibold text-[#A3E635]">
+                  <div className="text-xs font-semibold text-[#466B00]">
                     Formato real de la sticker para uñas
                   </div>
-                  <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
+                  <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#201927]">
                     CÓMO APLICAR:
                   </h2>
                 </div>
@@ -1050,12 +1064,12 @@ export default function App() {
                   ].map((stepText, idx) => (
                     <div
                       key={idx}
-                      className="p-3.5 rounded-xl bg-[#14111D] border border-[#262136] flex items-center gap-3.5"
+                      className="p-3.5 rounded-xl bg-white border border-[#E7E2EA] flex items-center gap-3.5"
                     >
                       <span className="w-7 h-7 rounded-full bg-[#A3E635] text-[#0B0910] font-mono font-extrabold text-sm flex items-center justify-center shrink-0">
                         {idx + 1}
                       </span>
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm font-medium text-[#201927]">
                         {stepText}
                       </span>
                     </div>
@@ -1063,17 +1077,17 @@ export default function App() {
                 </div>
 
                 {/* Highlighted Warning from Pouch */}
-                <div className="p-4 rounded-xl bg-[#14111D] border border-[#A855F7]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="text-sm sm:text-base font-bold text-white">
+                <div className="p-4 rounded-xl bg-white border border-[#A855F7]/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="text-sm sm:text-base font-bold text-[#201927]">
                     Si observas el cambio de color indicado por el fabricante,{' '}
-                    <span className="text-[#A3E635]">NO TOMES.</span>
+                    <span className="text-[#466B00]">NO TOMES.</span>
                   </div>
                   <div className="flex items-center gap-3 text-xs font-semibold shrink-0">
                     <span className="inline-flex items-center gap-1.5 text-yellow-300">
                       <span className="w-3 h-3 rounded-full bg-yellow-400 inline-block" />
                       Sin cambio visible
                     </span>
-                    <span className="inline-flex items-center gap-1.5 text-[#A3E635]">
+                    <span className="inline-flex items-center gap-1.5 text-[#466B00]">
                       <span className="w-3 h-3 rounded-full bg-gradient-to-r from-yellow-400 to-[#22C55E] inline-block" />
                       Posible reacción
                     </span>
@@ -1081,15 +1095,15 @@ export default function App() {
                 </div>
 
                 {/* Exact Verbatim Información de Seguridad Importante */}
-                <div className="p-5 sm:p-6 rounded-2xl bg-[#14111D] border border-[#2E2840] space-y-4">
-                  <div className="flex items-center gap-2 text-sm font-bold text-white border-b border-[#A855F7]/40 pb-3">
-                    <AlertTriangle className="w-4 h-4 text-[#A3E635] shrink-0" />
+                <div className="p-5 sm:p-6 rounded-2xl bg-white border border-[#E1DCE6] space-y-4">
+                  <div className="flex items-center gap-2 text-sm font-bold text-[#201927] border-b border-[#A855F7]/40 pb-3">
+                    <AlertTriangle className="w-4 h-4 text-[#466B00] shrink-0" />
                     <span>Información de Seguridad Importante</span>
                   </div>
 
-                  <ul className="space-y-2.5 text-xs text-[#C4BED4] leading-relaxed">
+                  <ul className="space-y-2.5 text-xs text-[#51495B] leading-relaxed">
                     <li className="flex items-start gap-2.5">
-                      <span className="text-[#A3E635] font-bold">•</span>
+                      <span className="text-[#466B00] font-bold">•</span>
                       <span>
                         Este es un producto de un solo uso para fines informativos y
                         de detección personal solamente. No garantiza el 100% de
@@ -1100,11 +1114,11 @@ export default function App() {
                       </span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="text-[#A3E635] font-bold">•</span>
+                      <span className="text-[#466B00] font-bold">•</span>
                       <span>Diseñado para un solo uso. No reutilizar.</span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="text-[#A3E635] font-bold">•</span>
+                      <span className="text-[#466B00] font-bold">•</span>
                       <span>
                         El lavado de manos es posible con el sticker puesto, pero la
                         exposición a ciertos jabones o químicos puede reducir la
@@ -1112,7 +1126,7 @@ export default function App() {
                       </span>
                     </li>
                     <li className="flex items-start gap-2.5">
-                      <span className="text-[#A3E635] font-bold">•</span>
+                      <span className="text-[#466B00] font-bold">•</span>
                       <span>
                         Este producto no está clasificado como dispositivo médico de
                         diagnóstico in vitro (IVD) y no está sujeto a regulaciones de
@@ -1121,15 +1135,15 @@ export default function App() {
                     </li>
                   </ul>
 
-                  <div className="pt-3 border-t border-[#231E30] flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#A19BB2]">
+                  <div className="pt-3 border-t border-[#E8E4EB] flex flex-wrap items-center justify-between gap-2 text-[11px] text-[#625969]">
                     <div>
-                      <span className="text-[#A3E635] font-bold">
+                      <span className="text-[#466B00] font-bold">
                         tragoocheck.shop · @tragoocheck
                       </span>{' '}
                       · Distribuido por Tragoo Check S.A. de C.V. México. / Caduca
                       01/2033.
                     </div>
-                    <span className="font-mono font-bold text-[#A3E635]">
+                    <span className="font-mono font-bold text-[#466B00]">
                       HECHO EN MÉXICO
                     </span>
                   </div>
@@ -1138,7 +1152,7 @@ export default function App() {
 
               {/* Right 6 Cols: Official Back of Pouch Photo */}
               <div className="lg:col-span-6">
-                <div className="rounded-2xl overflow-hidden border border-[#2E2840] bg-[#E2E2E2]">
+                <div className="rounded-2xl overflow-hidden border border-[#E1DCE6] bg-white">
                   <img
                     src={KIT_STICKERS_IMAGE}
                     alt="Sticker pequeño en forma de corazón colocado sobre una uña, en escala discreta"
@@ -1152,21 +1166,21 @@ export default function App() {
         </section>
 
         {/* INSTAGRAM @TRAGOOCHECK + ANDROID/IOS PWA INSTALL BANNER */}
-        <section className="py-12 sm:py-14 border-t border-[#231E30] bg-[#100D18]">
+        <section className="py-12 sm:py-14 border-t border-[#E8E4EB] bg-[#F8F7FA]">
           <div className="max-w-[1160px] mx-auto px-4 sm:px-6">
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#14111D] border border-[#2E2840] grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E1DCE6] grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
               <div className="lg:col-span-7 flex items-start sm:items-center gap-4">
                 <TragooLogoIcon className="w-14 h-14 sm:w-16 sm:h-16" />
                 <div className="space-y-1.5">
-                  <div className="text-xs font-semibold text-[#A3E635]">
+                  <div className="text-xs font-semibold text-[#466B00]">
                     App Instalable Android & iPhone (iOS) · Comunidad @tragoocheck
                   </div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white">
+                  <h3 className="text-lg sm:text-xl font-bold text-[#201927]">
                     Instala Tragoo Check en tu celular y síguenos en {INSTAGRAM_HANDLE}
                   </h3>
-                  <p className="text-xs text-[#C4BED4] leading-relaxed">
-                    Agrega el icono oficial de <strong className="text-white">Tragoo Check</strong>{' '}
-                    a tu pantalla de inicio en <strong className="text-white">Android o iPhone</strong>{' '}
+                  <p className="text-xs text-[#51495B] leading-relaxed">
+                    Agrega el icono oficial de <strong className="text-[#201927]">Tragoo Check</strong>{' '}
+                    a tu pantalla de inicio en <strong className="text-[#201927]">Android o iPhone</strong>{' '}
                     para comprar kits o consultar la escala de colores en 15 segundos.
                   </p>
                 </div>
@@ -1191,19 +1205,19 @@ export default function App() {
         {/* FAQ SECTION */}
         <section
           id="preguntas"
-          className="py-14 md:py-24 border-t border-[#231E30]"
+          className="py-14 md:py-24 border-t border-[#E8E4EB]"
         >
           <div className="max-w-[900px] mx-auto px-4 sm:px-6 space-y-10">
             <div className="space-y-2">
-              <div className="text-xs font-medium text-[#A3E635]">
+              <div className="text-xs font-medium text-[#466B00]">
                 Para salir con más calma · Dudas resueltas con claridad
               </div>
-              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white">
+              <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#201927]">
                 Preguntas frecuentes
               </h2>
             </div>
 
-            <div className="divide-y divide-[#231E30] border-t border-b border-[#231E30]">
+            <div className="divide-y divide-[#E8E4EB] border-t border-b border-[#E8E4EB]">
               {FAQS.map((faq, idx) => {
                 const isOpen = openFaqIndex === idx;
                 const answer = idx === 0
@@ -1218,10 +1232,10 @@ export default function App() {
                       onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
                       className="w-full flex items-center justify-between gap-4 text-left cursor-pointer"
                     >
-                      <span className="text-sm sm:text-base font-bold text-white">
+                      <span className="text-sm sm:text-base font-bold text-[#201927]">
                         {faq.question}
                       </span>
-                      <span className="text-[#A3E635] shrink-0">
+                      <span className="text-[#466B00] shrink-0">
                         {isOpen ? (
                           <Minus className="w-5 h-5" />
                         ) : (
@@ -1230,7 +1244,7 @@ export default function App() {
                       </span>
                     </button>
                     {isOpen && (
-                      <p className="mt-3 text-xs sm:text-sm text-[#C4BED4] leading-relaxed pr-4 sm:pr-8">
+                      <p className="mt-3 text-xs sm:text-sm text-[#51495B] leading-relaxed pr-4 sm:pr-8">
                         {answer}
                       </p>
                     )}
@@ -1239,13 +1253,13 @@ export default function App() {
               })}
             </div>
 
-            <div className="p-6 sm:p-8 rounded-2xl bg-[#14111D] border border-[#262136] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#E7E2EA] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
               <div className="space-y-1">
-                <h3 className="text-lg font-bold text-white">
+                <h3 className="text-lg font-bold text-[#201927]">
                   ¿Lista para completar tu pedido?
                 </h3>
-                <p className="text-xs text-[#C4BED4]">
-                  Atención inmediata en el <strong className="text-white">479 229 3687</strong> ·
+                <p className="text-xs text-[#51495B]">
+                  Atención inmediata en el <strong className="text-[#201927]">479 229 3687</strong> ·
                   {merchantConfig.hasStripeCheckout ? 'Paga con tarjeta en el checkout de Stripe; WhatsApp está disponible si necesitas ayuda.' : 'Solicita un link de pago con tarjeta por WhatsApp.'}
                 </p>
               </div>
@@ -1253,7 +1267,7 @@ export default function App() {
                 <button
                   type="button"
                   onClick={handleOpenOrder}
-                  className="px-5 py-3 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
+                  className="px-5 py-3 rounded-xl bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] font-bold text-xs transition-colors cursor-pointer whitespace-nowrap shrink-0"
                 >
                   Abrir carrito ({cartCount})
                 </button>
@@ -1263,9 +1277,9 @@ export default function App() {
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl border border-[#2E2840] text-xs font-semibold text-white hover:bg-[#1C1728] transition-colors whitespace-nowrap shrink-0"
+                  className="inline-flex items-center gap-1.5 px-4 py-3 rounded-xl border border-[#E1DCE6] text-xs font-semibold text-[#201927] hover:bg-[#F4F1F6] transition-colors whitespace-nowrap shrink-0"
                 >
-                  <MessageCircle className="w-3.5 h-3.5 text-[#A3E635]" />
+                  <MessageCircle className="w-3.5 h-3.5 text-[#466B00]" />
                   <span>WhatsApp 479 229 3687</span>
                 </a>
               </div>
@@ -1275,32 +1289,32 @@ export default function App() {
       </main>
 
       {/* Footer with Instagram, Domain Status & Seller Order Panel Trigger */}
-      <footer className="border-t border-[#231E30] bg-[#09070D] py-10">
+      <footer className="border-t border-[#E8E4EB] bg-[#F8F7FA] py-10">
         <div className="max-w-[1160px] mx-auto px-4 sm:px-6 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div className="flex items-start gap-3.5 max-w-xl">
             <TragooLogoIcon className="w-10 h-10 mt-0.5" />
             <div className="space-y-1.5">
               <div className="flex flex-wrap items-center gap-2.5">
-                <span className="font-display text-base font-extrabold text-white">
-                  Tragoo <span className="text-[#A3E635]">Check</span>
+                <span className="font-display text-base font-extrabold text-[#201927]">
+                  Tragoo <span className="text-[#466B00]">Check</span>
                 </span>
-                <span className="text-xs text-[#524A68]">·</span>
+                <span className="text-xs text-[#766D80]">·</span>
                 <a
                   href={activeInstagramUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-xs text-[#A3E635] hover:underline"
+                  className="inline-flex items-center gap-1 text-xs text-[#466B00] hover:underline"
                 >
                   <Instagram className="w-3.5 h-3.5" />
                   <span>{INSTAGRAM_HANDLE}</span>
                 </a>
-                <span className="text-xs text-[#524A68]">·</span>
-                <span className="inline-flex items-center gap-1 text-xs text-[#C4BED4] font-mono">
-                  <Globe className="w-3 h-3 text-[#A855F7]" />
+                <span className="text-xs text-[#766D80]">·</span>
+                <span className="inline-flex items-center gap-1 text-xs text-[#51495B] font-mono">
+                  <Globe className="w-3 h-3 text-[#7133A0]" />
                   {merchantConfig.customDomain || 'tragoocheck.shop'}
                 </span>
               </div>
-              <p className="text-xs text-[#8E87A0] leading-relaxed">
+              <p className="text-xs text-[#665D70] leading-relaxed">
                 Compra en línea o por WhatsApp 479 229 3687. Pedidos de 1 sola pieza o menores a $899 MXN pagan $99 MXN de
                 envío; envío gratis en compras desde $899 MXN.
               </p>
@@ -1311,7 +1325,7 @@ export default function App() {
             {import.meta.env.DEV && <button
               type="button"
               onClick={() => setIsMerchantPanelOpen(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] text-xs font-bold transition-colors cursor-pointer whitespace-nowrap shrink-0"
             >
               <SlidersHorizontal className="w-3.5 h-3.5" />
               <span>
@@ -1323,13 +1337,13 @@ export default function App() {
       </footer>
 
       {/* Mobile Sticky Bottom Bar (Android & iOS App Experience) */}
-      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-[#0F0C16]/95 backdrop-blur-md border-t border-[#262136] px-3 py-2.5 flex items-center justify-between gap-2 shadow-2xl">
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur-md border-t border-[#E7E2EA] px-3 py-2.5 flex items-center justify-between gap-2 shadow-2xl">
         <PWAInstallSection compact />
 
         <button
           type="button"
           onClick={handleOpenOrder}
-          className="flex-1 py-2.5 px-3.5 rounded-xl bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-md shadow-[#A3E635]/15"
+          className="flex-1 py-2.5 px-3.5 rounded-xl bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer shadow-md shadow-[#A3E635]/15"
         >
           <MessageCircle className="w-4 h-4 shrink-0" />
           <span className="truncate">
