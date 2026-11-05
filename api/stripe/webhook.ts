@@ -2,7 +2,13 @@ import type Stripe from 'stripe';
 import { stripeClient } from '../_shared.js';
 
 function json(data: unknown, status = 200): Response {
-  return Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
+  return Response.json(data, {
+    status,
+    headers: {
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
 }
 
 const PAYMENT_EVENTS = new Set([
@@ -11,7 +17,33 @@ const PAYMENT_EVENTS = new Set([
   'checkout.session.async_payment_failed',
 ]);
 
+async function readBodyLimited(request: Request, maxBytes: number): Promise<string> {
+  const reader = request.body?.getReader();
+  if (!reader) return '';
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    totalBytes += value.byteLength;
+    if (totalBytes > maxBytes) {
+      await reader.cancel();
+      throw new RangeError('Stripe event exceeds the request limit.');
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
+}
+
 export async function POST(request: Request): Promise<Response> {
+  const contentLength = Number(request.headers.get('content-length') || 0);
+  if (contentLength > 1_048_576) return json({ error: 'Evento de Stripe demasiado grande.' }, 413);
   const signature = request.headers.get('stripe-signature');
   const signingSecret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!signature || !signingSecret) {
@@ -20,7 +52,7 @@ export async function POST(request: Request): Promise<Response> {
 
   try {
     const stripe = await stripeClient();
-    const rawBody = await request.text();
+    const rawBody = await readBodyLimited(request, 1_048_576);
     let event: Stripe.Event;
 
     try {
@@ -71,6 +103,7 @@ export async function POST(request: Request): Promise<Response> {
 
     return json({ received: true, paymentStatus: paidEvent ? 'paid' : 'failed' });
   } catch (error) {
+    if (error instanceof RangeError) return json({ error: 'Evento de Stripe demasiado grande.' }, 413);
     console.error('[stripe-webhook] Processing failed', error instanceof Error ? error.name : 'UnknownError');
     return json({ error: 'No se pudo procesar el evento de Stripe.' }, 500);
   }

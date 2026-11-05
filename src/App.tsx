@@ -54,10 +54,6 @@ import {
 import squadPackImage from './assets/images/tragoo-pack-kit-noche-completa-5-clean.webp';
 
 const DEFAULT_CONFIG: MerchantConfigClient = {
-  bankName: '',
-  clabe: '',
-  accountHolder: '',
-  hasSpeiAccount: false,
   cardNumberRef: 'Tarjeta en Stripe o link de pago por WhatsApp',
   whatsappNumber: '524792293687',
   instagramUrl: INSTAGRAM_URL,
@@ -65,10 +61,8 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
   videoUrl: '/videos/intro-premium.mp4',
   shippingFee: 99,
   freeShippingThreshold: 899,
-  speiDiscountPercent: 5,
   hasLiveStripeKey: false,
   hasStripeCheckout: false,
-  stripePaymentLinks: {},
 };
 
 const NOVEMBER_PROMO_START = Date.parse('2026-11-01T06:00:00.000Z');
@@ -106,22 +100,10 @@ export default function App() {
           setMerchantConfig((previous) => ({
             ...previous,
             ...data,
-            stripePaymentLinks: {},
           }));
         }
       })
       .catch(() => {});
-
-    // The private local merchant panel may read orders during development;
-    // deployed customers never request or receive the shared order list.
-    if (import.meta.env.DEV) {
-      fetch('/api/orders')
-        .then((r) => r.json())
-        .then((data) => {
-          if (Array.isArray(data)) setOrders(data);
-        })
-        .catch(() => {});
-    }
 
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('stripe_session');

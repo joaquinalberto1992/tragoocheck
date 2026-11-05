@@ -22,10 +22,6 @@ export interface CartItem {
 }
 
 export interface MerchantConfigClient {
-  bankName: string;
-  clabe: string;
-  accountHolder: string;
-  hasSpeiAccount?: boolean;
   cardNumberRef: string;
   whatsappNumber: string;
   instagramUrl?: string;
@@ -33,12 +29,10 @@ export interface MerchantConfigClient {
   videoUrl?: string;
   shippingFee: number;
   freeShippingThreshold: number;
-  speiDiscountPercent: number;
   hasLiveStripeKey?: boolean;
   hasStripeCheckout?: boolean;
   hasStripeWebhook?: boolean;
   stripeMode?: 'test' | 'live' | 'off';
-  stripePaymentLinks?: Record<string, string>;
 }
 
 export type OrderPaymentMethod = 'link_pago' | 'stripe';
@@ -58,7 +52,6 @@ export interface ConfirmedOrder {
   discount: number;
   couponCode?: string;
   couponDiscount?: number;
-  speiDiscount?: number;
   shipping: number;
   total: number;
   paymentMethod: OrderPaymentMethod;

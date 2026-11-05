@@ -1,13 +1,40 @@
 import { CATALOG, formatMx, stripeClient, WHATSAPP_NUMBER } from '../_shared.js';
 
 function json(data: unknown, status = 200): Response {
-  return Response.json(data, { status });
+  return Response.json(data, {
+    status,
+    headers: { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' },
+  });
+}
+
+const confirmAttempts = new Map<string, { count: number; resetAt: number }>();
+
+function confirmRateLimited(request: Request): boolean {
+  const forwardedFor = request.headers.get('x-real-ip') || request.headers.get('x-forwarded-for') || '';
+  const address = forwardedFor.split(',')[0]?.trim() || 'unknown';
+  const now = Date.now();
+  const current = confirmAttempts.get(address);
+  if (!current || now >= current.resetAt) {
+    confirmAttempts.set(address, { count: 1, resetAt: now + 60_000 });
+  } else {
+    current.count += 1;
+    if (current.count > 30) return true;
+  }
+  if (confirmAttempts.size > 5000) {
+    for (const [key, value] of confirmAttempts) {
+      if (now >= value.resetAt) confirmAttempts.delete(key);
+    }
+  }
+  return false;
 }
 
 export async function GET(request: Request): Promise<Response> {
   if (request.method !== 'GET') return json({ error: 'Método no permitido.' }, 405);
+  if (confirmRateLimited(request)) return json({ error: 'Demasiadas consultas. Espera un minuto y vuelve a intentar.' }, 429);
   const sessionId = new URL(request.url).searchParams.get('session_id');
-  if (!sessionId || !sessionId.startsWith('cs_')) return json({ error: 'Sesión de pago inválida.' }, 400);
+  if (!sessionId || sessionId.length > 255 || !sessionId.startsWith('cs_')) {
+    return json({ error: 'Sesión de pago inválida.' }, 400);
+  }
 
   try {
     const stripe = await stripeClient();

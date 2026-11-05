@@ -1,5 +1,5 @@
 import express from 'express';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, timingSafeEqual } from 'node:crypto';
 import fs from 'fs';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
@@ -11,16 +11,14 @@ import {
   getStripeSecretKey,
   getStripeKeyMode,
   isStripeConfiguredForEnvironment,
+  quoteCheckout,
 } from './api/_shared.js';
 
-dotenv.config();
+dotenv.config({ path: ['.env.local', '.env'] });
 
 const DATA_FILE = path.resolve(process.cwd(), 'store-data.json');
 
 export interface MerchantConfig {
-  bankName: string;
-  clabe: string;
-  accountHolder: string;
   cardNumberRef: string;
   whatsappNumber: string;
   instagramUrl: string;
@@ -28,9 +26,6 @@ export interface MerchantConfig {
   videoUrl?: string;
   shippingFee: number;
   freeShippingThreshold: number;
-  speiDiscountPercent: number;
-  stripeSecretKeyOverride?: string;
-  stripePaymentLinks: Record<string, string>;
 }
 
 export interface OrderItem {
@@ -56,10 +51,9 @@ export interface OrderRecord {
   discount: number;
   couponCode?: string;
   couponDiscount?: number;
-  speiDiscount?: number;
   shipping: number;
   total: number;
-  paymentMethod: 'link_pago' | 'oxxo' | 'spei' | 'stripe';
+  paymentMethod: 'link_pago' | 'stripe';
   paymentStatus: 'pendiente_comprobante' | 'pagado' | 'enviado';
   transferReference?: string;
   stripeLast4?: string;
@@ -73,143 +67,177 @@ interface StoreData {
 
 const defaultData: StoreData = {
   config: {
-    bankName: 'BBVA México / STP (SPEI) / OXXO',
-    clabe: '012180015489203148',
-    accountHolder: 'Tragoo Check México',
-    cardNumberRef: 'Pago en OXXO o Link de Pago por WhatsApp',
+    cardNumberRef: 'Tarjeta en Stripe o link de pago por WhatsApp',
     whatsappNumber: '524792293687',
     instagramUrl: 'https://www.instagram.com/tragoocheck/',
     customDomain: 'tragoocheck.shop',
-    videoUrl: '/tragoo-oficial.mp4',
+    videoUrl: '/videos/intro-premium.mp4',
     shippingFee: 99,
     freeShippingThreshold: 899,
-    speiDiscountPercent: 5,
-    stripeSecretKeyOverride: '',
-    stripePaymentLinks: {},
   },
-  orders: [
-    {
-      folio: 'TC-9045',
-      createdAt: new Date(Date.now() - 1000 * 60 * 18).toISOString(),
-      customerName: 'Grupo Hostelero Roma Norte (Bar)',
-      customerPhone: '55 6102 9941',
-      customerEmail: 'compras@gruporoma.mx',
-      shippingAddress: 'Colima 268, Col. Roma Norte',
-      city: 'Ciudad de México',
-      state: 'CDMX',
-      postalCode: '06700',
-      items: [
-        {
-          id: 'mayoreo-exhibidor-30',
-          name: 'Caja Exhibidora Bares, Antros & Farmacias (30 Kits)',
-          price: 7800,
-          quantity: 1,
-        },
-      ],
-      subtotal: 7800,
-      discount: 390,
-      shipping: 0,
-      total: 7410,
-      paymentMethod: 'spei',
-      paymentStatus: 'pagado',
-      transferReference: 'SPEI-994120',
-      trackingNumber: 'DHL-884920192',
-    },
-    {
-      folio: 'TC-9041',
-      createdAt: new Date(Date.now() - 1000 * 60 * 48).toISOString(),
-      customerName: 'Valeria Montes de Oca',
-      customerPhone: '55 4192 8831',
-      customerEmail: 'valeria.mo@gmail.com',
-      shippingAddress: 'Av. Tamaulipas 142, Int 402, Col. Condesa',
-      city: 'Ciudad de México',
-      state: 'CDMX',
-      postalCode: '06140',
-      items: [
-        {
-          id: 'pack-trio-amigas-3x',
-          name: 'Pack Trío Amigas (3x Kits Noche Completa)',
-          price: 1125,
-          quantity: 1,
-        },
-      ],
-      subtotal: 1125,
-      discount: 56,
-      shipping: 0,
-      total: 1069,
-      paymentMethod: 'spei',
-      paymentStatus: 'pendiente_comprobante',
-      transferReference: 'Pendiente captura WhatsApp',
-    },
-    {
-      folio: 'TC-9038',
-      createdAt: new Date(Date.now() - 1000 * 60 * 165).toISOString(),
-      customerName: 'Sofía Elizondo',
-      customerPhone: '81 2093 4410',
-      customerEmail: 'sofi.elizondo@outlook.com',
-      shippingAddress: 'Río Guadalquivir 208, Col. Del Valle',
-      city: 'San Pedro Garza García',
-      state: 'Nuevo León',
-      postalCode: '66220',
-      items: [
-        {
-          id: 'kit-noche-completa',
-          name: 'Kit Noche Completa',
-          price: 449,
-          quantity: 1,
-        },
-      ],
-      subtotal: 449,
-      discount: 0,
-      shipping: 99,
-      total: 548,
-      paymentMethod: 'stripe',
-      paymentStatus: 'enviado',
-      stripeLast4: '4242',
-      trackingNumber: 'ESTAFETA-4029182',
-    },
-  ],
+  orders: [],
 };
 
-function loadStoreData(): StoreData {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const raw = fs.readFileSync(DATA_FILE, 'utf-8');
-      const parsed = JSON.parse(raw);
-      const mergedConfig: MerchantConfig = {
-        ...defaultData.config,
-        ...(parsed.config || {}),
-        // Enforce minimum $899 MXN free shipping threshold unless explicitly changed above 899
-        freeShippingThreshold:
-          parsed.config?.freeShippingThreshold && parsed.config.freeShippingThreshold >= 899
-            ? Number(parsed.config.freeShippingThreshold)
-            : 899,
-      };
-      return {
-        config: mergedConfig,
-        orders: Array.isArray(parsed.orders) ? parsed.orders : defaultData.orders,
-      };
-    }
-  } catch (e) {
-    console.error('Error reading store-data.json:', e);
+class StoreDataCorruptError extends Error {
+  constructor() {
+    super('El archivo de pedidos está dañado. Se bloqueó la escritura para evitar sobrescribirlo.');
+    this.name = 'StoreDataCorruptError';
   }
-  return defaultData;
+}
+
+function loadStoreData(): StoreData {
+  if (!fs.existsSync(DATA_FILE)) {
+    return { config: { ...defaultData.config }, orders: [] };
+  }
+  try {
+    const parsed = JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+    if (!parsed || typeof parsed !== 'object' || !parsed.config || !Array.isArray(parsed.orders)) {
+      throw new Error('Invalid store data shape');
+    }
+    const {
+      stripeSecretKeyOverride: _discardedLegacyKey,
+      bankName: _discardedBankName,
+      clabe: _discardedClabe,
+      accountHolder: _discardedAccountHolder,
+      speiDiscountPercent: _discardedSpeiDiscount,
+      stripePaymentLinks: _discardedPaymentLinks,
+      ...storedConfig
+    } = parsed.config;
+    const mergedConfig: MerchantConfig = {
+      ...defaultData.config,
+      ...storedConfig,
+      freeShippingThreshold:
+        Number(storedConfig.freeShippingThreshold) >= 899
+          ? Number(storedConfig.freeShippingThreshold)
+          : 899,
+    };
+    return { config: mergedConfig, orders: parsed.orders };
+  } catch {
+    console.error('Could not load store-data.json; refusing to replace it.');
+    throw new StoreDataCorruptError();
+  }
 }
 
 function saveStoreData(data: StoreData) {
-  try {
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
-  } catch (e) {
-    console.error('Error saving store-data.json:', e);
-  }
+  const safeConfig = { ...data.config } as MerchantConfig;
+  const temporaryFile = `${DATA_FILE}.${process.pid}.${randomUUID()}.tmp`;
+  fs.writeFileSync(temporaryFile, JSON.stringify({ config: safeConfig, orders: data.orders }, null, 2), {
+    encoding: 'utf-8',
+    flag: 'wx',
+  });
+  fs.renameSync(temporaryFile, DATA_FILE);
+}
+
+let storeMutationQueue: Promise<void> = Promise.resolve();
+
+function withStoreMutation<T>(mutation: () => T | Promise<T>): Promise<T> {
+  const result = storeMutationQueue.then(mutation, mutation);
+  storeMutationQueue = result.then(() => undefined, () => undefined);
+  return result;
 }
 
 async function startServer() {
   const app = express();
   const PORT = 3000;
+  const publicDir = path.resolve(process.cwd(), 'public');
+  const apiRequests = new Map<string, { count: number; resetAt: number }>();
+
+  app.disable('x-powered-by');
+  app.set('trust proxy', 1);
+  app.use((req, res, next) => {
+    res.setHeader('X-Content-Type-Options', 'nosniff');
+    res.setHeader('X-Frame-Options', 'DENY');
+    res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+    res.setHeader('X-DNS-Prefetch-Control', 'off');
+    res.setHeader('X-Permitted-Cross-Domain-Policies', 'none');
+    res.setHeader('X-Download-Options', 'noopen');
+    if (req.path.startsWith('/api/')) res.setHeader('Cache-Control', 'no-store, max-age=0');
+    next();
+  });
+
+  app.use('/api', (req, res, next) => {
+    const now = Date.now();
+    const key = req.ip || req.socket.remoteAddress || 'unknown';
+    const current = apiRequests.get(key);
+    if (!current || now >= current.resetAt) {
+      apiRequests.set(key, { count: 1, resetAt: now + 60_000 });
+    } else if (++current.count > 120) {
+      res.setHeader('Retry-After', '60');
+      res.status(429).json({ error: 'Demasiadas solicitudes. Intenta de nuevo en un minuto.' });
+      return;
+    }
+    if (apiRequests.size > 5000) {
+      for (const [address, value] of apiRequests) {
+        if (now >= value.resetAt) apiRequests.delete(address);
+      }
+    }
+    next();
+  });
+
+  const requireAdmin: express.RequestHandler = (req, res, next) => {
+    const expected = process.env.ADMIN_TOKEN || '';
+    const supplied = req.get('authorization')?.replace(/^Bearer\s+/i, '') || '';
+    const expectedBytes = Buffer.from(expected);
+    const suppliedBytes = Buffer.from(supplied);
+    if (Buffer.byteLength(expected) < 32) {
+      res.setHeader('Cache-Control', 'no-store');
+      res.status(503).json({ error: 'Configura ADMIN_TOKEN con al menos 32 caracteres aleatorios.' });
+      return;
+    }
+    if (
+      !/^Bearer\s+/i.test(req.get('authorization') || '') ||
+      expectedBytes.length !== suppliedBytes.length ||
+      !timingSafeEqual(expectedBytes, suppliedBytes)
+    ) {
+      res.setHeader('Cache-Control', 'no-store');
+      res.status(401).json({ error: 'Token de administrador incorrecto.' });
+      return;
+    }
+    next();
+  };
+
+  const saveUploadedVideo: express.RequestHandler = async (req, res, next) => {
+    try {
+      await withStoreMutation(() => {
+        const { base64Video } = req.body || {};
+        if (typeof base64Video !== 'string') {
+          res.status(400).json({ error: 'No se recibió archivo de video.' });
+          return;
+        }
+        const matches = base64Video.match(/^data:video\/mp4;base64,([A-Za-z0-9+/=]+)$/i);
+        if (!matches) {
+          res.status(400).json({ error: 'Solo se permiten videos MP4.' });
+          return;
+        }
+        const buffer = Buffer.from(matches[1], 'base64');
+        if (buffer.length < 12 || buffer.length > 25 * 1024 * 1024 || buffer.toString('ascii', 4, 8) !== 'ftyp') {
+          res.status(400).json({ error: 'El video MP4 no es válido o supera 25 MB.' });
+          return;
+        }
+        const videoFileName = `tragoo-reel-${randomUUID()}.mp4`;
+        const filePath = path.resolve(publicDir, videoFileName);
+        if (!filePath.startsWith(`${publicDir}${path.sep}`)) {
+          res.status(400).json({ error: 'Ruta de archivo no válida.' });
+          return;
+        }
+        fs.writeFileSync(filePath, buffer, { flag: 'wx' });
+        const data = loadStoreData();
+        data.config.videoUrl = `/${videoFileName}`;
+        saveStoreData(data);
+        res.setHeader('Cache-Control', 'no-store');
+        res.json({ ok: true, videoUrl: data.config.videoUrl });
+      });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  // The admin-only video endpoint gets its own bounded parser before the small general API parser.
+  app.post('/api/upload-video', requireAdmin, express.json({ limit: '34mb' }), saveUploadedVideo);
 
   app.use(express.json({
-    limit: '50mb',
+    limit: '1mb',
     verify: (rawRequest, _res, buffer) => {
       const req = rawRequest as express.Request & { rawBody?: Buffer };
       if (req.originalUrl.startsWith('/api/stripe/webhook')) {
@@ -217,8 +245,6 @@ async function startServer() {
       }
     },
   }));
-
-  const publicDir = path.resolve(process.cwd(), 'public');
   app.use(
     express.static(publicDir, {
       acceptRanges: true,
@@ -231,224 +257,266 @@ async function startServer() {
     })
   );
 
-  // Dedicated HTTP 206 Byte-Range Video Streaming Route
-  app.get('/api/video', (req, res) => {
-    const data = loadStoreData();
-    const relPath = (data.config.videoUrl || '/tragoo-oficial.mp4').replace(/^\//, '');
-    let videoPath = path.join(publicDir, relPath);
-    if (!fs.existsSync(videoPath)) {
-      videoPath = path.join(publicDir, 'tragoo-oficial.mp4');
-    }
-    if (!fs.existsSync(videoPath)) {
-      res.status(404).end();
-      return;
-    }
+  function safeVideoFilePath(videoUrl: unknown): string | null {
+    if (typeof videoUrl !== 'string') return null;
+    const relativeName = videoUrl.replace(/^\//, '');
+    if (!/^[A-Za-z0-9][A-Za-z0-9._-]*\.mp4$/i.test(relativeName)) return null;
+    const baseName = path.basename(relativeName);
+    if (baseName !== relativeName) return null;
+    const resolved = path.resolve(publicDir, baseName);
+    return resolved.startsWith(`${publicDir}${path.sep}`) ? resolved : null;
+  }
 
-    const stat = fs.statSync(videoPath);
-    const fileSize = stat.size;
-    const range = req.headers.range;
-
-    if (range) {
-      const parts = range.replace(/bytes=/, '').split('-');
-      const start = parseInt(parts[0], 10);
-      const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-      const chunksize = end - start + 1;
-      const file = fs.createReadStream(videoPath, { start, end });
-      res.writeHead(206, {
-        'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-        'Accept-Ranges': 'bytes',
-        'Content-Length': chunksize,
-        'Content-Type': 'video/mp4',
-      });
-      file.pipe(res);
-    } else {
-      res.writeHead(200, {
-        'Content-Length': fileSize,
-        'Content-Type': 'video/mp4',
-        'Accept-Ranges': 'bytes',
-      });
-      fs.createReadStream(videoPath).pipe(res);
-    }
-  });
-
-  // Upload MP4 Video directly from browser to public/tragoo-oficial.mp4
-  app.post('/api/upload-video', (req, res) => {
+  app.get('/api/video', (req, res, next) => {
     try {
-      const { base64Video } = req.body || {};
-      if (!base64Video || typeof base64Video !== 'string') {
-        res.status(400).json({ error: 'No se recibió archivo de video' });
+      const data = loadStoreData();
+      const configuredPath = safeVideoFilePath(data.config.videoUrl);
+      const fallbackPath = path.resolve(publicDir, 'videos', 'intro-premium.mp4');
+      const videoPath = configuredPath && fs.existsSync(configuredPath) && fs.statSync(configuredPath).isFile()
+        ? configuredPath
+        : fallbackPath;
+      if (!fs.existsSync(videoPath) || !fs.statSync(videoPath).isFile()) {
+        res.status(404).end();
         return;
       }
-      const matches = base64Video.match(/^data:video\/[a-zA-Z0-9.+-]+;base64,(.+)$/);
-      const rawBase64 = matches ? matches[1] : base64Video;
-      const buffer = Buffer.from(rawBase64, 'base64');
-      if (!fs.existsSync(publicDir)) {
-        fs.mkdirSync(publicDir, { recursive: true });
+
+      const fileSize = fs.statSync(videoPath).size;
+      const range = req.headers.range;
+      res.setHeader('Accept-Ranges', 'bytes');
+      res.setHeader('Content-Type', 'video/mp4');
+      res.setHeader('X-Content-Type-Options', 'nosniff');
+
+      if (!range) {
+        res.setHeader('Content-Length', fileSize);
+        fs.createReadStream(videoPath).on('error', next).pipe(res);
+        return;
       }
-      const videoFileName = `tragoo-reel-${Date.now()}.mp4`;
-      const filePath = path.join(publicDir, videoFileName);
-      const canonicalPath = path.join(publicDir, 'tragoo-oficial.mp4');
-      fs.writeFileSync(filePath, buffer);
-      fs.writeFileSync(canonicalPath, buffer);
 
-      const data = loadStoreData();
-      data.config.videoUrl = `/${videoFileName}`;
-      saveStoreData(data);
+      const match = /^bytes=(\d*)-(\d*)$/.exec(range);
+      if (!match || (!match[1] && !match[2])) {
+        res.setHeader('Content-Range', `bytes */${fileSize}`);
+        res.status(416).end();
+        return;
+      }
 
-      res.json({ ok: true, videoUrl: data.config.videoUrl });
-    } catch (err: any) {
-      console.error('Error guardando video:', err);
-      res.status(500).json({ error: 'No se pudo guardar el video' });
+      let start: number;
+      let end: number;
+      if (!match[1]) {
+        const suffixLength = Number(match[2]);
+        if (!Number.isSafeInteger(suffixLength) || suffixLength <= 0) {
+          res.setHeader('Content-Range', `bytes */${fileSize}`);
+          res.status(416).end();
+          return;
+        }
+        start = Math.max(0, fileSize - suffixLength);
+        end = fileSize - 1;
+      } else {
+        start = Number(match[1]);
+        end = match[2] ? Number(match[2]) : fileSize - 1;
+      }
+      if (
+        !Number.isSafeInteger(start) || !Number.isSafeInteger(end) ||
+        start < 0 || start >= fileSize || end < start
+      ) {
+        res.setHeader('Content-Range', `bytes */${fileSize}`);
+        res.status(416).end();
+        return;
+      }
+      end = Math.min(end, fileSize - 1);
+      res.status(206);
+      res.setHeader('Content-Range', `bytes ${start}-${end}/${fileSize}`);
+      res.setHeader('Content-Length', end - start + 1);
+      fs.createReadStream(videoPath, { start, end }).on('error', next).pipe(res);
+    } catch (error) {
+      next(error);
     }
   });
 
-  // Get Merchant Config & Stripe Status
-  app.get('/api/config', (_req, res) => {
-    const data = loadStoreData();
+  function stripeStatus() {
     const activeStripeKey = getStripeSecretKey();
     const keyMode = getStripeKeyMode(activeStripeKey);
-    const safeConfig = {
-      ...data.config,
-      stripeSecretKeyOverride: data.config.stripeSecretKeyOverride ? '••••••••' : '',
+    return {
       hasLiveStripeKey: keyMode === 'live',
       hasStripeCheckout: isStripeConfiguredForEnvironment(activeStripeKey),
       stripeMode: isStripeConfiguredForEnvironment(activeStripeKey) ? keyMode : 'off',
       hasStripeWebhook: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
     };
-    res.json(safeConfig);
-  });
+  }
 
-  // Update Merchant Config
-  app.post('/api/config', (req, res) => {
+  // Public storefront configuration never includes banking or order data.
+  app.get('/api/config', (_req, res) => {
     const data = loadStoreData();
-    const incoming = req.body || {};
-    const newStripeKey =
-      incoming.stripeSecretKeyOverride && incoming.stripeSecretKeyOverride !== '••••••••'
-        ? incoming.stripeSecretKeyOverride.trim()
-        : data.config.stripeSecretKeyOverride;
-
-    data.config = {
-      ...data.config,
-      bankName: incoming.bankName ?? data.config.bankName,
-      clabe: incoming.clabe ?? data.config.clabe,
-      accountHolder: incoming.accountHolder ?? data.config.accountHolder,
-      cardNumberRef: incoming.cardNumberRef ?? data.config.cardNumberRef,
-      whatsappNumber: incoming.whatsappNumber ?? data.config.whatsappNumber,
-      instagramUrl: incoming.instagramUrl ?? data.config.instagramUrl,
-      customDomain: incoming.customDomain ?? data.config.customDomain,
-      videoUrl: incoming.videoUrl ?? data.config.videoUrl,
-      shippingFee: Number(incoming.shippingFee ?? data.config.shippingFee),
-      freeShippingThreshold: Number(
-        incoming.freeShippingThreshold ?? data.config.freeShippingThreshold
-      ),
-      speiDiscountPercent: Number(
-        incoming.speiDiscountPercent ?? data.config.speiDiscountPercent
-      ),
-      stripeSecretKeyOverride: newStripeKey,
-      stripePaymentLinks: {
-        ...data.config.stripePaymentLinks,
-        ...(incoming.stripePaymentLinks || {}),
-      },
-    };
-    saveStoreData(data);
-
-    const activeStripeKey = getStripeSecretKey();
+    res.setHeader('Cache-Control', 'no-store');
     res.json({
-      ...data.config,
-      stripeSecretKeyOverride: data.config.stripeSecretKeyOverride ? '••••••••' : '',
-      hasLiveStripeKey: getStripeKeyMode(activeStripeKey) === 'live',
-      hasStripeCheckout: isStripeConfiguredForEnvironment(activeStripeKey),
-      stripeMode: isStripeConfiguredForEnvironment(activeStripeKey)
-        ? getStripeKeyMode(activeStripeKey)
-        : 'off',
-      hasStripeWebhook: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
+      whatsappNumber: data.config.whatsappNumber,
+      instagramUrl: data.config.instagramUrl,
+      customDomain: data.config.customDomain,
+      videoUrl: safeVideoFilePath(data.config.videoUrl) ? data.config.videoUrl : '/videos/intro-premium.mp4',
+      shippingFee: 99,
+      freeShippingThreshold: 899,
+      cardNumberRef: 'Tarjeta en Stripe o link de pago por WhatsApp',
+      ...stripeStatus(),
     });
   });
 
-  // List Orders
-  app.get('/api/orders', (_req, res) => {
+  app.get('/api/admin/config', requireAdmin, (_req, res) => {
     const data = loadStoreData();
+    res.setHeader('Cache-Control', 'no-store');
+    res.json({ ...data.config, ...stripeStatus() });
+  });
+
+  // Merchant configuration writes require the private admin token.
+  app.post('/api/config', requireAdmin, async (req, res, next) => {
+    try {
+      await withStoreMutation(() => {
+        const data = loadStoreData();
+        const incoming = req.body || {};
+        const nextVideoUrl = incoming.videoUrl ?? data.config.videoUrl;
+        const videoPath = safeVideoFilePath(nextVideoUrl);
+        if (!videoPath || !fs.existsSync(videoPath) || !fs.statSync(videoPath).isFile()) {
+          res.status(400).json({ error: 'El video debe ser un archivo MP4 dentro de public/.' });
+          return;
+        }
+        data.config = {
+          ...data.config,
+          cardNumberRef: 'Tarjeta en Stripe o link de pago por WhatsApp',
+          whatsappNumber: String(incoming.whatsappNumber ?? data.config.whatsappNumber).replace(/\D/g, '').slice(0, 15),
+          instagramUrl: String(incoming.instagramUrl ?? data.config.instagramUrl).slice(0, 300),
+          customDomain: String(incoming.customDomain ?? data.config.customDomain).slice(0, 160),
+          videoUrl: String(nextVideoUrl),
+          shippingFee: 99,
+          freeShippingThreshold: 899,
+        };
+        saveStoreData(data);
+        res.setHeader('Cache-Control', 'no-store');
+        res.json({ ...data.config, ...stripeStatus() });
+      });
+    } catch (error) {
+      next(error);
+    }
+  });
+
+  // List customer records only inside the authenticated merchant panel.
+  app.get('/api/orders', requireAdmin, (_req, res) => {
+    const data = loadStoreData();
+    res.setHeader('Cache-Control', 'no-store');
     res.json(data.orders);
   });
 
-  // Create Order (SPEI, Stripe, or Manual Admin Entry)
-  app.post('/api/orders', (req, res) => {
-    const data = loadStoreData();
-    const body = req.body;
-    const folio = `TC-${randomUUID().toUpperCase()}`;
+  // Manual orders use the server catalog and always start as unpaid.
+  app.post('/api/orders', requireAdmin, async (req, res, next) => {
+    try {
+      await withStoreMutation(() => {
+        const data = loadStoreData();
+        const body = req.body;
+        const quote = quoteCheckout({ items: body?.items, couponCode: body?.couponCode });
+        const folio = `TC-${randomUUID().replace(/-/g, '').toUpperCase()}`;
+        const customerName = String(body?.customerName || '').trim().slice(0, 120);
+        const customerPhone = String(body?.customerPhone || '').trim().slice(0, 30);
+        if (!customerName) {
+          res.status(400).json({ error: 'El nombre del cliente es obligatorio.' });
+          return;
+        }
 
-    const newOrder: OrderRecord = {
-      folio,
-      createdAt: new Date().toISOString(),
-      customerName: body.customerName || 'Cliente',
-      customerPhone: body.customerPhone || '',
-      customerEmail: body.customerEmail || '',
-      shippingAddress: body.shippingAddress || '',
-      city: body.city || '',
-      state: body.state || '',
-      postalCode: body.postalCode || '',
-      notes: body.notes || '',
-      items: Array.isArray(body.items) ? body.items : [],
-      subtotal: Number(body.subtotal || 0),
-      discount: Number(body.discount || 0),
-      couponCode: typeof body.couponCode === 'string' ? body.couponCode : undefined,
-      couponDiscount: Number(body.couponDiscount || 0),
-      speiDiscount: Number(body.speiDiscount || 0),
-      shipping: Number(body.shipping || 0),
-      total: Number(body.total || 0),
-      paymentMethod: ['link_pago', 'oxxo', 'spei', 'stripe'].includes(body.paymentMethod)
-        ? body.paymentMethod
-        : 'link_pago',
-      paymentStatus: body.paymentStatus || 'pendiente_comprobante',
-      transferReference: body.transferReference || '',
-      stripeLast4: body.stripeLast4 || '',
-      trackingNumber: body.trackingNumber || '',
-    };
+        const newOrder: OrderRecord = {
+          folio,
+          createdAt: new Date().toISOString(),
+          customerName,
+          customerPhone,
+          customerEmail: String(body?.customerEmail || '').trim().slice(0, 254),
+          shippingAddress: String(body?.shippingAddress || '').trim().slice(0, 200),
+          city: String(body?.city || '').trim().slice(0, 80),
+          state: String(body?.state || '').trim().slice(0, 80),
+          postalCode: String(body?.postalCode || '').trim().slice(0, 12),
+          notes: String(body?.notes || '').trim().slice(0, 500),
+          items: quote.lines.map((line) => ({ ...line })),
+          subtotal: quote.subtotal,
+          discount: quote.couponDiscount,
+          couponCode: quote.couponCode || undefined,
+          couponDiscount: quote.couponDiscount,
+          shipping: quote.shipping,
+          total: quote.total,
+          paymentMethod: 'link_pago',
+          paymentStatus: 'pendiente_comprobante',
+          transferReference: '',
+          stripeLast4: '',
+          trackingNumber: '',
+        };
 
-    data.orders.unshift(newOrder);
-    saveStoreData(data);
-    res.status(201).json(newOrder);
+        data.orders.unshift(newOrder);
+        saveStoreData(data);
+        res.status(201).json(newOrder);
+      });
+    } catch (error) {
+      next(error);
+    }
   });
 
   // Update Order Status / Tracking Number
-  app.patch('/api/orders/:folio', (req, res) => {
-    const { folio } = req.params;
-    const { paymentStatus, transferReference, trackingNumber } = req.body;
-    const data = loadStoreData();
-    const orderIndex = data.orders.findIndex((o) => o.folio === folio);
-    if (orderIndex === -1) {
-      res.status(404).json({ error: 'Pedido no encontrado' });
-      return;
+  app.patch('/api/orders/:folio', requireAdmin, async (req, res, next) => {
+    try {
+      await withStoreMutation(() => {
+        const { folio } = req.params;
+        const { paymentStatus, transferReference, trackingNumber } = req.body;
+        const data = loadStoreData();
+        const orderIndex = data.orders.findIndex((o) => o.folio === folio);
+        if (orderIndex === -1) {
+          res.status(404).json({ error: 'Pedido no encontrado' });
+          return;
+        }
+        if (paymentStatus !== undefined) {
+          if (!['pendiente_comprobante', 'pagado', 'enviado'].includes(paymentStatus)) {
+            res.status(400).json({ error: 'Estado de pago no válido.' });
+            return;
+          }
+          data.orders[orderIndex].paymentStatus = paymentStatus;
+        }
+        if (transferReference !== undefined) {
+          data.orders[orderIndex].transferReference = String(transferReference).slice(0, 120);
+        }
+        if (trackingNumber !== undefined) {
+          data.orders[orderIndex].trackingNumber = String(trackingNumber).slice(0, 120);
+        }
+        saveStoreData(data);
+        res.setHeader('Cache-Control', 'no-store');
+        res.json(data.orders[orderIndex]);
+      });
+    } catch (error) {
+      next(error);
     }
-    if (paymentStatus) {
-      data.orders[orderIndex].paymentStatus = paymentStatus;
-    }
-    if (transferReference !== undefined) {
-      data.orders[orderIndex].transferReference = transferReference;
-    }
-    if (trackingNumber !== undefined) {
-      data.orders[orderIndex].trackingNumber = trackingNumber;
-    }
-    saveStoreData(data);
-    res.json(data.orders[orderIndex]);
   });
 
   // Delete Order
-  app.delete('/api/orders/:folio', (req, res) => {
-    const { folio } = req.params;
-    const data = loadStoreData();
-    data.orders = data.orders.filter((o) => o.folio !== folio);
-    saveStoreData(data);
-    res.json({ ok: true });
+  app.delete('/api/orders/:folio', requireAdmin, async (req, res, next) => {
+    try {
+      await withStoreMutation(() => {
+        const data = loadStoreData();
+        const initialCount = data.orders.length;
+        data.orders = data.orders.filter((o) => o.folio !== req.params.folio);
+        if (data.orders.length === initialCount) {
+          res.status(404).json({ error: 'Pedido no encontrado' });
+          return;
+        }
+        saveStoreData(data);
+        res.json({ ok: true });
+      });
+    } catch (error) {
+      next(error);
+    }
   });
 
   // Create Stripe Checkout Session
   app.post('/api/checkout/stripe', async (req, res) => {
     try {
-      const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
+      const origin = process.env.NODE_ENV === 'production'
+        ? 'https://www.tragoocheck.shop'
+        : 'http://localhost:3000';
       const webRequest = new Request(`${origin}/api/checkout/stripe`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'x-forwarded-for': req.ip || req.socket.remoteAddress || 'unknown',
+        },
         body: JSON.stringify(req.body),
       });
       const response = await stripeCheckoutPost(webRequest);
@@ -461,7 +529,9 @@ async function startServer() {
 
   app.get('/api/checkout/confirm', async (req, res) => {
     try {
-      const origin = req.headers.origin || `${req.protocol}://${req.get('host')}`;
+      const origin = process.env.NODE_ENV === 'production'
+        ? 'https://www.tragoocheck.shop'
+        : 'http://localhost:3000';
       const sessionId = encodeURIComponent(String(req.query.session_id || ''));
       const webRequest = new Request(
         `${origin}/api/checkout/confirm?session_id=${sessionId}`
@@ -497,9 +567,23 @@ async function startServer() {
     }
   });
 
+  app.use((error: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    if (res.headersSent) return;
+    if (error instanceof StoreDataCorruptError) {
+      res.status(503).json({ error: error.message });
+      return;
+    }
+    if (error?.type === 'entity.too.large') {
+      res.status(413).json({ error: 'La solicitud supera el tamaño permitido.' });
+      return;
+    }
+    console.error('Request failed:', error instanceof Error ? error.name : 'UnknownError');
+    res.status(500).json({ error: 'No se pudo completar la solicitud.' });
+  });
+
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({
-      server: { middlewareMode: true, hmr: false, watch: null },
+      server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);

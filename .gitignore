@@ -6,6 +6,10 @@ coverage/
 *.log
 .env*
 !.env.example
+store-data.json
+store-data.json.*.tmp
+tmp/
+*.lnk
 .vercel
 .agents/
 skills-lock.json

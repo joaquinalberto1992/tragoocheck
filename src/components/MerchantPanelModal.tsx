@@ -4,7 +4,6 @@ import {
   Save,
   Download,
   CheckCircle2,
-  Building2,
   CreditCard,
   MessageCircle,
   Globe,
@@ -43,6 +42,10 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
   onOrdersUpdated,
 }) => {
   const [activeTab, setActiveTab] = useState<'orders' | 'domain' | 'bank_stripe'>('orders');
+  const [adminToken, setAdminToken] = useState('');
+  const [adminTokenInput, setAdminTokenInput] = useState('');
+  const [isAdminAuthenticated, setIsAdminAuthenticated] = useState(false);
+  const [authError, setAuthError] = useState<string | null>(null);
 
   // Order filtering & manual order creation
   const [statusFilter, setStatusFilter] = useState<
@@ -60,9 +63,6 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
   const newPaymentMethod: ConfirmedOrder['paymentMethod'] = 'link_pago';
 
   // Config states
-  const [bankName, setBankName] = useState(config.bankName);
-  const [clabe, setClabe] = useState(config.clabe);
-  const [accountHolder, setAccountHolder] = useState(config.accountHolder);
   const [whatsappNumber, setWhatsappNumber] = useState(config.whatsappNumber);
   const [instagramUrl, setInstagramUrl] = useState(
     config.instagramUrl || INSTAGRAM_URL
@@ -70,29 +70,14 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
   const [customDomain, setCustomDomain] = useState(
     config.customDomain || 'tragoocheck.shop'
   );
-  const [shippingFee, setShippingFee] = useState(String(config.shippingFee || 99));
-  const [freeShippingThreshold, setFreeShippingThreshold] = useState(
-    String(Math.max(899, config.freeShippingThreshold || 899))
-  );
-  const [speiDiscountPercent, setSpeiDiscountPercent] = useState(
-    String(config.speiDiscountPercent || 5)
-  );
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [copiedDns, setCopiedDns] = useState<string | null>(null);
 
   useEffect(() => {
-    setBankName(config.bankName);
-    setClabe(config.clabe);
-    setAccountHolder(config.accountHolder);
     setWhatsappNumber(config.whatsappNumber);
     setInstagramUrl(config.instagramUrl || INSTAGRAM_URL);
     setCustomDomain(config.customDomain || 'tragoocheck.shop');
-    setShippingFee(String(config.shippingFee || 99));
-    setFreeShippingThreshold(
-      String(Math.max(899, config.freeShippingThreshold || 899))
-    );
-    setSpeiDiscountPercent(String(config.speiDiscountPercent || 5));
   }, [config]);
 
   useEffect(() => {
@@ -103,12 +88,59 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
     setTrackingInputs(map);
   }, [orders]);
 
+  useEffect(() => {
+    if (!isOpen) {
+      setAdminToken('');
+      setAdminTokenInput('');
+      setIsAdminAuthenticated(false);
+      setAuthError(null);
+    }
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   const handleCopyText = (value: string, key: string) => {
     navigator.clipboard.writeText(value);
     setCopiedDns(key);
     setTimeout(() => setCopiedDns(null), 2000);
+  };
+
+  const withAdminAuthorization = (headers: Record<string, string> = {}) => ({
+    ...headers,
+    Authorization: `Bearer ${adminToken}`,
+  });
+
+  const handleAdminLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError(null);
+    const token = adminTokenInput.trim();
+    if (!token) {
+      setAuthError('Escribe el token configurado en ADMIN_TOKEN.');
+      return;
+    }
+    try {
+      const headers = { Authorization: `Bearer ${token}` };
+      const [ordersResponse, configResponse] = await Promise.all([
+        fetch('/api/orders', { headers, cache: 'no-store' }),
+        fetch('/api/admin/config', { headers, cache: 'no-store' }),
+      ]);
+      if (!ordersResponse.ok || !configResponse.ok) {
+        throw new Error(ordersResponse.status === 503 || configResponse.status === 503
+          ? 'Configura ADMIN_TOKEN en .env.local y reinicia el servidor.'
+          : 'El token no fue aceptado.');
+      }
+      const [loadedOrders, loadedConfig] = await Promise.all([
+        ordersResponse.json(),
+        configResponse.json(),
+      ]);
+      if (!Array.isArray(loadedOrders)) throw new Error('No se pudieron cargar los pedidos.');
+      setAdminToken(token);
+      setIsAdminAuthenticated(true);
+      onOrdersUpdated(loadedOrders);
+      onConfigUpdated(loadedConfig);
+    } catch (error) {
+      setAuthError(error instanceof Error ? error.message : 'No se pudo autenticar el panel.');
+    }
   };
 
   const handleSaveConfig = async (e: React.FormEvent) => {
@@ -123,20 +155,14 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
         .replace(/\/+$/, '');
 
       const payload: Record<string, any> = {
-        bankName,
-        clabe,
-        accountHolder,
         whatsappNumber,
         instagramUrl: instagramUrl.trim() || INSTAGRAM_URL,
         customDomain: cleanDomain || 'tragoocheck.shop',
-        shippingFee: Number(shippingFee) || 99,
-        freeShippingThreshold: Math.max(899, Number(freeShippingThreshold) || 899),
-        speiDiscountPercent: Number(speiDiscountPercent) || 5,
       };
 
       const res = await fetch('/api/config', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: withAdminAuthorization({ 'Content-Type': 'application/json' }),
         body: JSON.stringify(payload),
       });
       const updated = await res.json().catch(() => ({}));
@@ -163,9 +189,9 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
     newStatus: 'pendiente_comprobante' | 'pagado' | 'enviado'
   ) => {
     try {
-      const res = await fetch(`/api/orders/${folio}`, {
+      const res = await fetch(`/api/orders/${encodeURIComponent(folio)}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: withAdminAuthorization({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({ paymentStatus: newStatus }),
       });
       if (res.ok) {
@@ -180,9 +206,9 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
   const handleSaveTracking = async (folio: string) => {
     const trackingNumber = (trackingInputs[folio] || '').trim();
     try {
-      const res = await fetch(`/api/orders/${folio}`, {
+      const res = await fetch(`/api/orders/${encodeURIComponent(folio)}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
+        headers: withAdminAuthorization({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           trackingNumber,
           paymentStatus: trackingNumber ? 'enviado' : undefined,
@@ -199,8 +225,9 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
 
   const handleDeleteOrder = async (folio: string) => {
     try {
-      const res = await fetch(`/api/orders/${folio}`, {
+      const res = await fetch(`/api/orders/${encodeURIComponent(folio)}`, {
         method: 'DELETE',
+        headers: withAdminAuthorization(),
       });
       if (res.ok) {
         onOrdersUpdated(orders.filter((o) => o.folio !== folio));
@@ -217,13 +244,13 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
       ALL_PRODUCTS.find((p) => p.id === newSelectedProductId) || ALL_PRODUCTS[0];
     const qty = Math.max(1, Number(newQuantity) || 1);
     const subtotal = prod.price * qty;
-    const shipping = subtotal >= 899 ? 0 : Number(shippingFee) || 99;
+    const shipping = subtotal >= 899 ? 0 : 99;
     const total = subtotal + shipping;
 
     try {
       const res = await fetch('/api/orders', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: withAdminAuthorization({ 'Content-Type': 'application/json' }),
         body: JSON.stringify({
           customerName: newCustomerName.trim(),
           customerPhone: newCustomerPhone.trim(),
@@ -312,7 +339,7 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
     .filter((o) => o.paymentStatus === 'pagado' || o.paymentStatus === 'enviado')
     .reduce((acc, o) => acc + o.total, 0);
 
-  const pendingSpeiCount = orders.filter(
+  const pendingPaymentCount = orders.filter(
     (o) => o.paymentStatus === 'pendiente_comprobante'
   ).length;
   const readyToShipCount = orders.filter((o) => o.paymentStatus === 'pagado').length;
@@ -331,6 +358,36 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
     return matchesStatus && matchesSearch;
   });
 
+  if (!isAdminAuthenticated) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+        <form onSubmit={handleAdminLogin} className="w-full max-w-md rounded-2xl border border-[#E7E2EA] bg-white p-6 shadow-2xl">
+          <div className="mb-5 flex items-start justify-between gap-4">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#8B2D97]">Tragoo Check</p>
+              <h2 className="mt-1 text-xl font-bold text-[#201927]">Panel privado</h2>
+              <p className="mt-2 text-sm leading-relaxed text-[#665D70]">Ingresa el token de administrador configurado en el servidor local.</p>
+            </div>
+            <button type="button" onClick={onClose} aria-label="Cerrar" className="rounded-lg p-2 text-[#665D70] hover:bg-[#F5F2F7]">
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <label htmlFor="merchant-admin-token" className="mb-1.5 block text-sm font-semibold text-[#342C39]">Token de administrador</label>
+          <input
+            id="merchant-admin-token"
+            type="password"
+            autoComplete="current-password"
+            value={adminTokenInput}
+            onChange={(event) => setAdminTokenInput(event.target.value)}
+            className="w-full rounded-xl border border-[#D8D1DE] px-3 py-2.5 text-sm text-[#201927] outline-none focus:border-[#8B2D97] focus:ring-2 focus:ring-[#8B2D97]/15"
+          />
+          {authError && <p role="alert" className="mt-3 text-sm text-[#A22236]">{authError}</p>}
+          <button type="submit" className="mt-4 w-full rounded-xl bg-[#201927] px-4 py-3 text-sm font-bold text-white transition-colors hover:bg-[#4C2867]">Acceder al panel</button>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-xs p-3 sm:p-4">
       <div className="w-full max-w-5xl bg-[#0F0C16] border border-[#262136] rounded-2xl max-h-[92vh] flex flex-col overflow-hidden shadow-2xl">
@@ -345,7 +402,7 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                 Panel de Control Tragoo Check · Pedidos, Dominio y Cobros
               </h2>
               <p className="text-xs text-[#A19BB2]">
-                Administra pedidos SPEI/Stripe, asigna guías de envío y conecta tu dominio propio
+                Administra pedidos de tarjeta/link de pago, asigna guías de envío y conecta tu dominio propio
               </p>
             </div>
           </div>
@@ -393,7 +450,7 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                   : 'text-[#C4BED4] hover:text-white'
               }`}
             >
-              3. Cuenta SPEI, Stripe y Redes
+              3. Cobros y Redes
             </button>
           </div>
 
@@ -430,9 +487,9 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                   </div>
                 </div>
                 <div className="p-3.5 rounded-xl bg-[#14111D] border border-[#262136]">
-                  <div className="text-[11px] text-[#A19BB2]">Pendientes SPEI</div>
+                  <div className="text-[11px] text-[#A19BB2]">Pendientes de pago</div>
                   <div className="font-mono text-xl font-extrabold text-amber-400 mt-0.5">
-                    {pendingSpeiCount}
+                    {pendingPaymentCount}
                   </div>
                 </div>
                 <div className="p-3.5 rounded-xl bg-[#14111D] border border-[#262136]">
@@ -456,7 +513,7 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                     { id: 'all', label: `Todos (${orders.length})` },
                     {
                       id: 'pendiente_comprobante',
-                      label: `Pendientes SPEI (${pendingSpeiCount})`,
+                      label: `Pendientes de pago (${pendingPaymentCount})`,
                     },
                     { id: 'pagado', label: `Pagados (${readyToShipCount})` },
                     { id: 'enviado', label: `Enviados (${shippedCount})` },
@@ -832,53 +889,19 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
               )}
             </form>
           ) : (
-            /* TAB 3: SPEI, STRIPE, SHIPPING ($899 MIN) & INSTAGRAM */
+            /* TAB 3: CARD PAYMENTS, WHATSAPP & INSTAGRAM */
             <form onSubmit={handleSaveConfig} className="space-y-6">
-              {/* SPEI & Shipping Rules */}
+              {/* Store contact and delivery policy */}
               <div className="p-5 rounded-xl bg-[#14111D] border border-[#262136] space-y-4">
                 <div className="flex items-center gap-2 text-sm font-bold text-white">
-                  <Building2 className="w-4 h-4 text-[#A3E635]" />
-                  <span>Datos Bancarios SPEI, Regla de Envíos ($899 MXN) e Instagram</span>
+                  <MessageCircle className="w-4 h-4 text-[#A3E635]" />
+                  <span>Contacto de ventas, envío e Instagram</span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs text-[#A19BB2] mb-1">
-                      Banco receptor (Ej. BBVA, Nu, STP, Banorte)
-                    </label>
-                    <input
-                      type="text"
-                      value={bankName}
-                      onChange={(e) => setBankName(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0B0910] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-[#A19BB2] mb-1">
-                      CLABE Interbancaria (18 dígitos)
-                    </label>
-                    <input
-                      type="text"
-                      maxLength={18}
-                      value={clabe}
-                      onChange={(e) => setClabe(e.target.value.replace(/\D/g, ''))}
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0B0910] border border-[#2E2840] font-mono text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-[#A19BB2] mb-1">
-                      Nombre del Titular / Beneficiario
-                    </label>
-                    <input
-                      type="text"
-                      value={accountHolder}
-                      onChange={(e) => setAccountHolder(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0B0910] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-[#A19BB2] mb-1">
-                      WhatsApp de Ventas (con lada 521)
+                      WhatsApp de ventas (solo dígitos con código de país)
                     </label>
                     <input
                       type="text"
@@ -892,42 +915,9 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                  <div>
-                    <label className="block text-xs text-[#A19BB2] mb-1">
-                      Costo Envío (1 pza o &lt; $899 MXN)
-                    </label>
-                    <input
-                      type="number"
-                      value={shippingFee}
-                      onChange={(e) => setShippingFee(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0B0910] border border-[#2E2840] font-mono text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-[#A19BB2] mb-1">
-                      Envío Gratis a partir de ($ MXN, mín 899)
-                    </label>
-                    <input
-                      type="number"
-                      min={899}
-                      value={freeShippingThreshold}
-                      onChange={(e) => setFreeShippingThreshold(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0B0910] border border-[#2E2840] font-mono text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-[#A19BB2] mb-1">
-                      Descuento por pago SPEI (%)
-                    </label>
-                    <input
-                      type="number"
-                      value={speiDiscountPercent}
-                      onChange={(e) => setSpeiDiscountPercent(e.target.value)}
-                      className="w-full px-3.5 py-2 rounded-lg bg-[#0B0910] border border-[#2E2840] font-mono text-xs text-white focus:outline-none focus:border-[#A3E635]"
-                    />
-                  </div>
-                </div>
+                <p className="text-xs leading-relaxed text-[#C4BED4]">
+                  Envío: $99 MXN; gratis desde $899 MXN. Los pedidos se cobran con tarjeta por Stripe o mediante un enlace de pago enviado por WhatsApp.
+                </p>
 
                 <div>
                   <label className="block text-xs text-[#A19BB2] mb-1">
@@ -959,8 +949,8 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                 </div>
 
                 <div className="space-y-2 text-xs leading-relaxed text-[#C4BED4]">
-                  <p>
-                    La persona paga en la página segura de Stripe. El servidor valida el importe, aplica los cupones y confirma el estado del pago antes de mostrar el folio.
+                    <p>
+                    La persona paga en el checkout seguro de Stripe. El servidor obtiene precios y descuentos del catálogo y verifica el pago con Stripe.
                   </p>
                   <p>
                     Por seguridad, la clave secreta se guarda en <strong className="text-white">Vercel → Settings → Environment Variables</strong>; no se pega en este panel ni en el navegador.

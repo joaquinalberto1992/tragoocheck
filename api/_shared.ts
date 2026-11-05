@@ -167,7 +167,11 @@ export function quoteCheckout(input: unknown): CheckoutQuote {
     if (!Number.isInteger(quantity) || quantity < 1 || quantity > 500) {
       throw new Error('La cantidad de un producto no es válida.');
     }
-    quantities.set(item.id, (quantities.get(item.id) || 0) + quantity);
+    const combinedQuantity = (quantities.get(item.id) || 0) + quantity;
+    if (combinedQuantity > 500) {
+      throw new Error('La cantidad máxima por producto es de 500 piezas.');
+    }
+    quantities.set(item.id, combinedQuantity);
   }
 
   const christmasCupQuantity = [...quantities.entries()]

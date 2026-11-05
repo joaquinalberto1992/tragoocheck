@@ -17,5 +17,8 @@ export function GET(_request: Request): Response {
     hasStripeWebhook: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
     shippingFee: 99,
     freeShippingThreshold: 899,
-  }, { headers: { 'Cache-Control': 'no-store, max-age=0' } });
+  }, { headers: {
+    'Cache-Control': 'no-store, max-age=0',
+    'X-Content-Type-Options': 'nosniff',
+  } });
 }

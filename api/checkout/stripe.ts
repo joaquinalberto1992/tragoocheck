@@ -1,17 +1,86 @@
 import { quoteCheckout, stripeClient } from '../_shared.js';
 
 function json(data: unknown, status = 200): Response {
-  return Response.json(data, { status });
+  return Response.json(data, {
+    status,
+    headers: {
+      'Cache-Control': 'no-store',
+      'X-Content-Type-Options': 'nosniff',
+    },
+  });
+}
+
+const checkoutAttempts = new Map<string, { count: number; resetAt: number }>();
+const CHECKOUT_WINDOW_MS = 60_000;
+const CHECKOUT_MAX_ATTEMPTS = 12;
+
+function checkoutRateLimited(request: Request): boolean {
+  const forwardedFor = request.headers.get('x-real-ip') || request.headers.get('x-forwarded-for') || '';
+  const address = forwardedFor.split(',')[0]?.trim() || 'unknown';
+  const now = Date.now();
+  const current = checkoutAttempts.get(address);
+  if (!current || now >= current.resetAt) {
+    checkoutAttempts.set(address, { count: 1, resetAt: now + CHECKOUT_WINDOW_MS });
+  } else {
+    current.count += 1;
+    if (current.count > CHECKOUT_MAX_ATTEMPTS) return true;
+  }
+  if (checkoutAttempts.size > 5000) {
+    for (const [key, value] of checkoutAttempts) {
+      if (now >= value.resetAt) checkoutAttempts.delete(key);
+    }
+  }
+  return false;
+}
+
+function checkoutOrigin(request: Request): string {
+  const requestUrl = new URL(request.url);
+  if (process.env.VERCEL_ENV === 'production') return 'https://www.tragoocheck.shop';
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  if (['localhost', '127.0.0.1'].includes(requestUrl.hostname)) return requestUrl.origin;
+  return 'https://www.tragoocheck.shop';
+}
+
+async function readJsonLimited(request: Request, maxBytes: number): Promise<Record<string, unknown>> {
+  const reader = request.body?.getReader();
+  if (!reader) throw new Error('La solicitud está vacía.');
+
+  const chunks: Uint8Array[] = [];
+  let totalBytes = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    totalBytes += value.byteLength;
+    if (totalBytes > maxBytes) {
+      await reader.cancel();
+      throw new RangeError('La solicitud es demasiado grande.');
+    }
+    chunks.push(value);
+  }
+
+  const bytes = new Uint8Array(totalBytes);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  const parsed = JSON.parse(new TextDecoder().decode(bytes));
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    throw new Error('El formato de la solicitud no es válido.');
+  }
+  return parsed as Record<string, unknown>;
 }
 
 export async function POST(request: Request): Promise<Response> {
   if (request.method !== 'POST') return json({ error: 'Método no permitido.' }, 405);
+  const contentLength = Number(request.headers.get('content-length') || 0);
+  if (contentLength > 16_384) return json({ error: 'La solicitud es demasiado grande.' }, 413);
+  if (checkoutRateLimited(request)) return json({ error: 'Demasiados intentos. Espera un minuto y vuelve a intentar.' }, 429);
 
   try {
-    const body = await request.json() as Record<string, unknown>;
+    const body = await readJsonLimited(request, 16_384);
     const quote = quoteCheckout(body);
     const stripe = await stripeClient();
-    const origin = new URL(request.url).origin;
     const folio = `TC-${crypto.randomUUID().toUpperCase()}`;
     const customerName = String(body.customerName || '').trim().slice(0, 120);
     const customerPhone = String(body.customerPhone || '').trim().slice(0, 30);
@@ -107,16 +176,17 @@ export async function POST(request: Request): Promise<Response> {
         couponDiscount: String(quote.couponDiscount),
         shipping: String(quote.shipping),
         total: String(quote.total),
+        paymentStatus: 'pending',
       },
-      success_url: `${origin}/?stripe_session={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/?stripe_cancelled=1`,
+      success_url: `${checkoutOrigin(request)}/?stripe_session={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${checkoutOrigin(request)}/?stripe_cancelled=1`,
     });
 
     if (!session.url) return json({ error: 'Stripe no generó el enlace de pago. Intenta otra vez.' }, 502);
     return json({ url: session.url, folio, total: quote.total });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'No se pudo iniciar el pago.';
-    const status = message === 'STRIPE_NOT_CONFIGURED' ? 503 : 400;
+    const status = message === 'STRIPE_NOT_CONFIGURED' ? 503 : error instanceof RangeError ? 413 : 400;
     return json({
       error: status === 503
         ? 'El pago con tarjeta aún no está activado. Elige pedir un link por WhatsApp.'

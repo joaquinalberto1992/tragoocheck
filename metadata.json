@@ -1,6 +1,5 @@
 {
   "name": "Tragoo Check — Pruebas Portátiles para Bebidas",
-  "description": "Tienda oficial de Tragoo Check en México. Kits portátiles de tiras reactivas y stickers de uñas para detectar adulteración en bebidas en 15 segundos. Pago inmediato por Transferencia SPEI o Stripe.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "description": "Catálogo oficial de Tragoo Check en México. Compras con tarjeta mediante Stripe y atención por WhatsApp.",
+  "requestFramePermissions": []
 }
