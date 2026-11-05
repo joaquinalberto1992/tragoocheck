@@ -62,14 +62,14 @@ export const WHOLESALE_MASTER_IMAGE = wholesaleMasterImage;
 
 export const CHRISTMAS_PRODUCTS: ProductKit[] = [
   {
-    id: 'vaso-inteligente-navidad', category: 'navidad', name: 'Vaso Luminoso Tragoo Check · Edición Navideña',
-    subtitle: 'Vaso reutilizable con tapa, popote e iluminación LED multicolor recargable por USB-C. Un regalo llamativo para posadas, reuniones y celebraciones de temporada.',
-    kicker: 'Edición navideña · Recargable por USB-C', price: 399,
+    id: 'vaso-inteligente-navidad', category: 'navidad', name: 'Vaso Inteligente Tragoo Check · Detección y LED',
+    subtitle: 'Vaso reutilizable con detección de alteración en bebidas e indicador LED multicolor. Incluye tapa con popote y recarga USB-C; ideal para regalo, posadas y reuniones.',
+    kicker: 'Detección de alteración · Recargable USB-C', price: 399,
     unitPriceNumeric: 399, unitPriceLabel: '1 vaso · 5% menos desde 2 piezas', kitEquivalentCount: 0,
     image: christmasSmartCupImage,
     gallery: [{ src: christmasSmartCupImage, alt: 'Vaso reutilizable Tragoo Check con tapa, popote e iluminación LED multicolor sobre fondo blanco' }],
-    contentsSummary: '1 vaso luminoso · tapa con popote · cable USB-C', substancesDetected: '', reactionTime: '',
-    includedItems: ['1 vaso reutilizable con iluminación LED multicolor', 'Tapa con popote', 'Cable de carga USB-C'],
+    contentsSummary: '1 vaso inteligente · detección de alteración · tapa con popote · cable USB-C', substancesDetected: '', reactionTime: '',
+    includedItems: ['1 vaso inteligente Tragoo Check', 'Detección de alteración con indicador LED multicolor', 'Tapa con popote y cable de carga USB-C'],
     idealFor: 'Regalos, posadas, reuniones y celebraciones navideñas.', stockCount: null, featured: true,
   },
   ...[

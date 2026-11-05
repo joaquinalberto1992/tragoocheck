@@ -63,7 +63,7 @@ export const CATALOG: Record<string, { name: string; price: number }> = {
   'pulseras-grupo': { name: 'Pack Grupo de Pulseras', price: 2299 },
   'sos-family-bluetooth': { name: 'SOS Family Bluetooth — Pulsera de alerta', price: 499 },
   'sos-family-gps': { name: 'SOS Family GPS/SIM — Pulsera de alerta', price: 1499 },
-  'vaso-inteligente-navidad': { name: 'Vaso Luminoso Tragoo Check · Edición Navideña', price: 399 },
+  'vaso-inteligente-navidad': { name: 'Vaso Inteligente Tragoo Check · Detección y LED', price: 399 },
   'vaso-led-navidad-800': { name: 'Vaso LED Navideño Tragoo Check · 800 ml', price: 329 },
   'vaso-led-navidad-600': { name: 'Vaso LED Navideño Tragoo Check · 600 ml', price: 279 },
   'vaso-led-navidad-450': { name: 'Vaso LED Navideño Tragoo Check · 450 ml', price: 229 },
