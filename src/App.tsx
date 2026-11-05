@@ -755,7 +755,7 @@ export default function App() {
             <article className="overflow-hidden rounded-3xl border border-[#E1D6E8] bg-[#F9F5FF] text-[#21172B] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
                 <div className="grid md:grid-cols-[1.05fr_0.95fr]">
                   <div className="relative min-h-[260px] sm:min-h-[360px] bg-white">
-                    <img src={FAMILY_PRODUCTS[0].image} alt="Versiones Bluetooth y GPS/SIM de las pulseras SOS Family Tragoo Check" className="absolute inset-0 h-full w-full object-contain" loading="lazy" />
+                    <img src={FAMILY_PRODUCTS[0].image} alt="Pulsera negra SOS Family sobre fondo blanco" className="absolute inset-0 h-full w-full object-contain" loading="lazy" />
                   </div>
                   <div className="flex flex-col justify-center p-5 sm:p-8 lg:p-10">
                     <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#F1DDFE] px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#67249A]">

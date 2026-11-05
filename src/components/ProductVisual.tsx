@@ -1,4 +1,4 @@
-import { ProductKit, HERO_PRODUCT_IMAGE, PRODUCT_KITS } from '../data/products';
+import { ProductKit, PRODUCT_KITS } from '../data/products';
 
 export function ProductVisual({ product }: { product: ProductKit }) {
   const grouped = product.category === 'promocion' && product.kitEquivalentCount > 0;
@@ -13,12 +13,12 @@ export function ProductVisual({ product }: { product: ProductKit }) {
     <p className="absolute bottom-0 inset-x-0 bg-[#F4F1F6] text-[#51495B] text-xs p-2 text-center">10 tiras + 20 stickers · Recarga sin llavero</p>
   </div>;
   return <div className="relative aspect-[4/3] bg-white border-b border-[#E8E4EB] overflow-hidden p-3 sm:p-4">
-    {grouped ? <>
-      <div className="absolute inset-3 sm:inset-4 grid gap-1 p-2 pb-12" style={{ gridTemplateColumns: `repeat(${count <= 3 ? count : 3}, minmax(0, 1fr))` }}>
-        {Array.from({ length: Math.min(count, 6) }, (_, i) => <img key={i} src={HERO_PRODUCT_IMAGE} alt="Kit Noche Completa de referencia" loading="lazy" className="w-full h-full min-h-0 object-contain" />)}
-      </div>
-      <span className="absolute top-3 right-3 bg-[#5B2A78] text-white rounded-full px-3 py-1 font-bold">{count} kits</span>
-      <p className="absolute bottom-0 inset-x-0 bg-[#F4F1F6] text-[#51495B] text-xs p-2 text-center">{count} kits incluidos · Composición ilustrativa</p>
-    </> : <img src={product.image} alt={product.name} loading="lazy" className="w-full h-full object-contain" />}
+    <img
+      src={product.image}
+      alt={grouped ? `${count} kits Noche Completa Tragoo Check sobre fondo blanco` : product.name}
+      loading="lazy"
+      className="w-full h-full object-contain"
+    />
+    {grouped && <span className="absolute top-3 right-3 bg-[#5B2A78] text-white rounded-full px-3 py-1 font-bold">{count} kits</span>}
   </div>;
 }

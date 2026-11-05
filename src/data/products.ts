@@ -36,21 +36,25 @@ import heroProductImage from '../assets/images/tragoo-kit-noche-completa-branded
 import heroLifestyleImage from '../assets/images/hero_drink_test_1792021357545.jpg';
 import wholesaleBoxImage from '../assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg';
 import wholesaleMasterImage from '../assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg';
-import kitStickersImage from '../assets/images/tragoo-sticker-corazon-closeup.png';
-import kitStripsImage from '../assets/images/tragoo_kit_tiras_reactivas_1792022751432.jpg';
+import kitStickersImage from '../assets/images/tragoo-sticker-corazon-closeup-clean.webp';
+import kitStripsImage from '../assets/images/tragoo-kit-tiras-reactivas-clean.webp';
 import duoPackImage from '../assets/images/tragoo_pack_duo_amigas_1792022753318.jpg';
 import squadPackImage from '../assets/images/tragoo_pack_squad_5x_1792022755033.jpg';
-import braceletIndividualImage from '../assets/images/pulsera-individual.jpg';
-import braceletDetailImage from '../assets/images/pulsera-individual-detalle.jpg';
-import braceletTrioImage from '../assets/images/pulseras-trio-amigas.jpg';
-import braceletGroupImage from '../assets/images/pulseras-grupo-cinco.png';
-import braceletRefillsImage from '../assets/images/repuestos-pulseras-30.jpg';
-import testingStrawsImage from '../assets/images/popotes-prueba.jpg';
-import cupCoverImage from '../assets/images/tragoo-protector-vasos-reusable.jpg';
-import cupCoverLedImage from '../assets/images/tragoo-protector-vasos-led.jpg';
-import heartBraceletImage from '../assets/images/tragoo-pulsera-corazon.jpg';
-import nailStickers30Image from '../assets/images/tragoo-stickers-corazon-30.jpg';
-import sosFamilyModelsImage from '../assets/images/tragoo-sos-family-modelos.jpg';
+import packKits3Image from '../assets/images/tragoo-pack-kits-3-clean.webp';
+import packKits4Image from '../assets/images/tragoo-pack-kits-4-clean.webp';
+import packKits6Image from '../assets/images/tragoo-pack-kits-6-clean.webp';
+import packKits8Image from '../assets/images/tragoo-pack-kits-8-clean.webp';
+import packKits10Image from '../assets/images/tragoo-pack-kits-10-clean.webp';
+import braceletDetailImage from '../assets/images/tragoo-pulsera-individual-clean.webp';
+import braceletTrioImage from '../assets/images/tragoo-pulseras-trio-clean.webp';
+import braceletGroupImage from '../assets/images/tragoo-pulseras-grupo-cinco-clean.webp';
+import braceletRefillsImage from '../assets/images/tragoo-repuestos-pulseras-clean.webp';
+import testingStrawsImage from '../assets/images/tragoo-popotes-prueba-clean.webp';
+import cupCoverImage from '../assets/images/tragoo-protector-reusable-clean.webp';
+import cupCoverLedImage from '../assets/images/tragoo-protector-led-clean.webp';
+import heartBraceletImage from '../assets/images/tragoo-pulsera-corazon-clean.webp';
+import nailStickers30Image from '../assets/images/tragoo-stickers-corazon-30-clean.webp';
+import sosFamilyModelsImage from '../assets/images/tragoo-sos-family-clean.webp';
 import christmasSmartCupImage from '../assets/images/tragoo-navidad-vaso-led-individual.png';
 import christmasCupSizesImage from '../assets/images/tragoo-navidad-vasos-led-colores.png';
 
@@ -259,7 +263,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 399.5,
     unitPriceLabel: '$399.50 MXN por kit (Ahorras $99)',
     kitEquivalentCount: 2,
-    image: HERO_PRODUCT_IMAGE,
+    image: duoPackImage,
     contentsSummary: '10 tiras multipanel · 20 stickers de uñas · 2 llaveros mini-tumbler',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -284,7 +288,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 375,
     unitPriceLabel: '$375.00 MXN por kit · Envío Gratis incluido',
     kitEquivalentCount: 3,
-    image: HERO_PRODUCT_IMAGE,
+    image: packKits3Image,
     contentsSummary: '15 tiras multipanel · 30 stickers de uñas · 3 llaveros mini-tumbler',
     substancesDetected: 'GHB, ketamina, escopolamina, cocaína y aminas adulterantes',
     reactionTime: '10 a 15 segundos',
@@ -310,7 +314,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 349,
     unitPriceLabel: '$349.00 MXN por kit (Ahorras $500 + Envío Gratis)',
     kitEquivalentCount: 5,
-    image: HERO_PRODUCT_IMAGE,
+    image: squadPackImage,
     contentsSummary: '25 tiras multipanel · 50 stickers de uñas · 5 llaveros mini-tumbler',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -335,7 +339,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 319,
     unitPriceLabel: '$319.00 MXN por kit (Ahorras $1,300 + Envío Gratis)',
     kitEquivalentCount: 10,
-    image: HERO_PRODUCT_IMAGE,
+    image: packKits10Image,
     contentsSummary: '50 tiras multipanel · 100 stickers de uñas · 10 llaveros mini-tumbler',
     substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
     reactionTime: '10 a 15 segundos',
@@ -374,6 +378,7 @@ for (const combination of combinations) {
     unitPriceNumeric: price / quantity,
     unitPriceLabel: `${(price / quantity).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} MXN por kit`,
     kitEquivalentCount: quantity,
+    image: quantity === 4 ? packKits4Image : quantity === 6 ? packKits6Image : packKits8Image,
     contentsSummary: `${quantity * 5} tiras · ${quantity * 10} stickers · ${quantity} llaveros`,
     includedItems: parts.flatMap(part => part.includedItems),
     idealFor: 'Grupos que quieren repartir un kit completo por persona.',
@@ -542,7 +547,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '30 stickers · Precio competitivo', price: 169, unitPriceNumeric: 169 / 30,
     unitPriceLabel: '$5.63 MXN por sticker', kitEquivalentCount: 0,
     image: nailStickers30Image,
-    gallery: [{ src: nailStickers30Image, alt: 'Empaque Tragoo Check con 30 stickers corazón reactivos para uñas y guía de uso' }],
+    gallery: [{ src: nailStickers30Image, alt: 'Paquete Tragoo Check y lámina con 30 stickers corazón amarillos para uñas sobre fondo blanco' }],
     contentsSummary: '30 stickers corazón de un solo uso · Empaque Tragoo Check', substancesDetected: '', reactionTime: 'Lectura visual rápida, según la guía incluida',
     includedItems: ['30 stickers corazón de un solo uso', 'Guía de aplicación e interpretación incluida', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'],
     idealFor: 'Llevar en la bolsa para conciertos, festivales y reuniones.', stockCount: null,
@@ -553,7 +558,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: 'Protector reutilizable · Precio de lanzamiento', price: 199, unitPriceNumeric: 199,
     unitPriceLabel: '$199 MXN por protector', kitEquivalentCount: 0,
     image: cupCoverImage,
-    gallery: [{ src: cupCoverImage, alt: 'Protector reutilizable Tragoo Check tipo scrunchie colocado sobre vasos y presentado en su empaque' }],
+    gallery: [{ src: cupCoverImage, alt: 'Protector de tela reutilizable Tragoo Check junto a un vaso transparente y su empaque' }],
     contentsSummary: '1 protector elástico reutilizable Tragoo Check', substancesDetected: '', reactionTime: '',
     includedItems: ['Cubierta elástica tipo scrunchie para la boca del vaso', 'Reutilizable y lavable siguiendo sus instrucciones', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'],
     idealFor: 'Conciertos, bares, festivales y reuniones.', stockCount: null,
@@ -564,7 +569,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: 'LED 360° · 3 modos · Recargable', price: 249, unitPriceNumeric: 249,
     unitPriceLabel: '$249 MXN por protector LED', kitEquivalentCount: 0,
     image: cupCoverLedImage,
-    gallery: [{ src: cupCoverLedImage, alt: 'Protector Tragoo Check para vasos con iluminación LED 360 grados y tres modos de luz' }],
+    gallery: [{ src: cupCoverLedImage, alt: 'Protector de tela Tragoo Check con anillo LED y cable USB-C sobre fondo blanco' }],
     contentsSummary: '1 protector con LED 360° · Cable USB-C', substancesDetected: '', reactionTime: '',
     includedItems: ['Iluminación LED de 360° con tres modos', 'Batería recargable mediante USB-C', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'],
     idealFor: 'Eventos nocturnos, conciertos y reuniones.', stockCount: null,
@@ -575,7 +580,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '1 pulsera · 3 repuestos incluidos', price: 499, unitPriceNumeric: 499,
     unitPriceLabel: '$499 MXN · incluye 3 repuestos', kitEquivalentCount: 0,
     image: heartBraceletImage,
-    gallery: [{ src: heartBraceletImage, alt: 'Pulsera Tragoo Check con dije de corazón amarillo, estuche de presentación y tres repuestos' }],
+    gallery: [{ src: heartBraceletImage, alt: 'Pulsera plateada con dije de corazón amarillo en su estuche, junto a tres repuestos' }],
     contentsSummary: '1 pulsera Tragoo Check · 3 stickers de repuesto', substancesDetected: '', reactionTime: '',
     includedItems: ['Pulsera plateada con charm de corazón', '3 stickers reactivos de repuesto', 'Probada con personas reales y evaluada en estudios propios de Tragoo Check'],
     idealFor: 'Regalo, conciertos, festivales y reuniones.', stockCount: null,
@@ -586,7 +591,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '10 popotes de prueba', price: 599, unitPriceNumeric: 59.9,
     unitPriceLabel: '$59.90 MXN por popote', kitEquivalentCount: 0,
     image: testingStrawsImage,
-    gallery: [{ src: testingStrawsImage, alt: 'Empaque y popotes de prueba Tragoo Check; la imagen presenta los formatos de 10, 20 y 30 unidades' }],
+    gallery: [{ src: testingStrawsImage, alt: 'Popotes de prueba Tragoo Check con indicadores de color; imagen representativa del producto' }],
     contentsSummary: '10 popotes de prueba Tragoo Check', substancesDetected: 'GHB', reactionTime: '10 a 15 segundos',
     includedItems: ['10 popotes de prueba Tragoo Check', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'], idealFor: 'Eventos y reuniones.', stockCount: null,
   },
@@ -596,7 +601,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '20 popotes de prueba', price: 1499, unitPriceNumeric: 74.95,
     unitPriceLabel: '$74.95 MXN por popote', kitEquivalentCount: 0,
     image: testingStrawsImage,
-    gallery: [{ src: testingStrawsImage, alt: 'Empaque y popotes de prueba Tragoo Check; la imagen presenta los formatos de 10, 20 y 30 unidades' }],
+    gallery: [{ src: testingStrawsImage, alt: 'Popotes de prueba Tragoo Check con indicadores de color; imagen representativa del producto' }],
     contentsSummary: '20 popotes de prueba Tragoo Check', substancesDetected: 'GHB', reactionTime: '10 a 15 segundos',
     includedItems: ['20 popotes de prueba Tragoo Check', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'], idealFor: 'Compartir en eventos y reuniones.', stockCount: null,
   },
@@ -606,7 +611,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '30 popotes de prueba', price: 2299, unitPriceNumeric: 2299 / 30,
     unitPriceLabel: '$76.63 MXN por popote', kitEquivalentCount: 0,
     image: testingStrawsImage,
-    gallery: [{ src: testingStrawsImage, alt: 'Empaque y popotes de prueba Tragoo Check; la imagen presenta los formatos de 10, 20 y 30 unidades' }],
+    gallery: [{ src: testingStrawsImage, alt: 'Popotes de prueba Tragoo Check con indicadores de color; imagen representativa del producto' }],
     contentsSummary: '30 popotes de prueba Tragoo Check', substancesDetected: 'GHB', reactionTime: '10 a 15 segundos',
     includedItems: ['30 popotes de prueba Tragoo Check', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'], idealFor: 'Grupos y eventos.', stockCount: null,
   },
@@ -616,7 +621,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '30 parches · Exclusivos para pulseras Tragoo Check',
     price: 1589, unitPriceNumeric: 1589 / 30, unitPriceLabel: '$52.97 MXN por parche',
     kitEquivalentCount: 0, image: braceletRefillsImage,
-    gallery: [{ src: braceletRefillsImage, alt: 'Paquete de 30 parches de repuesto exclusivos para pulseras Tragoo Check, frente y reverso del empaque' }],
+    gallery: [{ src: braceletRefillsImage, alt: 'Paquete de 30 parches de repuesto junto a una pulsera Tragoo Check' }],
     contentsSummary: '30 parches reactivos de repuesto para pulseras Tragoo Check',
     substancesDetected: '', reactionTime: '',
     includedItems: ['30 parches reactivos de repuesto exclusivos para pulseras Tragoo Check', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'],
@@ -628,10 +633,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '1 sobre · 1 pulsera', price: 599, unitPriceNumeric: 599,
     unitPriceLabel: '$599.00 MXN por pulsera', kitEquivalentCount: 0,
     image: braceletDetailImage,
-    gallery: [
-      { src: braceletDetailImage, alt: 'Pulsera individual morada Tragoo Check fuera del sobre, junto al frente y reverso de su empaque' },
-      { src: braceletIndividualImage, alt: 'Pulsera individual Tragoo Check: frente y reverso del mismo sobre, presentación de una pulsera' },
-    ],
+    gallery: [{ src: braceletDetailImage, alt: 'Pulsera individual morada Tragoo Check fuera de su sobre, sobre fondo blanco' }],
     contentsSummary: '1 sobre con 1 pulsera ajustable morada y zona de prueba integrada',
     substancesDetected: '', reactionTime: '',
     includedItems: ['1 sobre', '1 pulsera ajustable morada con zona de prueba integrada', 'Probada con personas reales y evaluada en estudios propios de Tragoo Check'],
@@ -643,7 +645,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '1 sobre · 3 pulseras', price: 1499, unitPriceNumeric: 1499 / 3,
     unitPriceLabel: '$499.67 MXN por pulsera', kitEquivalentCount: 0,
     image: braceletTrioImage,
-    gallery: [{ src: braceletTrioImage, alt: 'Pack Trío de pulseras Tragoo Check: tres pulseras moradas fuera del sobre y vistas del frente y reverso del empaque' }],
+    gallery: [{ src: braceletTrioImage, alt: 'Pack Trío de pulseras Tragoo Check con tres pulseras moradas y un sobre' }],
     contentsSummary: '1 solo sobre con 3 pulseras',
     substancesDetected: '', reactionTime: '', includedItems: ['1 sobre con 3 pulseras', 'Probadas con personas reales y evaluadas en estudios propios de Tragoo Check'],
     idealFor: 'Compartir con amistades durante un evento.', stockCount: null,
@@ -654,7 +656,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '1 sobre · 5 pulseras', price: 2299, unitPriceNumeric: 2299 / 5,
     unitPriceLabel: '$459.80 MXN por pulsera', kitEquivalentCount: 0,
     image: braceletGroupImage,
-    gallery: [{ src: braceletGroupImage, alt: 'Presentación ilustrativa del Pack Grupo Tragoo Check: cinco pulseras moradas fuera del sobre, con frente y reverso del empaque' }],
+    gallery: [{ src: braceletGroupImage, alt: 'Pack Grupo Tragoo Check con cinco pulseras moradas y un sobre' }],
     contentsSummary: '1 sobre con 5 pulseras',
     substancesDetected: '', reactionTime: '', includedItems: ['1 sobre con 5 pulseras', 'Probadas con personas reales y evaluadas en estudios propios de Tragoo Check'],
     idealFor: 'Grupos, celebraciones y eventos.', stockCount: null,
@@ -674,7 +676,7 @@ export const FAMILY_PRODUCTS: ProductKit[] = [
     unitPriceLabel: '1 pulsera SOS Bluetooth · $499 MXN',
     kitEquivalentCount: 0,
     image: sosFamilyModelsImage,
-    gallery: [{ src: sosFamilyModelsImage, alt: 'Pulseras SOS Family Tragoo Check en versiones Bluetooth y GPS/SIM' }],
+    gallery: [{ src: sosFamilyModelsImage, alt: 'Pulsera negra SOS Family sobre fondo blanco' }],
     contentsSummary: '1 pulsera SOS Bluetooth · app Tragoo Check',
     substancesDetected: '',
     reactionTime: '',
@@ -701,7 +703,7 @@ export const FAMILY_PRODUCTS: ProductKit[] = [
     unitPriceLabel: '1 pulsera GPS/SIM · $1,499 MXN',
     kitEquivalentCount: 0,
     image: sosFamilyModelsImage,
-    gallery: [{ src: sosFamilyModelsImage, alt: 'Pulseras SOS Family Tragoo Check en versiones Bluetooth y GPS/SIM' }],
+    gallery: [{ src: sosFamilyModelsImage, alt: 'Pulsera negra SOS Family sobre fondo blanco' }],
     contentsSummary: '1 pulsera SOS GPS/SIM · plan de servicio desde $99 MXN/mes',
     substancesDetected: '',
     reactionTime: '',
