@@ -752,7 +752,6 @@ export default function App() {
                             </div>
                             <div className="shrink-0 text-right">
                               <div className="text-xl font-black tabular-nums text-[#24172F]">${product.price.toLocaleString('es-MX')} <span className="text-xs font-semibold">MXN</span></div>
-                              <span className="inline-block mt-1 rounded-full bg-[#A3E635] px-2 py-1 text-[9px] font-extrabold text-[#18220B]">50% OFF ESTE MES</span>
                             </div>
                           </div>
                           <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-[#413549]">
@@ -891,17 +890,21 @@ export default function App() {
                           ${kit.price.toLocaleString('es-MX')}
                         </span>
                         <span className="text-xs text-[#A19BB2]">MXN</span>
-                        <span className="rounded-full bg-[#A3E635]/10 px-2 py-1 text-[10px] font-extrabold text-[#A3E635]">
-                          50% OFF ESTE MES
-                        </span>
+                        {kit.compareAtPrice && kit.compareAtPrice > kit.price && (
+                          <span className="rounded-full bg-[#A3E635]/10 px-2 py-1 text-[10px] font-extrabold text-[#A3E635]">
+                            Ahorra {Math.round(((kit.compareAtPrice - kit.price) / kit.compareAtPrice) * 100)}%
+                          </span>
+                        )}
                       </div>
 
                       <p className="text-xs sm:text-sm text-[#C4BED4] leading-relaxed">
                         {kit.subtitle}
                       </p>
-                      <div className="inline-flex items-center gap-1.5 rounded-full border border-[#A3E635]/25 bg-[#A3E635]/10 px-2.5 py-1.5 text-[10px] font-semibold text-[#D9F99D]">
-                        <ShieldCheck className="h-3.5 w-3.5" /> Estudios propios y pruebas con personas reales
-                      </div>
+                      {kit.substancesDetected && (
+                        <div className="inline-flex items-center gap-1.5 rounded-full border border-[#A3E635]/25 bg-[#A3E635]/10 px-2.5 py-1.5 text-[10px] font-semibold text-[#D9F99D]">
+                          <ShieldCheck className="h-3.5 w-3.5" /> Estudios propios y pruebas con personas reales
+                        </div>
+                      )}
 
                       <div className="pt-2 border-t border-[#231E30] space-y-1.5 text-xs">
                         <div>

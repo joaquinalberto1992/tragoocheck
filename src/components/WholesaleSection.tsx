@@ -124,7 +124,7 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
     <section id="mayoreo" className="py-16 md:py-24 border-t border-[#231E30] bg-[#0D0A14]">
       <div className="max-w-[1160px] mx-auto px-4 sm:px-6 space-y-14">
         <div className="rounded-xl border border-[#A3E635]/40 bg-[#171E12] px-4 py-3 text-center text-sm font-extrabold tracking-wide text-[#A3E635]">
-          50% DE REBAJA ESTE MES · APLICA A TODOS LOS PRECIOS PUBLICADOS
+          Descuentos por volumen · precios unitarios y totales visibles antes de pedir
         </div>
         {/* Section Heading */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -216,9 +216,6 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
                       ${box.price.toLocaleString('es-MX')}
                     </span>
                     <span className="text-xs text-[#A19BB2]">MXN</span>
-                    <span className="rounded-full bg-[#A3E635]/10 px-2 py-1 text-[10px] font-extrabold text-[#A3E635]">
-                      50% OFF ESTE MES
-                    </span>
                   </div>
 
                   <p className="text-xs text-[#C4BED4] leading-relaxed">{box.subtitle}</p>
