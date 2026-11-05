@@ -12,7 +12,7 @@ export async function POST(request: Request): Promise<Response> {
     const quote = quoteCheckout(body);
     const stripe = await stripeClient();
     const origin = new URL(request.url).origin;
-    const folio = `TC-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+    const folio = `TC-${crypto.randomUUID().toUpperCase()}`;
     const customerName = String(body.customerName || '').trim().slice(0, 120);
     const customerPhone = String(body.customerPhone || '').trim().slice(0, 30);
     const customerEmail = String(body.customerEmail || '').trim().slice(0, 254);

@@ -26,6 +26,7 @@ import {
   PROMO_BUNDLES,
   BRACELET_PRODUCTS,
   FAMILY_PRODUCTS,
+  CHRISTMAS_PRODUCTS,
   ALL_PRODUCTS,
   ACTIVE_COUPONS,
   HERO_PRODUCT_IMAGE,
@@ -79,7 +80,7 @@ export default function App() {
     'video' | 'empaque' | 'squad'
   >('video');
   const [catalogFilter, setCatalogFilter] = useState<
-    'all' | 'individual' | 'promocion' | 'accesorios'
+    'all' | 'individual' | 'promocion' | 'accesorios' | 'navidad'
   >('all');
   const [selectedCouponCode, setSelectedCouponCode] = useState<string | null>(
     null
@@ -111,12 +112,16 @@ export default function App() {
       })
       .catch(() => {});
 
-    fetch('/api/orders')
-      .then((r) => r.json())
-      .then((data) => {
-        if (Array.isArray(data)) setOrders(data);
-      })
-      .catch(() => {});
+    // The private local merchant panel may read orders during development;
+    // deployed customers never request or receive the shared order list.
+    if (import.meta.env.DEV) {
+      fetch('/api/orders')
+        .then((r) => r.json())
+        .then((data) => {
+          if (Array.isArray(data)) setOrders(data);
+        })
+        .catch(() => {});
+    }
 
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get('stripe_session');
@@ -250,11 +255,13 @@ export default function App() {
   const displayedRetailProducts =
     catalogFilter === 'accesorios'
       ? BRACELET_PRODUCTS
+      : catalogFilter === 'navidad'
+      ? CHRISTMAS_PRODUCTS
       : catalogFilter === 'individual'
       ? [...PRODUCT_KITS, ...BRACELET_PRODUCTS.filter((product) => product.category === 'individual')]
       : catalogFilter === 'promocion'
       ? [...PROMO_BUNDLES, ...BRACELET_PRODUCTS.filter((product) => product.category === 'promocion')]
-      : [...PRODUCT_KITS, ...PROMO_BUNDLES, ...BRACELET_PRODUCTS];
+      : [...PRODUCT_KITS, ...PROMO_BUNDLES, ...BRACELET_PRODUCTS, ...CHRISTMAS_PRODUCTS];
 
   const activeHeroImage =
     heroView === 'empaque'
@@ -800,6 +807,22 @@ export default function App() {
           </div>
         </section>
 
+        <section id="edicion-navidad" className="border-t border-[#E8E4EB] bg-[#FCFBFD] py-9 sm:py-12">
+          <div className="mx-auto grid max-w-[1160px] items-center gap-5 px-4 sm:px-6 md:grid-cols-[0.8fr_1.2fr]">
+            <div className="overflow-hidden rounded-2xl border border-[#E7E2EA] bg-white p-3 sm:p-4">
+              <img src={CHRISTMAS_PRODUCTS[0].image} alt="Vaso luminoso navideño Tragoo Check con tapa y popote" className="mx-auto max-h-[260px] w-full object-contain" loading="lazy" />
+            </div>
+            <div className="space-y-3">
+              <div className="text-xs font-bold uppercase tracking-[0.16em] text-[#6B368B]">Edición navideña · Tragoo Check</div>
+              <h2 className="text-2xl font-extrabold tracking-tight text-[#201927] sm:text-3xl">Un detalle luminoso para tus reuniones de temporada.</h2>
+              <p className="max-w-2xl text-sm leading-relaxed text-[#51495B]">Vasos reutilizables con tapa, popote e iluminación LED en cinco tamaños, de 250 a 800 ml. Elige el que va con tu plan; hay precio por volumen al combinar piezas.</p>
+              <button type="button" onClick={() => { setCatalogFilter('navidad'); document.getElementById('kits')?.scrollIntoView({ behavior: 'smooth' }); }} className="inline-flex items-center gap-2 rounded-xl bg-[#201927] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#4C2867]">
+                Ver vasos navideños <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        </section>
+
         {/* FEATURED CATALOG: INDIVIDUALS + MULTIPACK PROMOTIONS */}
         <VideoGallery />
         <UpcomingProducts onBuy={handleBuyNow} />
@@ -817,7 +840,7 @@ export default function App() {
               </div>
 
               {/* Responsive filter controls */}
-              <div role="group" aria-label="Filtrar catálogo" className="grid grid-cols-2 xl:grid-cols-4 gap-1 w-full lg:w-auto p-1 bg-white border border-[#E7E2EA] rounded-xl self-start">
+              <div role="group" aria-label="Filtrar catálogo" className="grid grid-cols-2 xl:grid-cols-5 gap-1 w-full lg:w-auto p-1 bg-white border border-[#E7E2EA] rounded-xl self-start">
                 <button
                   type="button"
                   onClick={() => setCatalogFilter('all')}
@@ -828,7 +851,7 @@ export default function App() {
                       : 'text-[#51495B] hover:text-[#201927]'
                   }`}
                 >
-                  Todos ({PRODUCT_KITS.length + PROMO_BUNDLES.length + BRACELET_PRODUCTS.length})
+                  Todos ({PRODUCT_KITS.length + PROMO_BUNDLES.length + BRACELET_PRODUCTS.length + CHRISTMAS_PRODUCTS.length})
                 </button>
                 <button
                   type="button"
@@ -861,6 +884,14 @@ export default function App() {
                   className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${catalogFilter === 'accesorios' ? 'bg-[#A3E635] text-[#0B0910] font-bold' : 'text-[#51495B] hover:text-[#201927]'}`}
                 >
                   Accesorios ({BRACELET_PRODUCTS.length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCatalogFilter('navidad')}
+                  aria-pressed={catalogFilter === 'navidad'}
+                  className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${catalogFilter === 'navidad' ? 'bg-[#A3E635] text-[#0B0910] font-bold' : 'text-[#51495B] hover:text-[#201927]'}`}
+                >
+                  🎄 Navidad ({CHRISTMAS_PRODUCTS.length})
                 </button>
               </div>
             </div>

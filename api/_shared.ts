@@ -63,8 +63,23 @@ export const CATALOG: Record<string, { name: string; price: number }> = {
   'pulseras-grupo': { name: 'Pack Grupo de Pulseras', price: 2299 },
   'sos-family-bluetooth': { name: 'SOS Family Bluetooth — Pulsera de alerta', price: 499 },
   'sos-family-gps': { name: 'SOS Family GPS/SIM — Pulsera de alerta', price: 1499 },
+  'vaso-inteligente-navidad': { name: 'Vaso Luminoso Tragoo Check · Edición Navideña', price: 399 },
+  'vaso-led-navidad-800': { name: 'Vaso LED Navideño Tragoo Check · 800 ml', price: 329 },
+  'vaso-led-navidad-600': { name: 'Vaso LED Navideño Tragoo Check · 600 ml', price: 279 },
+  'vaso-led-navidad-450': { name: 'Vaso LED Navideño Tragoo Check · 450 ml', price: 229 },
+  'vaso-led-navidad-350': { name: 'Vaso LED Navideño Tragoo Check · 350 ml', price: 189 },
+  'vaso-led-navidad-250': { name: 'Vaso LED Navideño Tragoo Check · 250 ml', price: 169 },
   'regalo-stickers-5': { name: 'Regalo: tarjeta extra de 5 stickers', price: 0 },
 };
+
+const CHRISTMAS_CUP_IDS = new Set([
+  'vaso-inteligente-navidad',
+  'vaso-led-navidad-800',
+  'vaso-led-navidad-600',
+  'vaso-led-navidad-450',
+  'vaso-led-navidad-350',
+  'vaso-led-navidad-250',
+]);
 
 const NOVEMBER_COUPON_EXPIRY = Date.parse('2026-12-01T06:00:00.000Z');
 
@@ -81,7 +96,7 @@ export async function stripeClient(): Promise<Stripe> {
   return new StripeConstructor(key);
 }
 
-function unitPrice(id: string, quantity: number): number {
+function unitPrice(id: string, quantity: number, christmasCupQuantity = quantity): number {
   if (id === 'kit-noche-completa') {
     if (quantity >= 500) return 165;
     if (quantity >= 250) return 185;
@@ -109,6 +124,12 @@ function unitPrice(id: string, quantity: number): number {
     if (quantity >= 5) return 239;
     if (quantity >= 3) return 259;
     if (quantity === 2) return 275;
+  }
+  if (CHRISTMAS_CUP_IDS.has(id)) {
+    const discount = christmasCupQuantity >= 6 ? 0.12
+      : christmasCupQuantity >= 4 ? 0.08
+        : christmasCupQuantity >= 2 ? 0.05 : 0;
+    return Math.round(CATALOG[id].price * (1 - discount));
   }
   return CATALOG[id].price;
 }
@@ -149,10 +170,13 @@ export function quoteCheckout(input: unknown): CheckoutQuote {
     quantities.set(item.id, (quantities.get(item.id) || 0) + quantity);
   }
 
+  const christmasCupQuantity = [...quantities.entries()]
+    .filter(([id]) => CHRISTMAS_CUP_IDS.has(id))
+    .reduce((sum, [, quantity]) => sum + quantity, 0);
   const lines: CheckoutLine[] = [...quantities.entries()].map(([id, quantity]) => ({
     id,
     name: CATALOG[id].name,
-    price: unitPrice(id, quantity),
+    price: unitPrice(id, quantity, christmasCupQuantity),
     quantity,
   }));
   const subtotal = Math.round(lines.reduce((sum, line) => sum + line.price * line.quantity, 0));

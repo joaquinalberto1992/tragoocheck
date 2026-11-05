@@ -82,7 +82,20 @@ interface CheckoutModalProps {
 }
 
 // Helper: Strictly decreasing unit price when buying multiple individual items
-function getEffectiveUnitPrice(product: ProductKit, quantity: number): number {
+const CHRISTMAS_CUP_IDS = new Set([
+  'vaso-inteligente-navidad',
+  'vaso-led-navidad-800',
+  'vaso-led-navidad-600',
+  'vaso-led-navidad-450',
+  'vaso-led-navidad-350',
+  'vaso-led-navidad-250',
+]);
+
+function getEffectiveUnitPrice(
+  product: ProductKit,
+  quantity: number,
+  christmasCupQuantity = quantity
+): number {
   if (product.id === 'kit-noche-completa') {
     if (quantity >= 500) return 165;
     if (quantity >= 250) return 185;
@@ -113,6 +126,12 @@ function getEffectiveUnitPrice(product: ProductKit, quantity: number): number {
     if (quantity >= 3) return 259;
     if (quantity === 2) return 275;
     return 299;
+  }
+  if (CHRISTMAS_CUP_IDS.has(product.id)) {
+    const discount = christmasCupQuantity >= 6 ? 0.12
+      : christmasCupQuantity >= 4 ? 0.08
+        : christmasCupQuantity >= 2 ? 0.05 : 0;
+    return Math.round(product.price * (1 - discount));
   }
   return product.price;
 }
@@ -180,10 +199,15 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   if (!isOpen) return null;
 
+  const christmasCupQuantity = cart.reduce(
+    (sum, item) => sum + (CHRISTMAS_CUP_IDS.has(item.product.id) ? item.quantity : 0),
+    0
+  );
+
   const subtotal = Math.round(
     cart.reduce(
       (acc, item) =>
-        acc + getEffectiveUnitPrice(item.product, item.quantity) * item.quantity,
+        acc + getEffectiveUnitPrice(item.product, item.quantity, christmasCupQuantity) * item.quantity,
       0
     )
   );
@@ -237,7 +261,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     const baseItems = cart.map((i) => ({
       id: i.product.id,
       name: i.product.name,
-      price: getEffectiveUnitPrice(i.product, i.quantity),
+      price: getEffectiveUnitPrice(i.product, i.quantity, christmasCupQuantity),
       quantity: i.quantity,
     }));
     if (unlocksFreeGift) {
@@ -334,8 +358,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     setErrorMsg(null);
     setIsSubmitting(true);
 
-    const randomDigits = Math.floor(1000 + Math.random() * 9000);
-    const generatedFolio = `TC-${randomDigits}`;
+    const generatedFolio = `TC-${crypto.randomUUID().toUpperCase()}`;
 
     const orderPayload: ConfirmedOrder = {
       folio: generatedFolio,
@@ -447,6 +470,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       )
     : 0;
 
+  const cartProductIds = new Set(cart.map((item) => item.product.id));
+  const cartHasChristmasCup = cart.some((item) => CHRISTMAS_CUP_IDS.has(item.product.id));
+  const cartHasBracelet = cart.some((item) =>
+    item.product.id.startsWith('pulsera') || item.product.id === 'repuestos-pulseras-30'
+  );
+  const crossSellCandidates = cartHasBracelet
+    ? ['repuestos-pulseras-30', 'stickers-corazon-30', 'vaso-led-navidad-350']
+    : cartHasChristmasCup
+      ? ['protector-vasos', 'kit-stickers', 'kit-noche-completa']
+      : ['vaso-led-navidad-350', 'protector-vasos', 'stickers-corazon-30'];
+  const crossSellProduct = crossSellCandidates
+    .map((id) => ALL_PRODUCTS.find((product) => product.id === id))
+    .find((product) => product && !cartProductIds.has(product.id));
+
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/80 backdrop-blur-xs">
       <div className="relative w-full max-w-xl bg-white border-l border-[#E7E2EA] h-full flex flex-col justify-between overflow-hidden">
@@ -460,8 +497,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </h2>
             <p className="text-[11px] sm:text-xs text-[#466B00]">
               {merchantConfig.hasStripeCheckout
-                ? 'Tarjeta en checkout seguro · Link de pago disponible por WhatsApp'
-                : 'Solicita tu link de pago por WhatsApp'}
+                ? 'Compra sin crear cuenta · Tarjeta segura · Link por WhatsApp'
+                : 'Compra sin crear cuenta · Solicita tu link por WhatsApp'}
             </p>
           </div>
           <button
@@ -645,6 +682,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   )}
                 </div>
 
+                <div
+                  className="h-2 overflow-hidden rounded-full bg-[#EEEAF1]"
+                  role="progressbar"
+                  aria-label="Avance para obtener envío gratis"
+                  aria-valuemin={0}
+                  aria-valuemax={effectiveThreshold}
+                  aria-valuenow={Math.min(subtotal, effectiveThreshold)}
+                >
+                  <div
+                    className="h-full rounded-full bg-[#72A719] transition-[width] duration-300"
+                    style={{ width: `${Math.min(100, (subtotal / effectiveThreshold) * 100)}%` }}
+                  />
+                </div>
+
                 <div className="flex items-center gap-2.5 text-xs border-t border-[#E8E4EB] pt-2">
                   <Gift className="w-4 h-4 text-[#7133A0] shrink-0" />
                   {unlocksFreeGift ? (
@@ -656,11 +707,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </span>
                   ) : (
                     <span className="text-[#625969]">
-                      Entre más piezas agregues,{' '}
-                      <strong className="text-[#201927]">
-                        más baja el precio unitario
-                      </strong>{' '}
-                      automáticamente.
+                      {christmasCupQuantity > 0 ? (
+                        <>Vasos navideños: 5% menos desde 2, 8% desde 4 y 12% desde 6 piezas,{' '}
+                          <strong className="text-[#201927]">combinando tamaños</strong> en el carrito.</>
+                      ) : (
+                        <>En los vasos LED navideños, el descuento por volumen se aplica automáticamente al agregar más piezas.</>
+                      )}
                     </span>
                   )}
                 </div>
@@ -669,7 +721,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               {/* Cart Items List */}
               <div className="space-y-2.5">
                 {cart.map(({ product, quantity }) => {
-                  const unitPrice = getEffectiveUnitPrice(product, quantity);
+                  const unitPrice = getEffectiveUnitPrice(product, quantity, christmasCupQuantity);
                   const lineTotal = Math.round(unitPrice * quantity);
                   const hasVolumeDiscount = unitPrice < product.price;
 
@@ -805,6 +857,25 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     className="px-3 py-1.5 rounded-lg bg-[#F2EEF5] hover:bg-[#A3E635] text-[#201927] hover:text-[#0B0910] text-xs font-semibold transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     + Agregar {upsellQuantity}
+                  </button>
+                </div>
+              )}
+
+              {crossSellProduct && (
+                <div className="p-3 rounded-xl bg-[#F8F7FA] border border-[#E7E2EA] flex items-center justify-between gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <img src={crossSellProduct.image} alt="" className="h-12 w-12 rounded-lg border border-[#E7E2EA] bg-white object-contain" loading="lazy" />
+                    <div className="min-w-0 text-xs">
+                      <div className="font-semibold text-[#201927]">Puede acompañar tu pedido</div>
+                      <div className="truncate text-[#625969]">{crossSellProduct.name} · ${crossSellProduct.price.toLocaleString('es-MX')} MXN</div>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onAddProduct(crossSellProduct)}
+                    className="shrink-0 rounded-lg border border-[#D9D2DF] bg-white px-3 py-1.5 text-xs font-semibold text-[#201927] transition-colors hover:bg-[#EEF3E5]"
+                  >
+                    + Agregar
                   </button>
                 </div>
               )}

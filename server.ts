@@ -1,4 +1,5 @@
 import express from 'express';
+import { randomUUID } from 'node:crypto';
 import fs from 'fs';
 import path from 'path';
 import { createServer as createViteServer } from 'vite';
@@ -374,8 +375,7 @@ async function startServer() {
   app.post('/api/orders', (req, res) => {
     const data = loadStoreData();
     const body = req.body;
-    const randomDigits = Math.floor(1000 + Math.random() * 9000);
-    const folio = body.folio || `TC-${randomDigits}`;
+    const folio = `TC-${randomUUID().toUpperCase()}`;
 
     const newOrder: OrderRecord = {
       folio,

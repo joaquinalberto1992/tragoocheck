@@ -1,4 +1,4 @@
-export type ProductCategory = 'individual' | 'promocion' | 'mayoreo' | 'familia';
+export type ProductCategory = 'individual' | 'promocion' | 'mayoreo' | 'familia' | 'navidad';
 
 export interface ProductKit {
   id: string;
@@ -51,12 +51,48 @@ import cupCoverLedImage from '../assets/images/tragoo-protector-vasos-led.jpg';
 import heartBraceletImage from '../assets/images/tragoo-pulsera-corazon.jpg';
 import nailStickers30Image from '../assets/images/tragoo-stickers-corazon-30.jpg';
 import sosFamilyModelsImage from '../assets/images/tragoo-sos-family-modelos.jpg';
+import christmasSmartCupImage from '../assets/images/tragoo-navidad-vaso-led-individual.png';
+import christmasCupSizesImage from '../assets/images/tragoo-navidad-vasos-led-colores.png';
 
 export const HERO_PRODUCT_IMAGE = heroProductImage;
 export const HERO_LIFESTYLE_IMAGE = heroLifestyleImage;
 export const KIT_STICKERS_IMAGE = kitStickersImage;
 export const WHOLESALE_BOX_IMAGE = wholesaleBoxImage;
 export const WHOLESALE_MASTER_IMAGE = wholesaleMasterImage;
+
+export const CHRISTMAS_PRODUCTS: ProductKit[] = [
+  {
+    id: 'vaso-inteligente-navidad', category: 'navidad', name: 'Vaso Luminoso Tragoo Check · Edición Navideña',
+    subtitle: 'Vaso reutilizable con tapa, popote e iluminación LED multicolor recargable por USB-C. Un regalo llamativo para posadas, reuniones y celebraciones de temporada.',
+    kicker: 'Edición navideña · Recargable por USB-C', price: 399,
+    unitPriceNumeric: 399, unitPriceLabel: '1 vaso · 5% menos desde 2 piezas', kitEquivalentCount: 0,
+    image: christmasSmartCupImage,
+    gallery: [{ src: christmasSmartCupImage, alt: 'Vaso reutilizable Tragoo Check con tapa, popote e iluminación LED multicolor sobre fondo blanco' }],
+    contentsSummary: '1 vaso luminoso · tapa con popote · cable USB-C', substancesDetected: '', reactionTime: '',
+    includedItems: ['1 vaso reutilizable con iluminación LED multicolor', 'Tapa con popote', 'Cable de carga USB-C'],
+    idealFor: 'Regalos, posadas, reuniones y celebraciones navideñas.', stockCount: null, featured: true,
+  },
+  ...[
+    { size: 800, price: 329, label: 'XL' },
+    { size: 600, price: 279, label: 'Grande' },
+    { size: 450, price: 229, label: 'Mediano' },
+    { size: 350, price: 189, label: 'Personal' },
+    { size: 250, price: 169, label: 'Compacto' },
+  ].map(({ size, price, label }) => ({
+    id: `vaso-led-navidad-${size}`, category: 'navidad' as const,
+    name: `Vaso LED Navideño Tragoo Check · ${size} ml`,
+    subtitle: `Vaso reutilizable de ${size} ml con tapa y popote, decorado para la temporada e iluminado con LED multicolor. Disponible en varios colores, sujeto a existencias.`,
+    kicker: `Edición navideña · ${label} · ${size} ml`, price,
+    unitPriceNumeric: price,
+    unitPriceLabel: `Desde 1 pieza · 5% menos desde 2 vasos`, kitEquivalentCount: 0,
+    image: christmasCupSizesImage,
+    gallery: [{ src: christmasCupSizesImage, alt: 'Vasos LED navideños Tragoo Check en cinco tamaños y colores sobre fondo blanco' }],
+    contentsSummary: `1 vaso LED reutilizable de ${size} ml con tapa y popote`,
+    substancesDetected: '', reactionTime: '',
+    includedItems: [`1 vaso reutilizable de ${size} ml`, 'Tapa con popote', 'Iluminación LED multicolor'],
+    idealFor: 'Intercambios de regalos, posadas y reuniones de temporada.', stockCount: null,
+  })),
+];
 
 export const INSTAGRAM_URL = 'https://www.instagram.com/tragoocheck/';
 export const INSTAGRAM_HANDLE = '@tragoocheck';
@@ -687,6 +723,7 @@ export const ALL_PRODUCTS: ProductKit[] = [
   ...WHOLESALE_KITS,
   ...BRACELET_PRODUCTS,
   ...FAMILY_PRODUCTS,
+  ...CHRISTMAS_PRODUCTS,
 ];
 
 export const FAQS = [
