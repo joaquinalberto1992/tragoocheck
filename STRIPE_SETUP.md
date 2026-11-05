@@ -6,9 +6,10 @@ El sitio usa Stripe Checkout alojado. La tarjeta se captura en Stripe y no pasa 
 
 1. En Stripe, completa la activación de la cuenta y primero usa una clave de prueba.
 2. En Vercel abre el proyecto **tragocheck** → **Settings** → **Environment Variables**.
-3. Configura `STRIPE_SECRET_KEY` como **Sensitive**:
-   - **Preview:** clave de prueba `rk_test_...` (recomendada) o `sk_test_...`.
-   - **Production:** clave activa `rk_live_...` (recomendada) o `sk_live_...`.
+3. Configura las claves como **Sensitive**:
+   - **Preview:** `STRIPE_SECRET_KEY` con una clave de prueba `rk_test_...` o `sk_test_...`.
+   - **Production:** `STRIPE_SECRET_KEY_LIVE` con una clave activa `rk_live_...` o `sk_live_...`.
+     Si no existe `STRIPE_SECRET_KEY_LIVE`, Production usa `STRIPE_SECRET_KEY`; esa variable también debe contener una clave activa.
    - En una clave restringida, habilita lectura y escritura de **Checkout Sessions**. No uses claves `pk_` como secreto del servidor.
 4. La aplicación solo acepta claves de prueba en Preview/desarrollo y claves activas en Production. Así una prueba no puede cobrar por accidente a una tarjeta real.
 5. Después de cambiar variables, crea un nuevo deployment de Vercel.

@@ -1,4 +1,5 @@
 import {
+  getStripeSecretKey,
   getStripeKeyMode,
   isStripeConfiguredForEnvironment,
   WHATSAPP_NUMBER,
@@ -15,7 +16,7 @@ function isValidClabe(value: string): boolean {
 }
 
 export function GET(_request: Request): Response {
-  const key = process.env.STRIPE_SECRET_KEY || '';
+  const key = getStripeSecretKey();
   const keyMode = getStripeKeyMode(key);
   const hasStripeCheckout = isStripeConfiguredForEnvironment(key);
   const clabe = (process.env.MERCHANT_CLABE || '').replace(/\D/g, '');

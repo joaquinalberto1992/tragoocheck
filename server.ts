@@ -7,6 +7,7 @@ import { POST as stripeCheckoutPost } from './api/checkout/stripe.js';
 import { GET as stripeCheckoutConfirmGet } from './api/checkout/confirm.js';
 import { POST as stripeWebhookPost } from './api/stripe/webhook.js';
 import {
+  getStripeSecretKey,
   getStripeKeyMode,
   isStripeConfiguredForEnvironment,
 } from './api/_shared.js';
@@ -303,7 +304,7 @@ async function startServer() {
   // Get Merchant Config & Stripe Status
   app.get('/api/config', (_req, res) => {
     const data = loadStoreData();
-    const activeStripeKey = process.env.STRIPE_SECRET_KEY || '';
+    const activeStripeKey = getStripeSecretKey();
     const keyMode = getStripeKeyMode(activeStripeKey);
     const safeConfig = {
       ...data.config,
@@ -350,7 +351,7 @@ async function startServer() {
     };
     saveStoreData(data);
 
-    const activeStripeKey = process.env.STRIPE_SECRET_KEY || '';
+    const activeStripeKey = getStripeSecretKey();
     res.json({
       ...data.config,
       stripeSecretKeyOverride: data.config.stripeSecretKeyOverride ? '••••••••' : '',
