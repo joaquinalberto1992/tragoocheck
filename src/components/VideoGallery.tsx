@@ -1,33 +1,53 @@
 import { useRef, useState } from 'react';
 
 const videos = [
-  { src: '/videos/antes-de-salir.mp4', poster: '/videos/antes-de-salir.jpg', title: 'Antes de salir', description: 'Un recordatorio para llevar tus herramientas de autocuidado y consultar sus indicaciones.' },
-  { src: '/videos/intro-premium.mp4', poster: '/videos/intro-premium.jpg', title: 'Conoce Tragoo Check', description: 'Una presentación breve de la marca y sus productos.' },
-  { src: '/videos/pulsera-premium.mp4', poster: '/videos/pulsera-premium.jpg', title: 'Pulsera Tragoo Check', description: 'Conoce la presentación individual para conciertos, festivales y reuniones.' },
-  { src: '/videos/popotes-premium.mp4', poster: '/videos/popotes-premium.jpg', title: 'Popotes de prueba', description: 'Conoce las presentaciones de 10, 20 y 30 unidades.' },
-  { src: '/videos/tiras.mp4', poster: '/videos/tiras.jpg', title: 'Tiras reactivas', description: 'Presentación del producto y una guía para consultar sus instrucciones.' },
+  { src: '/videos/intro-premium.mp4', poster: '/videos/intro-premium.jpg', title: 'Kit Noche Completa', description: 'Todo lo esencial en una sola presentación.' },
+  { src: '/videos/antes-de-salir.mp4', poster: '/videos/antes-de-salir.jpg', title: 'SOS Family GPS/SIM', description: 'Un apoyo para mantenerse en contacto.' },
+  { src: '/videos/pulsera-premium.mp4', poster: '/videos/pulsera-premium.jpg', title: 'Pulsera Tragoo Check', description: 'Llévala contigo a conciertos y reuniones.' },
+  { src: '/videos/popotes-premium.mp4', poster: '/videos/popotes-premium.jpg', title: 'Popotes de prueba', description: 'Consulta sus indicaciones y presentaciones.' },
+  { src: '/videos/tiras.mp4', poster: '/videos/tiras.jpg', title: 'Tiras reactivas', description: 'Conoce el empaque y su guía de uso.' },
 ];
 
 export function VideoGallery() {
   const players = useRef<(HTMLVideoElement | null)[]>([]);
   const [failed, setFailed] = useState<Record<number, boolean>>({});
-  return <section id="videos" className="py-14 border-t border-[#E8E4EB] bg-[#F8F7FA] scroll-mt-20">
-    <div className="max-w-[1160px] mx-auto px-4 sm:px-6">
-      <p className="text-[#466B00] text-sm font-bold mb-3">TRAGOO CHECK EN VIDEO</p>
-      <h2 className="text-3xl sm:text-4xl font-bold mb-3">Conoce lo que llevas contigo.</h2>
-      <p className="text-[#51495B] mb-8">Explora nuestros videos de presentación y elige tu próximo kit.</p>
-      <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {videos.map((video, i) => <article key={video.src} className="rounded-2xl overflow-hidden border border-[#E1DCE6] bg-white">
-          <video ref={node => { players.current[i] = node; }} src={video.src} poster={video.poster} controls playsInline preload="none" aria-label={video.title}
-            onPlay={() => players.current.forEach((player, index) => { if (index !== i) player?.pause(); })}
-            onError={() => setFailed(previous => ({ ...previous, [i]: true }))}
-            className="w-full aspect-[9/16] object-contain bg-black" />
-          <div className="p-5"><h3 className="font-bold text-lg mb-2">{video.title}</h3><p className="text-sm text-[#51495B]">{video.description}</p>
-            {failed[i] && <p role="status" className="mt-2 text-sm">No se pudo cargar el video. <a href={video.src} className="underline">Abrir video</a></p>}
-            <a href="#kits" className="inline-block mt-4 text-[#466B00] font-bold">Elegir mi kit →</a>
+
+  return (
+    <section id="videos" className="scroll-mt-20 border-t border-[#ECE8EE] bg-white py-14 sm:py-16">
+      <div className="mx-auto max-w-[1160px] px-4 sm:px-6">
+        <div className="mb-7 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[#8B2D97]">TRAGOO CHECK · EN VIDEO</p>
+            <h2 className="text-3xl font-bold tracking-tight text-[#201927] sm:text-4xl">Ideas claras. Planes tuyos.</h2>
           </div>
-        </article>)}
+          <a href="#kits" className="text-sm font-bold text-[#201927] underline decoration-[#A3E635] decoration-2 underline-offset-4">Ver productos</a>
+        </div>
+
+        <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4">
+          {videos.map((video, i) => (
+            <article key={video.src} className="min-w-0 flex-[0_0_78vw] snap-start overflow-hidden rounded-2xl border border-[#EAE6EC] bg-white shadow-[0_8px_24px_rgba(32,25,39,0.05)] sm:flex-[0_0_42vw] md:flex-[0_0_30%] xl:flex-[0_0_18.25%]">
+              <video
+                ref={(node) => { players.current[i] = node; }}
+                src={video.src}
+                poster={video.poster}
+                controls
+                playsInline
+                preload="metadata"
+                aria-label={video.title}
+                onPlay={() => players.current.forEach((player, index) => { if (index !== i) player?.pause(); })}
+                onError={() => setFailed((previous) => ({ ...previous, [i]: true }))}
+                className="aspect-[9/16] w-full bg-[#FCFBFD] object-cover"
+              />
+              <div className="p-4">
+                <h3 className="font-bold text-[#201927]">{video.title}</h3>
+                <p className="mt-1 min-h-10 text-sm leading-5 text-[#665D70]">{video.description}</p>
+                {failed[i] && <p role="status" className="mt-2 text-sm text-[#8A2630]">No se pudo cargar. <a href={video.src} className="underline">Abrir video</a></p>}
+                <a href="#kits" className="mt-3 inline-block text-sm font-bold text-[#466B00]">Elegir producto <span aria-hidden="true">→</span></a>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
-    </div>
-  </section>;
+    </section>
+  );
 }

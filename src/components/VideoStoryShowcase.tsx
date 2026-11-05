@@ -281,7 +281,7 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
   };
 
   return (
-    <div className="relative flex-1 min-h-[380px] rounded-2xl overflow-hidden border border-[#2E2840] bg-[#09070E] flex flex-col justify-between shadow-2xl">
+    <div className="relative flex-1 min-h-[380px] rounded-2xl overflow-hidden border border-[#EAE6EC] bg-white flex flex-col justify-between shadow-[0_18px_50px_rgba(32,25,39,0.10)]">
       {import.meta.env.DEV && <input
         ref={fileInputRef}
         type="file"
@@ -290,17 +290,17 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
         className="hidden"
       />}
 
-      {/* Top Overlay Header */}
-      <div className="relative z-10 px-4 py-3 bg-[#14111D]/95 border-b border-[#262136] flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-xs font-bold text-[#A3E635]">
-          <Video className="w-4 h-4" />
-          <span>VIDEO OFICIAL TRAGOO CHECK</span>
+      <div className="relative z-10 px-4 py-3 bg-white border-b border-[#F0EDF2] flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-xs font-bold tracking-[0.12em] text-[#6D237A]">
+          <Video className="w-4 h-4" aria-hidden="true" />
+          <span>TRAGOO CHECK · EN VIDEO</span>
         </div>
 
         <button
           type="button"
           onClick={handleToggleMute}
-          className="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-[11px] transition-colors cursor-pointer shrink-0"
+          aria-label={isMuted ? 'Activar audio del video' : 'Silenciar video'}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#EAE6EC] bg-white hover:bg-[#F8F5FA] text-[#342C39] font-semibold text-[11px] transition-colors cursor-pointer shrink-0"
         >
           {isMuted ? (
             <>
@@ -316,8 +316,7 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
         </button>
       </div>
 
-      {/* Main Native HTML5 MP4 Video Stream */}
-      <div className="relative flex-1 bg-black flex items-center justify-center min-h-[300px]">
+      <div className="relative flex-1 bg-[#FCFBFD] flex items-center justify-center min-h-[300px]">
         <video
           key={`${activeVideoSrc}-${streamVersion}`}
           ref={videoRef}
@@ -328,28 +327,27 @@ export const HeroVideoPlayer: React.FC<HeroVideoPlayerProps> = ({
           playsInline
           controls
           preload="metadata"
-          className="w-full h-full max-h-[430px] object-contain bg-black"
+          className="w-full h-[min(72vh,520px)] object-contain bg-[#FCFBFD]"
         />
       </div>
 
-      {/* Bottom Action & Replace Bar */}
-      <div className="relative z-10 px-4 py-3 bg-[#14111D] border-t border-[#262136] flex flex-wrap items-center justify-between gap-2">
+      <div className="relative z-10 px-4 py-3 bg-white border-t border-[#F0EDF2] flex flex-wrap items-center justify-between gap-2">
         <button
           type="button"
           onClick={onBuyKit}
-          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-[#A3E635] hover:bg-[#BEF264] text-[#0B0910] font-bold text-xs transition-colors cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#8B2D97] hover:bg-[#762382] text-white font-bold text-xs transition-colors cursor-pointer"
         >
           <ShoppingBag className="w-3.5 h-3.5" />
-          <span>Pedir Kit del Video · $449 MXN</span>
+          <span>Ver Kit Noche Completa · $449 MXN</span>
         </button>
 
         {import.meta.env.DEV && <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={isUploading}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#1E192B] hover:bg-[#2A233D] border border-[#2E2840] text-[11px] text-[#C4BED4] hover:text-white cursor-pointer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-[#EAE6EC] bg-white hover:bg-[#F8F5FA] text-[11px] text-[#665D70] cursor-pointer"
         >
-          <Upload className="w-3.5 h-3.5 text-[#A3E635]" />
+          <Upload className="w-3.5 h-3.5 text-[#8B2D97]" />
           <span>{isUploading ? 'Actualizando video...' : 'Cambiar video MP4'}</span>
         </button>}
       </div>
