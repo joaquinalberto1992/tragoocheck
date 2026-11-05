@@ -55,9 +55,14 @@ export const CATALOG: Record<string, { name: string; price: number }> = {
   'popotes-prueba-30': { name: 'Popotes de Prueba · Paquete de 30', price: 2299 },
   'repuestos-pulseras-30': { name: 'Repuestos exclusivos para pulseras (30 parches)', price: 1589 },
   'pulsera-individual': { name: 'Pulsera Individual', price: 599 },
+  'pulsera-corazon': { name: 'Pulsera Detectora con Charm Corazón', price: 499 },
+  'stickers-corazon-30': { name: 'Stickers Corazón Reactivos · Pack de 30', price: 169 },
+  'protector-vasos': { name: 'Protector Reutilizable para Vasos', price: 199 },
+  'protector-vasos-led': { name: 'Protector para Vasos con Luz LED 360°', price: 249 },
   'pulseras-trio': { name: 'Pack Trío de Pulseras', price: 1499 },
   'pulseras-grupo': { name: 'Pack Grupo de Pulseras', price: 2299 },
-  'sos-family': { name: 'SOS Family — Pulsera de emergencia', price: 699 },
+  'sos-family-bluetooth': { name: 'SOS Family Bluetooth — Pulsera de alerta', price: 499 },
+  'sos-family-gps': { name: 'SOS Family GPS/SIM — Pulsera de alerta', price: 1499 },
   'regalo-stickers-5': { name: 'Regalo: tarjeta extra de 5 stickers', price: 0 },
 };
 

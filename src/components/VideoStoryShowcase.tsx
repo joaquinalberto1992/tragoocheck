@@ -28,7 +28,7 @@ export const WOMEN_PERSUASIVE_SLIDES: PersuasiveSlide[] = [
     id: 'slide-1',
     slogan: 'UNA PRUEBA ORIENTATIVA, CON LÍMITES.',
     phrase:
-      'Algunas sustancias pueden ser difíciles de identificar a simple vista. La prueba ofrece una señal orientativa para las sustancias indicadas por el fabricante; no detecta todo.',
+      'Tragoo Check combina indicadores reactivos con estudios propios y pruebas con personas reales. Revisa cada bebida siguiendo la guía del producto que llevas contigo.',
     subtext: 'Frase 1 de 5 · Lectura pausada (5.6 seg)',
     durationMs: 5600,
     ctaLabel: 'Quiero mi Kit Noche Completa · $449',

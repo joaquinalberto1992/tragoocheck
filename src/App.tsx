@@ -27,6 +27,7 @@ import {
 import {
   PRODUCT_KITS,
   PROMO_BUNDLES,
+  BRACELET_PRODUCTS,
   FAMILY_PRODUCTS,
   ALL_PRODUCTS,
   ACTIVE_COUPONS,
@@ -78,7 +79,7 @@ export default function App() {
     'video' | 'empaque' | 'squad'
   >('video');
   const [catalogFilter, setCatalogFilter] = useState<
-    'all' | 'individual' | 'promocion'
+    'all' | 'individual' | 'promocion' | 'accesorios'
   >('all');
   const [selectedCouponCode, setSelectedCouponCode] = useState<string | null>(
     null
@@ -257,11 +258,13 @@ export default function App() {
   const paymentInfoColumns =
     2 + Number(Boolean(merchantConfig.hasStripeCheckout)) + Number(Boolean(merchantConfig.hasSpeiAccount));
   const displayedRetailProducts =
-    catalogFilter === 'individual'
-      ? PRODUCT_KITS
+    catalogFilter === 'accesorios'
+      ? BRACELET_PRODUCTS
+      : catalogFilter === 'individual'
+      ? [...PRODUCT_KITS, ...BRACELET_PRODUCTS.filter((product) => product.category === 'individual')]
       : catalogFilter === 'promocion'
-      ? PROMO_BUNDLES
-      : [...PRODUCT_KITS, ...PROMO_BUNDLES];
+      ? [...PROMO_BUNDLES, ...BRACELET_PRODUCTS.filter((product) => product.category === 'promocion')]
+      : [...PRODUCT_KITS, ...PROMO_BUNDLES, ...BRACELET_PRODUCTS];
 
   const activeHeroImage =
     heroView === 'empaque'
@@ -741,51 +744,46 @@ export default function App() {
               <p className="mt-3 text-sm sm:text-base leading-relaxed text-[#D5CDE0]">Una propuesta de apoyo familiar para personas adultas mayores y para salidas acompañadas con niñas y niños. Diseñada para dar más tranquilidad en el día a día.</p>
             </div>
 
-            {FAMILY_PRODUCTS.map((product) => (
-              <article key={product.id} className="overflow-hidden rounded-3xl border border-[#4B3463] bg-[#F9F5FF] text-[#21172B] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
+            <article className="overflow-hidden rounded-3xl border border-[#4B3463] bg-[#F9F5FF] text-[#21172B] shadow-[0_24px_80px_rgba(0,0,0,0.28)]">
                 <div className="grid md:grid-cols-[1.05fr_0.95fr]">
                   <div className="relative min-h-[260px] sm:min-h-[360px] bg-[#160F1D]">
-                    <img src={product.image} alt="Pulsera SOS Family Tragoo Check para personas adultas mayores, empaque y contenido" className="absolute inset-0 h-full w-full object-contain" loading="lazy" />
+                    <img src={FAMILY_PRODUCTS[0].image} alt="Versiones Bluetooth y GPS/SIM de las pulseras SOS Family Tragoo Check" className="absolute inset-0 h-full w-full object-contain" loading="lazy" />
                   </div>
                   <div className="flex flex-col justify-center p-5 sm:p-8 lg:p-10">
                     <div className="inline-flex w-fit items-center gap-2 rounded-full bg-[#F1DDFE] px-3 py-1.5 text-[11px] font-extrabold uppercase tracking-wider text-[#67249A]">
                       <span aria-hidden="true">💜</span> Tranquilidad para la familia
                     </div>
                     <h3 className="mt-4 text-2xl sm:text-3xl font-extrabold leading-tight">SOS Family</h3>
-                    <p className="mt-3 text-sm leading-relaxed text-[#54485E]">{product.subtitle}</p>
-
-                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {product.includedItems.slice(0, 3).map((item) => (
-                        <div key={item} className="flex items-start gap-2 rounded-xl border border-[#E8DDF0] bg-white/80 p-3 text-xs leading-relaxed text-[#413549]">
-                          <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#7C2EAF]" />{item}
+                    <p className="mt-3 text-sm leading-relaxed text-[#54485E]">Una pulsera SOS para que las personas adultas mayores y sus familias puedan estar en contacto. Elige la versión que mejor se adapte a tu familia.</p>
+                    <div className="mt-5 grid grid-cols-1 gap-3">
+                      {FAMILY_PRODUCTS.map((product) => (
+                        <div key={product.id} className="rounded-2xl border border-[#E8DDF0] bg-white p-4">
+                          <div className="flex flex-wrap items-start justify-between gap-2">
+                            <div>
+                              <h4 className="font-extrabold text-[#291B35]">{product.name.replace(' — Pulsera de alerta', '')}</h4>
+                              <p className="mt-1 text-xs leading-relaxed text-[#54485E]">{product.subtitle}</p>
+                            </div>
+                            <div className="shrink-0 text-right">
+                              <div className="text-xl font-black tabular-nums text-[#24172F]">${product.price.toLocaleString('es-MX')} <span className="text-xs font-semibold">MXN</span></div>
+                              <span className="inline-block mt-1 rounded-full bg-[#A3E635] px-2 py-1 text-[9px] font-extrabold text-[#18220B]">50% OFF ESTE MES</span>
+                            </div>
+                          </div>
+                          <ul className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-[#413549]">
+                            {product.includedItems.slice(0, product.id === 'sos-family-gps' ? 3 : 4).map((item) => (
+                              <li key={item} className="flex items-start gap-1.5"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#7C2EAF]" />{item}</li>
+                            ))}
+                          </ul>
+                          <div className="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <button type="button" onClick={() => handleBuyNow(product)} className="rounded-xl bg-[#67249A] px-4 py-2.5 text-sm font-extrabold text-white transition-colors hover:bg-[#7C2EAF]">Comprar · ${product.price.toLocaleString('es-MX')} MXN</button>
+                            <button type="button" onClick={() => handleAddToCart(product)} className="rounded-xl border border-[#D6C4E2] bg-white px-4 py-2.5 text-sm font-bold text-[#4C2867] transition-colors hover:bg-[#F1E8F8]">Agregar al carrito</button>
+                          </div>
                         </div>
                       ))}
                     </div>
-
-                    <div className="mt-5 rounded-xl border border-[#E8DDF0] bg-white/70 p-3 text-xs leading-relaxed text-[#5C5263]">
-                      Para menores, requiere acompañamiento de una persona adulta. Consulta antes de comprar los requisitos de conexión, cobertura y configuración del dispositivo.
-                    </div>
-
-                    <div className="mt-6 flex flex-wrap items-end gap-x-3 gap-y-2">
-                      <span className="text-3xl font-black tabular-nums text-[#24172F]">{'$'}{product.price.toLocaleString('es-MX')}</span>
-                      <span className="pb-1 text-sm font-semibold text-[#655A6B]">MXN</span>
-                      <span className="mb-1 rounded-full bg-[#A3E635] px-2.5 py-1 text-[10px] font-extrabold text-[#18220B]">50% OFF ESTE MES</span>
-                    </div>
-                    <p className="mt-1 text-[11px] text-[#655A6B]">Envío $99 MXN; gratis en pedidos desde $899 MXN.</p>
-
-                    <div className="mt-5 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      <button type="button" onClick={() => handleBuyNow(product)} className="rounded-xl bg-[#67249A] px-4 py-3 text-sm font-extrabold text-white transition-colors hover:bg-[#7C2EAF] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#67249A]">
-                        Comprar SOS Family · {'$'}{product.price.toLocaleString('es-MX')} MXN
-                      </button>
-                      <button type="button" onClick={() => handleAddToCart(product)} className="rounded-xl border border-[#D6C4E2] bg-white px-4 py-3 text-sm font-bold text-[#4C2867] transition-colors hover:bg-[#F1E8F8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#67249A]">
-                        Agregar al carrito
-                      </button>
-                    </div>
-                    <p className="mt-3 text-[11px] leading-relaxed text-[#766C7E]">La imagen del empaque presenta botón SOS, avisos a familiares y ubicación compartida. Confirma los requisitos de servicio con nosotros antes de usarlo.</p>
+                    <p className="mt-3 text-[11px] leading-relaxed text-[#766C7E]">Envío $99 MXN; gratis en pedidos desde $899 MXN. Para niñas y niños, configuración y uso con supervisión adulta.</p>
                   </div>
                 </div>
-              </article>
-            ))}
+            </article>
 
             <div className="mt-5 flex flex-col gap-3 rounded-2xl border border-[#48335B] bg-[#1C1425] p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
               <div className="flex items-start gap-3">
@@ -811,15 +809,15 @@ export default function App() {
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
               <div className="space-y-2">
                 <div className="text-xs font-medium text-[#A3E635]">
-                  Catálogo personal y grupal · A mayor cantidad, menor precio por pieza
+                  Kits, paquetes y accesorios Tragoo Check
                 </div>
                 <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-white [text-wrap:balance]">
-                  Elige tu Kit Individual o Pack de Promoción.
+                  Encuentra lo que necesitas para tu próxima salida.
                 </h2>
               </div>
 
               {/* Responsive filter controls */}
-              <div role="group" aria-label="Filtrar catálogo" className="grid grid-cols-1 sm:grid-cols-3 gap-1 w-full lg:w-auto p-1 bg-[#14111D] border border-[#262136] rounded-xl self-start">
+              <div role="group" aria-label="Filtrar catálogo" className="grid grid-cols-2 xl:grid-cols-4 gap-1 w-full lg:w-auto p-1 bg-[#14111D] border border-[#262136] rounded-xl self-start">
                 <button
                   type="button"
                   onClick={() => setCatalogFilter('all')}
@@ -830,7 +828,7 @@ export default function App() {
                       : 'text-[#C4BED4] hover:text-white'
                   }`}
                 >
-                  Todos ({PRODUCT_KITS.length + PROMO_BUNDLES.length})
+                  Todos ({PRODUCT_KITS.length + PROMO_BUNDLES.length + BRACELET_PRODUCTS.length})
                 </button>
                 <button
                   type="button"
@@ -842,7 +840,7 @@ export default function App() {
                       : 'text-[#C4BED4] hover:text-white'
                   }`}
                 >
-                  1 Pieza / Individuales ({PRODUCT_KITS.length})
+                  Individuales ({PRODUCT_KITS.length + BRACELET_PRODUCTS.filter((product) => product.category === 'individual').length})
                 </button>
                 <button
                   type="button"
@@ -854,7 +852,15 @@ export default function App() {
                       : 'text-[#C4BED4] hover:text-white'
                   }`}
                 >
-                  Paquetes de 2 a 10 kits ({PROMO_BUNDLES.length})
+                  Paquetes ({PROMO_BUNDLES.length + BRACELET_PRODUCTS.filter((product) => product.category === 'promocion').length})
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCatalogFilter('accesorios')}
+                  aria-pressed={catalogFilter === 'accesorios'}
+                  className={`px-3.5 sm:px-4 py-2.5 text-xs font-medium rounded-lg transition-colors cursor-pointer ${catalogFilter === 'accesorios' ? 'bg-[#A3E635] text-[#0B0910] font-bold' : 'text-[#C4BED4] hover:text-white'}`}
+                >
+                  Accesorios ({BRACELET_PRODUCTS.length})
                 </button>
               </div>
             </div>
@@ -906,6 +912,9 @@ export default function App() {
                       <p className="text-xs sm:text-sm text-[#C4BED4] leading-relaxed">
                         {kit.subtitle}
                       </p>
+                      <div className="inline-flex items-center gap-1.5 rounded-full border border-[#A3E635]/25 bg-[#A3E635]/10 px-2.5 py-1.5 text-[10px] font-semibold text-[#D9F99D]">
+                        <ShieldCheck className="h-3.5 w-3.5" /> Estudios propios y pruebas con personas reales
+                      </div>
 
                       <div className="pt-2 border-t border-[#231E30] space-y-1.5 text-xs">
                         <div>
@@ -914,14 +923,16 @@ export default function App() {
                             {kit.contentsSummary}
                           </span>
                         </div>
+                        {kit.substancesDetected && (
                         <div>
                           <span className="text-[#8E87A0] block">
-                            Detecta, según fabricante:
+                            Lectura de prueba:
                           </span>
                           <span className="text-[#C4BED4]">
                             {kit.substancesDetected}
                           </span>
                         </div>
+                        )}
                       </div>
 
                       <ul className="space-y-1.5 pt-1 text-xs text-[#A19BB2]">

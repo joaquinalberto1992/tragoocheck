@@ -1,7 +1,7 @@
 import { ProductKit, HERO_PRODUCT_IMAGE, PRODUCT_KITS } from '../data/products';
 
 export function ProductVisual({ product }: { product: ProductKit }) {
-  const grouped = product.category !== 'individual';
+  const grouped = product.category === 'promocion' && product.kitEquivalentCount > 0;
   const count = product.kitEquivalentCount;
   if (product.id === 'kit-recarga-total') return <div className="relative aspect-[4/3] bg-[#E2E2E2] border-b border-[#231E30]">
     <div className="grid grid-cols-2 h-full pb-10">
