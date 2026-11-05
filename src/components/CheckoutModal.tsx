@@ -7,8 +7,6 @@ import {
   Copy,
   Check,
   CreditCard,
-  Building2,
-  Store,
   Truck,
   MessageCircle,
   Sparkles,
@@ -43,7 +41,7 @@ export interface MerchantConfigClient {
   stripePaymentLinks?: Record<string, string>;
 }
 
-export type OrderPaymentMethod = 'link_pago' | 'oxxo' | 'spei' | 'stripe';
+export type OrderPaymentMethod = 'link_pago' | 'stripe';
 
 export interface ConfirmedOrder {
   folio: string;
@@ -140,9 +138,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   onOrderCreated,
   initialCouponCode,
 }) => {
-  const [paymentMethod, setPaymentMethod] = useState<
-    'link_pago' | 'oxxo' | 'spei' | 'stripe'
-  >('link_pago');
+  const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>(
+    merchantConfig.hasStripeCheckout ? 'stripe' : 'link_pago'
+  );
   const [copiedOrderText, setCopiedOrderText] = useState(false);
 
   // Coupon state
@@ -163,9 +161,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   // Customer shipping state
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
+  const [customerEmail, setCustomerEmail] = useState('');
+  const [sendReceiptByEmail, setSendReceiptByEmail] = useState(true);
   const [shippingAddress, setShippingAddress] = useState('');
   const [city, setCity] = useState('');
-  const [stateName, setStateName] = useState('Guanajuato');
+  const [stateName, setStateName] = useState('');
   const [postalCode, setPostalCode] = useState('');
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -208,14 +208,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     ? Math.round((subtotal * appliedCoupon.discountPercent) / 100)
     : 0;
 
-  const subtotalAfterCoupon = Math.max(0, subtotal - couponDiscount);
-  const speiDiscount =
-    paymentMethod === 'spei'
-      ? Math.round(
-          (subtotalAfterCoupon * (merchantConfig.speiDiscountPercent || 5)) / 100
-        )
-      : 0;
-  const totalDiscount = couponDiscount + speiDiscount;
+  const totalDiscount = couponDiscount;
   const total = Math.max(0, subtotal - totalDiscount + shipping);
 
   const amountForFreeShipping = Math.max(0, effectiveThreshold - subtotal);
@@ -259,12 +252,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   };
 
   const getPaymentMethodTitle = (method: OrderPaymentMethod) => {
-    if (method === 'oxxo') {
-      return 'Pago en Efectivo en OXXO (Solicito ficha/referencia OXXO)';
-    }
-    if (method === 'spei') {
-      return `Transferencia Bancaria SPEI (-${merchantConfig.speiDiscountPercent || 5}% aplicado)`;
-    }
     if (method === 'stripe') return 'Pago con tarjeta procesado por Stripe';
     return 'Link de Pago con Tarjeta (Solicito link de pago por WhatsApp)';
   };
@@ -293,9 +280,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       ...(order.couponDiscount
         ? [`• Cupón ${order.couponCode}: -$${order.couponDiscount.toLocaleString('es-MX')} MXN`]
         : []),
-      ...(order.speiDiscount
-        ? [`• Descuento SPEI: -$${order.speiDiscount.toLocaleString('es-MX')} MXN`]
-        : []),
       `• Envío Express: ${
         order.shipping === 0
           ? 'GRATIS (Pedido >= $899 MXN)'
@@ -304,13 +288,19 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       `• *TOTAL A PAGAR: $${order.total.toLocaleString('es-MX')} MXN*`,
       ...(instagramSource ? [`• Canal: Instagram`] : []),
       ...(order.customerName ? [`• Nombre: ${order.customerName}`] : []),
+      ...(order.customerPhone ? [`• WhatsApp: ${order.customerPhone}`] : []),
+      ...(order.customerEmail ? [`• Correo para comprobante: ${order.customerEmail}`] : []),
+      ...(order.shippingAddress ? [`• Dirección de entrega: ${order.shippingAddress}`] : []),
+      ...(order.city || order.state || order.postalCode
+        ? [`• Ciudad/Estado/CP: ${order.city}, ${order.state} · ${order.postalCode}`]
+        : []),
       ``,
       `*Método de pago elegido:*`,
       `👉 *${getPaymentMethodTitle(order.paymentMethod)}*`,
       ``,
       order.paymentStatus === 'pagado'
         ? `El pago ya aparece confirmado por Stripe. ¿Me confirmas la recepción del pedido? ¡Gracias!`
-        : `¿Me confirmas disponibilidad y me compartes el link de pago o la ficha OXXO por aquí? Después te envío mis datos de entrega. ¡Gracias!`,
+        : `¿Me confirmas disponibilidad y me compartes el link de pago por aquí? ¡Gracias!`,
     ].join('\n');
   };
 
@@ -322,15 +312,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleSendOrderToWhatsApp = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (paymentMethod === 'stripe' && (
+    if (
       !customerName.trim() ||
       !customerPhone.trim() ||
       !shippingAddress.trim() ||
-      !postalCode.trim()
-    )) {
+      !city.trim() ||
+      !stateName.trim() ||
+      !postalCode.trim() ||
+      (sendReceiptByEmail && !customerEmail.trim())
+    ) {
       setErrorMsg(
-        'Completa tu nombre, tu número de WhatsApp, dirección y código postal para enviarte tu pedido.'
+        'Completa tu nombre, WhatsApp y dirección de entrega. Agrega un correo si quieres recibir el comprobante.'
       );
+      return;
+    }
+    if (sendReceiptByEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail.trim())) {
+      setErrorMsg('Escribe un correo válido para enviarte el comprobante.');
       return;
     }
 
@@ -345,7 +342,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       createdAt: new Date().toISOString(),
       customerName: customerName.trim(),
       customerPhone: customerPhone.trim(),
-      customerEmail: '',
+      customerEmail: sendReceiptByEmail ? customerEmail.trim() : '',
       shippingAddress: shippingAddress.trim(),
       city: city.trim() || stateName.trim(),
       state: stateName.trim(),
@@ -355,17 +352,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       discount: totalDiscount,
       couponCode: couponDiscount > 0 ? appliedCoupon?.code : undefined,
       couponDiscount,
-      speiDiscount,
       shipping,
       total,
       paymentMethod,
       paymentStatus: 'pendiente_comprobante',
-      transferReference:
-        paymentMethod === 'oxxo'
-          ? 'Pago en OXXO vía WhatsApp'
-          : paymentMethod === 'link_pago'
-          ? 'Link de Pago vía WhatsApp'
-          : 'Transferencia SPEI vía WhatsApp',
+      transferReference: paymentMethod === 'link_pago' ? 'Link de Pago vía WhatsApp' : undefined,
     };
 
     try {
@@ -379,6 +370,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             couponCode: couponDiscount > 0 ? appliedCoupon?.code : '',
             customerName: orderPayload.customerName,
             customerPhone: orderPayload.customerPhone,
+            customerEmail: orderPayload.customerEmail,
+            sendReceiptByEmail,
             shippingAddress: orderPayload.shippingAddress,
             city: orderPayload.city,
             state: orderPayload.state,
@@ -402,18 +395,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         return;
       }
 
-      const res = await fetch('/api/orders', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(orderPayload),
-      });
-      const created: ConfirmedOrder = res.ok ? await res.json() : orderPayload;
-      setConfirmedOrder(created);
-      onOrderCreated(created);
+      setConfirmedOrder(orderPayload);
+      onOrderCreated(orderPayload);
       onClearCart();
 
       // Open WhatsApp directly (works on Android, iOS Safari & Desktop)
-      const waUrl = buildWhatsAppUrl(created);
+      const waUrl = buildWhatsAppUrl(orderPayload);
       window.location.href = waUrl;
     } catch (err) {
       if (paymentMethod === 'stripe') {
@@ -469,10 +456,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             <h2 className="text-sm sm:text-base font-bold text-white">
               {confirmedOrder
                 ? `Pedido Listo · Folio ${confirmedOrder.folio}`
-                : 'Finalizar Pedido Directo por WhatsApp'}
+                : 'Finalizar compra'}
             </h2>
             <p className="text-[11px] sm:text-xs text-[#A3E635]">
-              WhatsApp 479 229 3687 · Atención a tu pedido
+              {merchantConfig.hasStripeCheckout
+                ? 'Tarjeta en checkout seguro · Link de pago disponible por WhatsApp'
+                : 'Solicita tu link de pago por WhatsApp'}
             </p>
           </div>
           <button
@@ -497,7 +486,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <div className="flex items-center justify-between">
                   <span className="inline-flex items-center gap-1.5 text-xs font-bold text-[#A3E635]">
                     <CheckCircle2 className="w-4 h-4" />
-                    Pedido registrado en el sistema
+                    Pedido listo para enviar
                   </span>
                   <span className="font-mono text-xs sm:text-sm font-bold text-white bg-[#1F1A2C] px-3 py-1 rounded-lg border border-[#2E2840]">
                     Folio: {confirmedOrder.folio}
@@ -513,11 +502,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   Toca el botón verde de abajo para abrir WhatsApp con tu pedido
                   completo. Ahí mismo te enviaremos de inmediato tu{' '}
                   <strong className="text-white">
-                    {confirmedOrder.paymentMethod === 'oxxo'
-                      ? 'ficha de pago en OXXO'
-                      : confirmedOrder.paymentMethod === 'spei'
-                      ? 'confirmación de transferencia SPEI'
-                      : 'Link de Pago seguro con tarjeta'}
+                    {confirmedOrder.paymentMethod === 'stripe'
+                      ? 'confirmación de pago con tarjeta'
+                      : 'link de pago seguro con tarjeta'}
                   </strong>{' '}
                   y tu guía de envío express.
                 </p>
@@ -606,7 +593,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             /* EMPTY CART STATE */
             <div className="py-10 text-center space-y-5">
               <p className="text-[#A19BB2] text-sm">
-                Tu carrito está vacío. Selecciona uno de los kits o paquetes para hacer tu pedido por WhatsApp.
+                Tu carrito está vacío. Agrega productos para revisar el total, el envío y pagar.
               </p>
               <div className="grid grid-cols-1 gap-3 text-left">
                 {ALL_PRODUCTS.slice(0, 4).map((kit) => (
@@ -633,7 +620,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               </div>
             </div>
           ) : (
-            /* CART + PAYMENT PREFERENCE (LINK / OXXO / SPEI) + SHIPPING FORM */
+            /* Cart, payment method, and delivery details */
             <>
               {/* Strict $899 MXN Free Shipping Banner */}
               <div className="p-3.5 rounded-xl bg-[#14111D] border border-[#262136] space-y-2">
@@ -822,12 +809,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
               )}
 
-              {/* 3 Payment Options Handled via WhatsApp 479 229 3687 */}
+              {/* Card payment through Stripe, with WhatsApp payment link as the fallback */}
               <div className="space-y-2.5">
                 <label className="block text-xs font-bold text-white">
                   1. Elige cómo deseas pagar
                 </label>
-                <div className={`grid grid-cols-1 ${merchantConfig.hasStripeCheckout && merchantConfig.hasSpeiAccount ? 'sm:grid-cols-4' : merchantConfig.hasStripeCheckout || merchantConfig.hasSpeiAccount ? 'sm:grid-cols-3' : 'sm:grid-cols-2'} gap-2`}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {merchantConfig.hasStripeCheckout && (
                     <button
                       type="button"
@@ -842,9 +829,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         <CreditCard className="w-4 h-4 text-[#A3E635]" />
                         <span className="font-mono text-[10px] font-bold text-[#A3E635]">STRIPE</span>
                       </div>
-                      <div className="text-xs font-bold text-white mt-1.5">Pagar ahora</div>
+                      <div className="text-xs font-bold text-white mt-1.5">Tarjeta en línea · Recomendado</div>
                       <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
-                        Checkout seguro; opciones según tu dispositivo
+                        Checkout seguro de Stripe. El pago se confirma al instante.
                       </div>
                     </button>
                   )}
@@ -871,94 +858,47 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </div>
                   </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setPaymentMethod('oxxo')}
-                    className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
-                      paymentMethod === 'oxxo'
-                        ? 'bg-[#171E12] border-[#A3E635] text-white'
-                        : 'bg-[#14111D] border-[#262136] text-[#A19BB2] hover:text-white'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <Store className="w-4 h-4 text-[#A3E635]" />
-                      <span className="font-mono text-[10px] font-bold text-amber-400">
-                        EFECTIVO
-                      </span>
-                    </div>
-                    <div className="text-xs font-bold text-white mt-1.5">
-                      Pago en OXXO
-                    </div>
-                    <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
-                      Solicita la ficha de pago por WhatsApp
-                    </div>
-                  </button>
-
-                  {merchantConfig.hasSpeiAccount && (
-                    <button
-                      type="button"
-                      onClick={() => setPaymentMethod('spei')}
-                      className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
-                        paymentMethod === 'spei'
-                          ? 'bg-[#171E12] border-[#A3E635] text-white'
-                          : 'bg-[#14111D] border-[#262136] text-[#A19BB2] hover:text-white'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <Building2 className="w-4 h-4 text-[#A3E635]" />
-                        <span className="font-mono text-[10px] font-bold text-[#A3E635]">
-                          -{merchantConfig.speiDiscountPercent || 5}% EXTRA
-                        </span>
-                      </div>
-                      <div className="text-xs font-bold text-white mt-1.5">
-                        Transferencia SPEI
-                      </div>
-                      <div className="text-[11px] text-[#A19BB2] mt-0.5 leading-snug">
-                        Descuento adicional incluido en tu total
-                      </div>
-                    </button>
-                  )}
                 </div>
               </div>
 
               <div className="rounded-xl border border-[#262136] bg-[#14111D] px-3.5 py-3 text-[11px] leading-relaxed text-[#C4BED4]">
                 {paymentMethod === 'stripe'
-                  ? 'Pagarás en el checkout alojado por Stripe. Al confirmarse el pago, se abrirá WhatsApp con tu folio y el pedido listo para enviar. No almacenamos los datos de tu tarjeta.'
-                  : 'Al continuar se abrirá WhatsApp con el resumen. Aún no pagas: confirma disponibilidad y método; después compartes tus datos de entrega por el chat.'}
+                  ? 'Pagarás en el checkout seguro de Stripe. Al confirmarse el pago, verás el folio y podrás coordinar la entrega por WhatsApp. Los datos de tu tarjeta se capturan en Stripe.'
+                  : 'Se abrirá WhatsApp con tu pedido y dirección. Te responderemos con el enlace de pago; el pedido se paga al abrir ese enlace.'}
               </div>
 
-              {/* Minimal order-start form: collect delivery details in WhatsApp after confirmation */}
+              {/* Contact, delivery, and optional receipt email details */}
               <form
                 id="checkout-form"
                 onSubmit={handleSendOrderToWhatsApp}
                 className="space-y-3 pt-1"
               >
                 <div className="text-xs font-bold text-white">
-                  {paymentMethod === 'stripe' ? '2. Datos de contacto y envío' : '2. Nombre para identificar tu pedido (opcional)'}
+                  2. Datos de contacto y entrega
                 </div>
                 <label className="sr-only" htmlFor="checkout-customer-name">
-                  Nombre para identificar tu pedido (opcional)
+                  Nombre completo
                 </label>
                 <input
                   id="checkout-customer-name"
                   type="text"
-                  required={paymentMethod === 'stripe'}
+                  required
                   autoComplete="name"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  placeholder={paymentMethod === 'stripe' ? 'Nombre completo para el envío' : 'Tu nombre (opcional)'}
+                  placeholder="Nombre completo"
                   className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
                 />
                 <div className="rounded-lg border border-[#262136] bg-[#14111D] px-3 py-2.5 text-[11px] leading-relaxed text-[#C4BED4]">
                   {paymentMethod === 'stripe'
-                    ? 'El pago se procesa en la página segura de Stripe. Tragoo Check no recibe ni almacena los datos de tu tarjeta.'
-                    : 'No necesitas escribir aquí tu teléfono ni tu dirección. Se abrirá WhatsApp con el folio, productos, descuentos y total; primero confirmas el pedido y luego compartes tus datos de entrega por el chat.'}
+                    ? 'Usaremos estos datos para preparar el envío. El pago con tarjeta se procesa en Stripe.'
+                    : 'Usaremos estos datos para preparar tu pedido y solicitar el enlace de pago por WhatsApp.'}
                 </div>
-                {paymentMethod === 'stripe' && (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <input
                       type="tel"
                       required
+                      autoComplete="tel"
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
                       placeholder="Tu WhatsApp (10 dígitos)"
@@ -968,32 +908,75 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     <input
                       type="text"
                       required
+                      autoComplete="street-address"
                       value={shippingAddress}
                       onChange={(e) => setShippingAddress(e.target.value)}
-                      placeholder="Dirección de entrega"
+                      placeholder="Calle, número, colonia y referencias"
                       aria-label="Dirección de entrega"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635] sm:col-span-2"
+                    />
+                    <input
+                      type="text"
+                      required
+                      autoComplete="address-level2"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="Ciudad o municipio"
+                      aria-label="Ciudad o municipio"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                    />
+                    <input
+                      type="text"
+                      required
+                      autoComplete="address-level1"
+                      value={stateName}
+                      onChange={(e) => setStateName(e.target.value)}
+                      placeholder="Estado"
+                      aria-label="Estado"
                       className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
                     />
                     <input
                       type="text"
                       required
                       maxLength={5}
+                      pattern="[0-9]{5}"
+                      title="Escribe un código postal de 5 dígitos"
+                      autoComplete="postal-code"
                       value={postalCode}
                       onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, ''))}
                       placeholder="Código Postal"
                       aria-label="Código Postal"
                       className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
                     />
+                </div>
+                <div className="space-y-2 rounded-xl border border-[#262136] bg-[#14111D] p-3">
+                  <label className="flex items-start gap-2.5 text-xs font-medium text-white">
                     <input
-                      type="text"
-                      value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      placeholder="Ciudad"
-                      aria-label="Ciudad"
-                      className="w-full px-3 py-2.5 rounded-lg bg-[#14111D] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                      type="checkbox"
+                      checked={sendReceiptByEmail}
+                      onChange={(e) => setSendReceiptByEmail(e.target.checked)}
+                      className="mt-0.5 h-4 w-4 accent-[#A3E635]"
                     />
-                  </div>
-                )}
+                    <span>Quiero recibir el comprobante de pago por correo</span>
+                  </label>
+                  {sendReceiptByEmail && (
+                    <input
+                      type="email"
+                      required
+                      autoComplete="email"
+                      value={customerEmail}
+                      onChange={(e) => setCustomerEmail(e.target.value)}
+                      placeholder="Correo electrónico"
+                      aria-label="Correo para recibir el comprobante"
+                      className="w-full px-3 py-2.5 rounded-lg bg-[#0F0C16] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
+                    />
+                  )}
+                  <p className="text-[10px] leading-relaxed text-[#A19BB2]">
+                    {paymentMethod === 'stripe'
+                      ? 'Stripe enviará el recibo cuando el pago con tarjeta se confirme.'
+                      : 'Incluiremos este correo en tu solicitud de pago por WhatsApp.'}
+                  </p>
+                </div>
 
                 {errorMsg && (
                   <div className="p-3 rounded-lg bg-red-950/60 border border-red-800/60 text-xs text-red-200">
@@ -1026,14 +1009,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
               {appliedCoupon && couponDiscount === 0 && (
                 <div className="text-[11px] text-amber-300">
                   El cupón {appliedCoupon.code} se aplicará al llegar a ${appliedCoupon.minPurchase.toLocaleString('es-MX')} MXN en productos.
-                </div>
-              )}
-              {speiDiscount > 0 && (
-                <div className="flex justify-between text-[#A3E635]">
-                  <span>Descuento SPEI (-{merchantConfig.speiDiscountPercent}%)</span>
-                  <span className="font-mono">
-                    -${speiDiscount.toLocaleString('es-MX')} MXN
-                  </span>
                 </div>
               )}
               <div className="flex justify-between text-[#A19BB2]">
@@ -1072,10 +1047,6 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     : 'Enviando pedido a WhatsApp...'
                   : paymentMethod === 'stripe'
                   ? `Pagar con tarjeta en Stripe · $${total.toLocaleString('es-MX')}`
-                  : paymentMethod === 'oxxo'
-                  ? `Solicitar ficha OXXO · $${total.toLocaleString('es-MX')}`
-                  : paymentMethod === 'spei'
-                  ? `Continuar con SPEI (-5%) · $${total.toLocaleString('es-MX')}`
                   : `Solicitar link de pago · $${total.toLocaleString('es-MX')}`}
               </span>
             </button>

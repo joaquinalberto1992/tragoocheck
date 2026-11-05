@@ -57,9 +57,7 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
   const [newCustomerCity, setNewCustomerCity] = useState('León, Gto.');
   const [newSelectedProductId, setNewSelectedProductId] = useState(ALL_PRODUCTS[0].id);
   const [newQuantity, setNewQuantity] = useState(1);
-  const [newPaymentMethod, setNewPaymentMethod] = useState<'link_pago' | 'oxxo' | 'spei'>(
-    'link_pago'
-  );
+  const newPaymentMethod: ConfirmedOrder['paymentMethod'] = 'link_pago';
 
   // Config states
   const [bankName, setBankName] = useState(config.bankName);
@@ -220,9 +218,7 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
     const qty = Math.max(1, Number(newQuantity) || 1);
     const subtotal = prod.price * qty;
     const shipping = subtotal >= 899 ? 0 : Number(shippingFee) || 99;
-    const discount =
-      newPaymentMethod === 'spei' ? Math.round(subtotal * 0.05) : 0;
-    const total = subtotal - discount + shipping;
+    const total = subtotal + shipping;
 
     try {
       const res = await fetch('/api/orders', {
@@ -245,7 +241,7 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
             },
           ],
           subtotal,
-          discount,
+          discount: 0,
           shipping,
           total,
           paymentMethod: newPaymentMethod,
@@ -602,10 +598,8 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                               ·
                             </span>
                             <span className="text-[#A19BB2]">
-                              {order.paymentMethod === 'oxxo'
-                                ? 'Pago en OXXO (WhatsApp)'
-                                : order.paymentMethod === 'spei'
-                                ? 'Transferencia SPEI'
+                              {order.paymentMethod === 'stripe'
+                                ? 'Tarjeta (Stripe)'
                                 : 'Link de Pago (WhatsApp)'}
                             </span>
                             <span aria-hidden="true" className="text-[#524A68]">
@@ -649,7 +643,7 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                             className="px-3 py-1.5 rounded-lg bg-[#0B0910] border border-[#2E2840] text-xs text-white focus:outline-none focus:border-[#A3E635]"
                           >
                             <option value="pendiente_comprobante">
-                              Pendiente pago (Link / OXXO / SPEI)
+                              Pendiente de pago
                             </option>
                             <option value="pagado">Pagado (Preparando)</option>
                             <option value="enviado">Enviado con Guía</option>
@@ -664,7 +658,7 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                                 .join(', ')}).${
                                 trackingInputs[order.folio]
                                   ? ` Tu guía de rastreo express es: *${trackingInputs[order.folio]}*`
-                                  : ' Aquí te compartimos tu link de pago / ficha OXXO para confirmar tu envío:'
+                                  : ' Aquí te compartiremos tu link de pago para confirmar tu envío:'
                               }`
                             )}`}
                             target="_blank"

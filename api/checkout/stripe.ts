@@ -15,13 +15,24 @@ export async function POST(request: Request): Promise<Response> {
     const folio = `TC-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
     const customerName = String(body.customerName || '').trim().slice(0, 120);
     const customerPhone = String(body.customerPhone || '').trim().slice(0, 30);
+    const customerEmail = String(body.customerEmail || '').trim().slice(0, 254);
+    const sendReceiptByEmail = body.sendReceiptByEmail === true;
     const shippingAddress = String(body.shippingAddress || '').trim().slice(0, 200);
     const city = String(body.city || '').trim().slice(0, 80);
     const state = String(body.state || '').trim().slice(0, 80);
     const postalCode = String(body.postalCode || '').trim().slice(0, 12);
 
     const phoneDigits = customerPhone.replace(/\D/g, '');
-    if (!customerName || phoneDigits.length < 10 || phoneDigits.length > 15 || !shippingAddress || !postalCode) {
+    if (
+      !customerName ||
+      phoneDigits.length < 10 ||
+      phoneDigits.length > 15 ||
+      !shippingAddress ||
+      !city ||
+      !state ||
+      !/^\d{5}$/.test(postalCode) ||
+      (sendReceiptByEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customerEmail))
+    ) {
       return json({ error: 'Completa tus datos de envío antes de pagar.' }, 400);
     }
 
@@ -74,13 +85,18 @@ export async function POST(request: Request): Promise<Response> {
       mode: 'payment',
       locale: 'es',
       submit_type: 'pay',
+      allowed_payment_method_types: ['card'],
       line_items: lineItems,
       billing_address_collection: 'auto',
+      ...(sendReceiptByEmail ? { customer_email: customerEmail } : {}),
+      ...(sendReceiptByEmail ? { payment_intent_data: { receipt_email: customerEmail } } : {}),
       client_reference_id: folio,
       metadata: {
         folio,
         customerName,
         customerPhone,
+        customerEmail: sendReceiptByEmail ? customerEmail : '',
+        sendReceiptByEmail: String(sendReceiptByEmail),
         shippingAddress,
         city,
         state,

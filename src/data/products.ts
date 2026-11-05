@@ -688,7 +688,7 @@ export const FAQS = [
   {
     question: '¿Cómo realizo mi pedido y cuáles son las formas de pago?',
     answer:
-      'Agrega tus productos al carrito y revisa el total y el envío. Puedes pagar con tarjeta cuando el checkout esté habilitado o solicitar atención por WhatsApp para coordinar tu pedido.',
+      'Agrega tus productos al carrito, completa tus datos de entrega y revisa el total. Paga con tarjeta en el checkout seguro de Stripe o solicita un link de pago por WhatsApp.',
   },
   {
     question: '¿Cómo se aplica el sticker y qué significa el resultado?',
