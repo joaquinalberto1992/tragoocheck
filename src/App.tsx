@@ -1,5 +1,5 @@
 import { ProductVisual } from './components/ProductVisual';
-import { Analytics } from '@vercel/analytics/react';
+import { Analytics, type BeforeSendEvent } from '@vercel/analytics/react';
 import { BuenFinCountdown } from './components/BuenFinCountdown';
 import { VideoGallery } from './components/VideoGallery';
 import { UpcomingProducts } from './components/UpcomingProducts';
@@ -63,6 +63,20 @@ import {
 } from './components/VideoStoryShowcase';
 import squadPackImage from './assets/images/tragoo-pack-kit-noche-completa-5-clean.webp';
 
+const INTERNAL_TRAFFIC_KEY = 'tc_internal_traffic';
+
+const analyticsBeforeSend = (event: BeforeSendEvent) => {
+  try {
+    if (window.localStorage.getItem(INTERNAL_TRAFFIC_KEY) === '1') {
+      return null;
+    }
+  } catch {
+    // Keep page analytics available if browser storage is unavailable.
+  }
+
+  return event;
+};
+
 const DEFAULT_CONFIG: MerchantConfigClient = {
   cardNumberRef: 'Tarjeta en Stripe o link de pago por WhatsApp',
   whatsappNumber: '524792293687',
@@ -76,13 +90,14 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
 };
 
 export default function App() {
+  const isInstagramLanding = window.location.pathname === '/instagram';
   const [cart, setCart] = useState<CartItem[]>([]);
   const [heroView, setHeroView] = useState<
     'video' | 'empaque' | 'squad'
   >('video');
   const [catalogFilter, setCatalogFilter] = useState<
     'all' | 'individual' | 'promocion' | 'accesorios' | 'navidad'
-  >('all');
+  >(isInstagramLanding ? 'individual' : 'all');
   const [selectedCouponCode, setSelectedCouponCode] = useState<string | null>(
     null
   );
@@ -104,6 +119,13 @@ export default function App() {
     const interval = window.setInterval(() => setPromotionNow(Date.now()), 1000);
     return () => window.clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (!isInstagramLanding) return;
+    window.requestAnimationFrame(() => {
+      document.getElementById('kits')?.scrollIntoView({ block: 'start' });
+    });
+  }, [isInstagramLanding]);
 
   useEffect(() => {
     fetch('/api/config')
@@ -855,11 +877,20 @@ export default function App() {
             <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5">
               <div className="space-y-2">
                 <div className="text-xs font-medium text-[#466B00]">
-                  Kits, paquetes y accesorios Tragoo Check
+                  {isInstagramLanding
+                    ? 'Tienda oficial · Compra directa desde Instagram'
+                    : 'Kits, paquetes y accesorios Tragoo Check'}
                 </div>
                 <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#201927] [text-wrap:balance]">
-                  Encuentra lo que necesitas para tu próxima salida.
+                  {isInstagramLanding
+                    ? 'Elige tu kit y revisa tu total antes de pagar.'
+                    : 'Encuentra lo que necesitas para tu próxima salida.'}
                 </h2>
+                {isInstagramLanding && (
+                  <p className="max-w-2xl text-sm leading-relaxed text-[#51495B]">
+                    Precios en MXN, compra sin crear cuenta y pago con tarjeta en Stripe. El envío y el total se muestran antes de confirmar.
+                  </p>
+                )}
               </div>
 
               {/* Responsive filter controls */}
@@ -1443,7 +1474,7 @@ export default function App() {
         orders={orders}
         onOrdersUpdated={(updatedOrders) => setOrders(updatedOrders)}
       />
-      <Analytics />
+      <Analytics beforeSend={analyticsBeforeSend} />
     </div>
   );
 }
