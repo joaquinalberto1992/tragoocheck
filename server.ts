@@ -259,12 +259,36 @@ async function startServer() {
 
   function safeVideoFilePath(videoUrl: unknown): string | null {
     if (typeof videoUrl !== 'string') return null;
-    const relativeName = videoUrl.replace(/^\//, '');
-    if (!/^[A-Za-z0-9][A-Za-z0-9._-]*\.mp4$/i.test(relativeName)) return null;
-    const baseName = path.basename(relativeName);
-    if (baseName !== relativeName) return null;
-    const resolved = path.resolve(publicDir, baseName);
-    return resolved.startsWith(`${publicDir}${path.sep}`) ? resolved : null;
+    const relativeName = videoUrl.replace(/^\/+/, '');
+    const segments = relativeName.split('/');
+    if (
+      segments.length === 0 ||
+      segments.some((segment) => !/^[A-Za-z0-9][A-Za-z0-9._-]*$/i.test(segment)) ||
+      !/\.mp4$/i.test(segments[segments.length - 1])
+    ) return null;
+
+    const resolved = path.resolve(publicDir, ...segments);
+    const relativePath = path.relative(publicDir, resolved);
+    if (
+      !relativePath ||
+      relativePath === '..' ||
+      relativePath.startsWith(`..${path.sep}`) ||
+      path.isAbsolute(relativePath)
+    ) return null;
+
+    // Reject an in-public symlink that points outside public/ as well.
+    if (fs.existsSync(resolved)) {
+      const publicRealPath = fs.realpathSync(publicDir);
+      const targetRealPath = fs.realpathSync(resolved);
+      const realRelativePath = path.relative(publicRealPath, targetRealPath);
+      if (
+        !realRelativePath ||
+        realRelativePath === '..' ||
+        realRelativePath.startsWith(`..${path.sep}`) ||
+        path.isAbsolute(realRelativePath)
+      ) return null;
+    }
+    return resolved;
   }
 
   app.get('/api/video', (req, res, next) => {
