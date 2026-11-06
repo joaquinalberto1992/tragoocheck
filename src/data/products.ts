@@ -61,6 +61,9 @@ import cupCoverImage from '../assets/images/tragoo-protector-reusable-clean.webp
 import cupCoverLedImage from '../assets/images/tragoo-protector-led-clean.webp';
 import heartBraceletImage from '../assets/images/tragoo-pulsera-corazon-clean.webp';
 import nailStickers30Image from '../assets/images/tragoo-stickers-corazon-30-clean.webp';
+import safeGlowSetImage from '../assets/images/tragoo-safeglow-set-white.webp';
+import safeBagImage from '../assets/images/tragoo-safebag-white.webp';
+import personalAlarmImage from '../assets/images/tragoo-personal-alarm-white.webp';
 import sosFamilyBluetoothImage from '../assets/images/tragoo-sos-family-bluetooth-pack-clean.webp';
 import sosFamilyGpsImage from '../assets/images/tragoo-sos-family-gps-pack-clean.webp';
 import christmasSmartCupImage from '../assets/images/tragoo-navidad-vaso-led-individual.png';
@@ -573,6 +576,42 @@ export const WHOLESALE_KITS: ProductKit[] = [
 ];
 
 export const BRACELET_PRODUCTS: ProductKit[] = [
+  {
+    id: 'safeglow-set', category: 'individual', name: 'Set SafeGlow · Pulsera inteligente + accesorios',
+    subtitle: 'Set de presentación con pulsera negra de acentos fucsia, aretes de corazón y tres sobres Tragoo Check, pensado para llevar contigo en tus salidas.',
+    kicker: 'SafeGlow · Set de lanzamiento', price: 1299, compareAtPrice: 1699,
+    unitPriceNumeric: 1299, unitPriceLabel: '$1,299 MXN por set', kitEquivalentCount: 0,
+    image: safeGlowSetImage,
+    gallery: [{ src: safeGlowSetImage, alt: 'Set SafeGlow Tragoo Check con pulsera, aretes de corazón y tres sobres sobre fondo blanco' }],
+    contentsSummary: '1 pulsera SafeGlow · 2 aretes de corazón · 3 sobres Tragoo Check',
+    substancesDetected: '', reactionTime: '',
+    includedItems: ['1 pulsera SafeGlow negra con acentos fucsia', '2 aretes de corazón', '3 sobres de prueba Tragoo Check'],
+    idealFor: 'Un regalo especial o para llevar tus accesorios juntos.', stockCount: null,
+  },
+  {
+    id: 'safebag-bolsa', category: 'individual', name: 'SafeBag Tragoo Check · Bolsa de mano',
+    subtitle: 'Bolsa negra de mano con interior organizado, detalles fucsia y un accesorio colgante con botón y luz. Una pieza práctica para tus salidas.',
+    kicker: 'SafeBag · Precio de lanzamiento', price: 1999, compareAtPrice: 2499,
+    unitPriceNumeric: 1999, unitPriceLabel: '$1,999 MXN por bolsa', kitEquivalentCount: 0,
+    image: safeBagImage,
+    gallery: [{ src: safeBagImage, alt: 'Bolsa SafeBag negra Tragoo Check con forro fucsia y accesorio colgante sobre fondo blanco' }],
+    contentsSummary: '1 bolsa SafeBag negra · 1 accesorio colgante · tiras de prueba incluidas',
+    substancesDetected: '', reactionTime: '',
+    includedItems: ['1 bolsa de mano negra con compartimentos interiores', '1 accesorio colgante con botón frontal y luz', 'Tiras de prueba incluidas (cantidad indicada en el empaque)'],
+    idealFor: 'Llevar tus pertenencias organizadas en salidas y eventos.', stockCount: null,
+  },
+  {
+    id: 'alarma-personal-jalon', category: 'individual', name: 'Alarma Personal Tragoo Check · Naranja',
+    subtitle: 'Alarma compacta de jalón con correa naranja y aro metálico para sujetarla a tus llaves, bolso o mochila.',
+    kicker: 'Alarma personal · Diseño portátil', price: 249,
+    unitPriceNumeric: 249, unitPriceLabel: '$249 MXN por alarma', kitEquivalentCount: 0,
+    image: personalAlarmImage,
+    gallery: [{ src: personalAlarmImage, alt: 'Alarma personal naranja Tragoo Check con correa y aro metálico sobre fondo blanco' }],
+    contentsSummary: '1 alarma personal naranja · 1 correa con aro metálico',
+    substancesDetected: '', reactionTime: '',
+    includedItems: ['1 alarma personal compacta', 'Correa naranja con aro metálico', 'Activación por jalón, según el empaque'],
+    idealFor: 'Tenerla a la mano en llaves, mochila o bolso.', stockCount: null,
+  },
   {
     id: 'stickers-corazon-30', category: 'individual', name: 'Stickers Corazón Reactivos · Pack de 30',
     subtitle: '30 stickers de corazón con lectura visual rápida. Llévalos en la uña y sigue la guía incluida para revisar tu bebida.',
