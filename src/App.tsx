@@ -30,7 +30,7 @@ import {
   FAMILY_PRODUCTS,
   CHRISTMAS_PRODUCTS,
   ALL_PRODUCTS,
-  ACTIVE_COUPONS,
+  getVisibleCoupons,
   HERO_PRODUCT_IMAGE,
   KIT_STICKERS_IMAGE,
   INSTAGRAM_URL,
@@ -38,6 +38,14 @@ import {
   FAQS,
   ProductKit,
 } from './data/products';
+import {
+  BUEN_FIN_END,
+  NOVEMBER_PROMOTION_END,
+  NOVEMBER_PROMOTION_START,
+  REGULAR_FREE_SHIPPING_THRESHOLD,
+  getBuenFinFreeShippingThreshold,
+  isBuenFinActive,
+} from './data/promotionRules';
 import { ReactionSimulator } from './components/ReactionSimulator';
 import { WholesaleSection } from './components/WholesaleSection';
 import {
@@ -67,9 +75,6 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
   hasStripeCheckout: false,
 };
 
-const NOVEMBER_PROMO_START = Date.parse('2026-11-01T06:00:00.000Z');
-const NOVEMBER_PROMO_END = Date.parse('2026-12-01T06:00:00.000Z');
-
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [heroView, setHeroView] = useState<
@@ -93,6 +98,12 @@ export default function App() {
   );
   const [stripePaymentMessage, setStripePaymentMessage] = useState('');
   const [stripeWhatsAppUrl, setStripeWhatsAppUrl] = useState('');
+  const [promotionNow, setPromotionNow] = useState(() => Date.now());
+
+  useEffect(() => {
+    const interval = window.setInterval(() => setPromotionNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     fetch('/api/config')
@@ -186,6 +197,9 @@ export default function App() {
       }
       return [...prev, { product, quantity: 1 }];
     });
+    if (openDrawer && isBuenFinPromotionActive && product.id === 'pack-amigas-2x') {
+      setSelectedCouponCode('BUENFIN12');
+    }
     if (openDrawer) {
       setIsCheckoutOpen(true);
     }
@@ -197,6 +211,9 @@ export default function App() {
       if (existing) return prev;
       return [{ product, quantity: 1 }];
     });
+    if (isBuenFinPromotionActive && product.id === 'pack-amigas-2x') {
+      setSelectedCouponCode('BUENFIN12');
+    }
     setIsCheckoutOpen(true);
   };
 
@@ -258,9 +275,17 @@ export default function App() {
   const cleanWhatsAppPhone = normalizeWhatsAppPhone(
     merchantConfig.whatsappNumber
   );
-  const currentTime = Date.now();
   const isNovemberPromotionActive =
-    currentTime >= NOVEMBER_PROMO_START && currentTime < NOVEMBER_PROMO_END;
+    promotionNow >= NOVEMBER_PROMOTION_START && promotionNow < NOVEMBER_PROMOTION_END;
+  const isBuenFinCampaignVisible =
+    promotionNow >= NOVEMBER_PROMOTION_START && promotionNow < BUEN_FIN_END;
+  const isBuenFinPromotionActive = isBuenFinActive(promotionNow);
+  const freeShippingThreshold = isBuenFinPromotionActive
+    ? getBuenFinFreeShippingThreshold(promotionNow)
+    : Math.max(
+        REGULAR_FREE_SHIPPING_THRESHOLD,
+        merchantConfig.freeShippingThreshold || REGULAR_FREE_SHIPPING_THRESHOLD
+      );
 
   return (
     <div className="min-h-screen bg-white text-[#201927] flex flex-col pb-24 md:pb-0">
@@ -353,14 +378,24 @@ export default function App() {
         )}
       </header>
 
-      <a href="#buen-fin" aria-label="Ver cuenta regresiva y promociones para El Buen Fin" className="block border-b border-[#E7DDEE] bg-[#F7F2FA] px-4 py-2.5 text-center text-xs sm:text-sm text-[#3A2845] hover:bg-[#F1EAF6]">
-        <span className="mr-2 inline-flex items-center gap-1.5 rounded-full bg-[#5B2A78] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white">El Buen Fin · 13–17 nov</span>
-        {isNovemberPromotionActive ? <span className="font-semibold">10% con HOY10 desde $449 · 15% con AMIGAS15 desde $1,100 · Envío gratis desde $899</span> : <span className="font-semibold">Consulta las promociones y condiciones vigentes</span>}
-      </a>
+      {isBuenFinCampaignVisible ? (
+        <a href="#buen-fin" aria-label="Ver cuenta regresiva y promociones para El Buen Fin" className="block border-b border-[#E7DDEE] bg-[#F7F2FA] px-4 py-2.5 text-center text-xs sm:text-sm text-[#3A2845] hover:bg-[#F1EAF6]">
+          <span className="mr-2 inline-flex items-center gap-1.5 rounded-full bg-[#5B2A78] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white">El Buen Fin · 13–17 nov</span>
+          {isBuenFinPromotionActive ? (
+            <span className="font-semibold">12% con BUENFIN12 desde $799 · Pack Dúo $703.12 · Envío gratis desde $799</span>
+          ) : (
+            <span className="font-semibold">Del 13 al 17: 12% con BUENFIN12 desde $799 · Envío gratis desde $799</span>
+          )}
+        </a>
+      ) : isNovemberPromotionActive ? (
+        <a href="#promociones" className="block border-b border-[#E7DDEE] bg-[#F7F2FA] px-4 py-2.5 text-center text-xs font-semibold text-[#3A2845] hover:bg-[#F1EAF6]">
+          Promociones de noviembre · 10% con HOY10 desde $449 · 15% con AMIGAS15 desde $1,100 · Envío gratis desde ${freeShippingThreshold.toLocaleString('es-MX')}
+        </a>
+      ) : null}
       <div className="border-b border-[#E8E4EB] bg-white px-4 py-2.5">
         <div className="mx-auto flex max-w-[1160px] flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-medium text-[#51495B] sm:text-xs">
           <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-[#5B2A78]" />Pago con tarjeta procesado por Stripe</span>
-          <span className="inline-flex items-center gap-1.5"><Globe className="h-4 w-4 text-[#5B2A78]" />Envío $99 · Gratis desde $899 MXN</span>
+          <span className="inline-flex items-center gap-1.5"><Globe className="h-4 w-4 text-[#5B2A78]" />Envío $99 · Gratis desde ${freeShippingThreshold.toLocaleString('es-MX')} MXN</span>
           <span className="inline-flex items-center gap-1.5"><MessageCircle className="h-4 w-4 text-[#5B2A78]" />Atención por WhatsApp</span>
         </div>
       </div>
@@ -510,9 +545,9 @@ export default function App() {
                   <p className="text-xs text-[#665D70] leading-relaxed max-w-xl">
                     <strong className="text-[#51495B]">Regla de envíos:</strong>{' '}
                     Pedidos de 1 sola pieza o menores a{' '}
-                    <strong className="text-[#201927]">$899 MXN</strong> pagan{' '}
+                    <strong className="text-[#201927]">${freeShippingThreshold.toLocaleString('es-MX')} MXN</strong> pagan{' '}
                     <strong className="text-[#201927]">$99 MXN</strong> de envío. A
-                    partir de <strong className="text-[#466B00]">$899 MXN</strong>{' '}
+                    partir de <strong className="text-[#466B00]">${freeShippingThreshold.toLocaleString('es-MX')} MXN</strong>{' '}
                     (Pack Trío 3x, Pack Squad 5x y todas las Cajas de Mayoreo) el{' '}
                     <strong className="text-[#466B00]">
                       Envío Express Asegurado es GRATIS
@@ -633,10 +668,10 @@ export default function App() {
 
               <div className="p-4 rounded-xl bg-white border border-[#E8E4EB]">
                 <div className="font-mono text-base sm:text-lg font-bold text-[#201927] tabular-nums">
-                  Envío Gratis ≥ $899
+                  Envío Gratis ≥ ${freeShippingThreshold.toLocaleString('es-MX')}
                 </div>
                 <div className="text-xs text-[#51495B] mt-0.5">
-                  Pedidos de 1 pieza o menores a $899 MXN pagan $99 MXN de envío a
+                  Pedidos menores a ${freeShippingThreshold.toLocaleString('es-MX')} MXN pagan $99 MXN de envío a
                   todo México
                 </div>
               </div>
@@ -684,46 +719,49 @@ export default function App() {
                 </h2>
               </div>
               <span className="text-xs text-[#625969]">
-                Toca cualquier cupón para aplicarlo automáticamente al finalizar tu pedido
+                Activa las ofertas disponibles al pagar. BUENFIN12 estará disponible del 13 al 17 de noviembre.
               </span>
             </div>
 
-            {/* 3 Active Coupon Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {ACTIVE_COUPONS.map((coupon) => (
-                <div
-                  key={coupon.code}
-                  className="p-5 rounded-xl bg-white border border-[#E7E2EA] flex flex-col justify-between gap-4"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-mono text-sm font-bold text-[#466B00] flex items-center gap-1.5">
-                        <Tag className="w-3.5 h-3.5" />
-                        {coupon.code}
-                      </span>
-                      <span className="text-xs text-[#201927] font-semibold">
-                        {coupon.label}
-                      </span>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+              {getVisibleCoupons(promotionNow).map((coupon) => {
+                const isUpcoming = Boolean(coupon.startsAt && promotionNow < Date.parse(coupon.startsAt));
+                return (
+                  <div
+                    key={coupon.code}
+                    className={`p-5 rounded-xl bg-white border flex flex-col justify-between gap-4 ${coupon.code === 'BUENFIN12' ? 'border-[#5B2A78] shadow-sm ring-1 ring-[#5B2A78]/10' : 'border-[#E7E2EA]'}`}
+                  >
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-mono text-sm font-bold text-[#466B00] flex items-center gap-1.5">
+                          <Tag className="w-3.5 h-3.5" />
+                          {coupon.code}
+                        </span>
+                        <span className="text-xs text-[#201927] font-semibold text-right">
+                          {coupon.label}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#51495B] leading-relaxed">
+                        {coupon.description}
+                      </p>
                     </div>
-                    <p className="text-xs text-[#51495B] leading-relaxed">
-                      {coupon.description}
-                    </p>
-                  </div>
 
-                  <div className="flex items-center justify-between pt-2 border-t border-[#E8E4EB]">
-                    <span className="text-[11px] text-[#665D70] font-mono">
-                      Compra mín: ${coupon.minPurchase.toLocaleString('es-MX')} MXN
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleActivateCoupon(coupon.code)}
-                      className="text-xs font-bold text-[#466B00] hover:underline cursor-pointer whitespace-nowrap shrink-0"
-                    >
-                      Activar cupón →
-                    </button>
+                    <div className="flex items-center justify-between gap-2 pt-2 border-t border-[#E8E4EB]">
+                      <span className="text-[11px] text-[#665D70] font-mono">
+                        Compra mín: ${coupon.minPurchase.toLocaleString('es-MX')} MXN
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleActivateCoupon(coupon.code)}
+                        disabled={isUpcoming}
+                        className={`text-xs font-bold whitespace-nowrap shrink-0 ${isUpcoming ? 'text-[#766C7E] cursor-not-allowed' : 'text-[#466B00] hover:underline cursor-pointer'}`}
+                      >
+                        {isUpcoming ? 'Disponible 13 nov' : 'Activar cupón →'}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
@@ -772,7 +810,7 @@ export default function App() {
                         </div>
                       ))}
                     </div>
-                    <p className="mt-3 text-[11px] leading-relaxed text-[#766C7E]">Envío $99 MXN; gratis en pedidos desde $899 MXN. Para niñas y niños, configuración y uso con supervisión adulta.</p>
+                    <p className="mt-3 text-[11px] leading-relaxed text-[#766C7E]">Envío $99 MXN; gratis en pedidos desde ${freeShippingThreshold.toLocaleString('es-MX')} MXN. Para niñas y niños, configuración y uso con supervisión adulta.</p>
                   </div>
                 </div>
             </article>
@@ -896,7 +934,11 @@ export default function App() {
                     <div className="p-5 sm:p-6 space-y-4">
                       {/* Unboxed Metadata Kicker */}
                       <div className="text-xs font-medium text-[#466B00]">
-                        {kit.kicker}
+                        {isBuenFinPromotionActive && kit.id === 'pack-amigas-2x'
+                          ? '12% adicional con BUENFIN12 · $703.12 + envío gratis'
+                          : isBuenFinPromotionActive
+                            ? kit.kicker.replaceAll('$899', '$799')
+                            : kit.kicker}
                       </div>
 
                       <div className="space-y-1">
@@ -928,7 +970,11 @@ export default function App() {
                       </div>
 
                       <p className="text-xs sm:text-sm text-[#51495B] leading-relaxed">
-                        {kit.subtitle}
+                        {isBuenFinPromotionActive && kit.id === 'pack-amigas-2x'
+                          ? 'Dos Kits Noche Completa con sus 2 llaveros mini-tumbler Tragoo Check. Con BUENFIN12 queda en $703.12 MXN y recibe envío gratis del 13 al 17 de noviembre.'
+                          : isBuenFinPromotionActive
+                            ? kit.subtitle.replaceAll('$899', '$799')
+                            : kit.subtitle}
                       </p>
                       {kit.substancesDetected && (
                         <div className="inline-flex items-center gap-1.5 rounded-full border border-[#C7DCA9]/25 bg-[#A3E635]/10 px-2.5 py-1.5 text-[10px] font-semibold text-[#426700]">
@@ -956,7 +1002,9 @@ export default function App() {
                       </div>
 
                       <ul className="space-y-1.5 pt-1 text-xs text-[#625969]">
-                        {kit.includedItems.map((item, idx) => (
+                        {kit.includedItems
+                          .filter((item) => !(isBuenFinPromotionActive && kit.id === 'pack-amigas-2x' && item.startsWith('Nota:')))
+                          .map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2">
                             <Check className="w-3.5 h-3.5 text-[#466B00] shrink-0 mt-0.5" />
                             <span>{item}</span>
@@ -974,7 +1022,9 @@ export default function App() {
                     >
                       <CreditCard className="w-3.5 h-3.5 shrink-0" />
                       <span>
-                        Comprar ahora · ${kit.price.toLocaleString('es-MX')} MXN
+                        {isBuenFinPromotionActive && kit.id === 'pack-amigas-2x'
+                          ? 'Comprar ahora · $703.12 con envío gratis'
+                          : `Comprar ahora · $${kit.price.toLocaleString('es-MX')} MXN`}
                       </span>
                     </button>
                     <button
@@ -1240,6 +1290,8 @@ export default function App() {
                   ? merchantConfig.hasStripeCheckout
                     ? `Agrega tus productos al carrito, revisa el total y el envío y paga con tarjeta en el checkout seguro de Stripe. Después puedes enviar el folio por WhatsApp para coordinar el envío.`
                     : `Agrega tus productos al carrito y revisa el total y el envío. Escríbenos por WhatsApp para solicitar un link de pago con tarjeta.`
+                  : idx === 2
+                    ? `El envío cuesta $99 MXN cuando el pedido no alcanza el mínimo de envío gratis. Durante El Buen Fin (13 al 17 de noviembre de 2026), el envío es gratis desde $799 MXN; fuera de esas fechas, desde $899 MXN. El monto y el método de envío se muestran antes de pagar.`
                   : faq.answer;
                 return (
                   <div key={idx} className="py-5">
@@ -1331,8 +1383,8 @@ export default function App() {
                 </span>
               </div>
               <p className="text-xs text-[#665D70] leading-relaxed">
-                Compra en línea o por WhatsApp 479 229 3687. Pedidos de 1 sola pieza o menores a $899 MXN pagan $99 MXN de
-                envío; envío gratis en compras desde $899 MXN.
+              Compra en línea o por WhatsApp 479 229 3687. Pedidos menores a ${freeShippingThreshold.toLocaleString('es-MX')} MXN pagan $99 MXN de
+                envío; envío gratis en compras desde ${freeShippingThreshold.toLocaleString('es-MX')} MXN.
               </p>
             </div>
           </div>

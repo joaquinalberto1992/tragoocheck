@@ -14,7 +14,12 @@ import {
   Gift,
   CheckCircle2,
 } from 'lucide-react';
-import { ProductKit, ALL_PRODUCTS, ACTIVE_COUPONS, PromoCoupon } from '../data/products';
+import { ProductKit, ALL_PRODUCTS, getActiveCoupons, PromoCoupon } from '../data/products';
+import {
+  getBuenFinFreeShippingThreshold,
+  isBuenFinActive,
+  REGULAR_FREE_SHIPPING_THRESHOLD,
+} from '../data/promotionRules';
 
 export interface CartItem {
   product: ProductKit;
@@ -153,15 +158,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [paymentMethod, setPaymentMethod] = useState<OrderPaymentMethod>(
     merchantConfig.hasStripeCheckout ? 'stripe' : 'link_pago'
   );
+  const [checkoutNow, setCheckoutNow] = useState(() => Date.now());
   const [copiedOrderText, setCopiedOrderText] = useState(false);
 
   // Coupon state
   const [appliedCoupon, setAppliedCoupon] = useState<PromoCoupon | null>(null);
   const [couponFeedback, setCouponFeedback] = useState<string | null>(null);
+  const activeCoupons = getActiveCoupons(checkoutNow);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const interval = window.setInterval(() => setCheckoutNow(Date.now()), 1000);
+    return () => window.clearInterval(interval);
+  }, [isOpen]);
 
   useEffect(() => {
     if (initialCouponCode) {
-      const found = ACTIVE_COUPONS.find(
+      const found = getActiveCoupons().find(
         (c) => c.code.toUpperCase() === initialCouponCode.toUpperCase()
       );
       if (found) {
@@ -190,6 +203,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     }
   }, [isOpen, merchantConfig.hasStripeCheckout]);
 
+  useEffect(() => {
+    if (appliedCoupon && !getActiveCoupons(checkoutNow).some((coupon) => coupon.code === appliedCoupon.code)) {
+      setAppliedCoupon(null);
+      setCouponFeedback('El periodo de esta promoción terminó. Revisa los códigos vigentes.');
+    }
+  }, [appliedCoupon, checkoutNow]);
+
   if (!isOpen) return null;
 
   const christmasCupQuantity = cart.reduce(
@@ -205,11 +225,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     )
   );
 
-  // STRICT SHIPPING RULE: Orders under $899 MXN ALWAYS pay shipping ($99 MXN)
-  const effectiveThreshold = Math.max(
-    899,
-    merchantConfig.freeShippingThreshold || 899
-  );
+  const effectiveThreshold = isBuenFinActive(checkoutNow)
+    ? getBuenFinFreeShippingThreshold(checkoutNow)
+    : Math.max(
+        REGULAR_FREE_SHIPPING_THRESHOLD,
+        merchantConfig.freeShippingThreshold || REGULAR_FREE_SHIPPING_THRESHOLD
+      );
   const qualifiesFreeShipping = subtotal >= effectiveThreshold;
   const shipping =
     cart.length === 0
@@ -222,7 +243,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const isCouponValidForSubtotal =
     appliedCoupon && subtotal >= appliedCoupon.minPurchase;
   const couponDiscount = isCouponValidForSubtotal
-    ? Math.round((subtotal * appliedCoupon.discountPercent) / 100)
+    ? Math.round(subtotal * appliedCoupon.discountPercent) / 100
     : 0;
 
   const totalDiscount = couponDiscount;
@@ -233,9 +254,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleApplyCouponCode = (codeToApply: string) => {
     const clean = codeToApply.trim().toUpperCase();
-    const found = ACTIVE_COUPONS.find((c) => c.code === clean);
+    const found = getActiveCoupons().find((c) => c.code === clean);
     if (!found) {
-      setCouponFeedback('Código no válido. Usa HOY10, AMIGAS15 o SOCIOB2B.');
+      setCouponFeedback(`Código no válido. Usa ${getActiveCoupons().map((coupon) => coupon.code).join(', ')}.`);
       return;
     }
     setAppliedCoupon(found);
@@ -299,7 +320,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
         : []),
       `• Envío Express: ${
         order.shipping === 0
-          ? 'GRATIS (Pedido >= $899 MXN)'
+          ? `GRATIS (Pedido >= $${effectiveThreshold.toLocaleString('es-MX')} MXN)`
           : `$${order.shipping} MXN`
       }`,
       `• *TOTAL A PAGAR: $${order.total.toLocaleString('es-MX')} MXN*`,
@@ -803,7 +824,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
 
                 <div className="flex flex-wrap gap-1.5">
-                  {ACTIVE_COUPONS.map((c) => {
+                  {activeCoupons.map((c) => {
                     const isSelected = appliedCoupon?.code === c.code;
                     return (
                       <button
@@ -1079,7 +1100,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <span>Envío Express Discreto</span>
                 <span className="font-mono text-[#201927]">
                   {shipping === 0 ? (
-                    <strong className="text-[#466B00]">GRATIS (≥$899)</strong>
+                    <strong className="text-[#466B00]">GRATIS (≥${effectiveThreshold.toLocaleString('es-MX')})</strong>
                   ) : (
                     `$${shipping} MXN`
                   )}

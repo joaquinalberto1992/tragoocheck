@@ -1,3 +1,9 @@
+import {
+  BUEN_FIN_END,
+  BUEN_FIN_START,
+  NOVEMBER_PROMOTION_END,
+} from './promotionRules';
+
 export type ProductCategory = 'individual' | 'promocion' | 'mayoreo' | 'familia' | 'navidad';
 
 export interface ProductKit {
@@ -28,6 +34,7 @@ export interface PromoCoupon {
   discountPercent: number;
   minPurchase: number;
   description: string;
+  startsAt?: string;
   expiresAt?: string;
 }
 
@@ -103,9 +110,21 @@ export const INSTAGRAM_URL = 'https://www.instagram.com/tragoocheck/';
 export const INSTAGRAM_HANDLE = '@tragoocheck';
 export const OFFICIAL_DOMAIN = 'tragoocheck.shop';
 
-const NOVEMBER_COUPON_EXPIRY = '2026-12-01T06:00:00.000Z';
+const NOVEMBER_COUPON_EXPIRY = new Date(NOVEMBER_PROMOTION_END).toISOString();
+const BUEN_FIN_COUPON_START = new Date(BUEN_FIN_START).toISOString();
+const BUEN_FIN_COUPON_END = new Date(BUEN_FIN_END).toISOString();
 
-export const ACTIVE_COUPONS: PromoCoupon[] = [
+export const PROMO_COUPONS: PromoCoupon[] = [
+  {
+    code: 'BUENFIN12',
+    label: '12% OFF desde $799',
+    discountPercent: 12,
+    minPurchase: 799,
+    description:
+      'Oferta exclusiva del 13 al 17 de noviembre de 2026: 12% de descuento desde $799 MXN y envío gratis desde $799 MXN. El Pack Dúo de $799 queda en $703.12 MXN con este código.',
+    startsAt: BUEN_FIN_COUPON_START,
+    expiresAt: BUEN_FIN_COUPON_END,
+  },
   {
     code: 'HOY10',
     label: '10% OFF desde $449',
@@ -132,7 +151,19 @@ export const ACTIVE_COUPONS: PromoCoupon[] = [
     description:
       '8% de bonificación adicional sobre precios de mayoreo para bares, antros y distribuidores.',
   },
-].filter((coupon) => !coupon.expiresAt || Date.now() < Date.parse(coupon.expiresAt));
+];
+
+export function getActiveCoupons(now = Date.now()): PromoCoupon[] {
+  return PROMO_COUPONS.filter(
+    (coupon) =>
+      (!coupon.startsAt || now >= Date.parse(coupon.startsAt)) &&
+      (!coupon.expiresAt || now < Date.parse(coupon.expiresAt))
+  );
+}
+
+export function getVisibleCoupons(now = Date.now()): PromoCoupon[] {
+  return PROMO_COUPONS.filter((coupon) => !coupon.expiresAt || now < Date.parse(coupon.expiresAt));
+}
 
 // STRICTLY DECREASING UNIT PRICE PROGRESSION FOR KIT NOCHE COMPLETA:
 // 1 pieza: $449.00 c/u (+ $99 envío por ser < $899 MXN)

@@ -1,4 +1,10 @@
 import type Stripe from 'stripe';
+import {
+  BUEN_FIN_END,
+  BUEN_FIN_START,
+  NOVEMBER_PROMOTION_END,
+  getBuenFinFreeShippingThreshold,
+} from '../src/data/promotionRules.js';
 
 export const WHATSAPP_NUMBER = process.env.WHATSAPP_NUMBER || '524792293687';
 
@@ -81,9 +87,10 @@ const CHRISTMAS_CUP_IDS = new Set([
   'vaso-led-navidad-250',
 ]);
 
-const NOVEMBER_COUPON_EXPIRY = Date.parse('2026-12-01T06:00:00.000Z');
+const NOVEMBER_COUPON_EXPIRY = NOVEMBER_PROMOTION_END;
 
-const COUPONS: Record<string, { percent: number; minimum: number; expiresAt?: number }> = {
+const COUPONS: Record<string, { percent: number; minimum: number; startsAt?: number; expiresAt?: number }> = {
+  BUENFIN12: { percent: 12, minimum: 799, startsAt: BUEN_FIN_START, expiresAt: BUEN_FIN_END },
   HOY10: { percent: 10, minimum: 449, expiresAt: NOVEMBER_COUPON_EXPIRY },
   AMIGAS15: { percent: 15, minimum: 1100, expiresAt: NOVEMBER_COUPON_EXPIRY },
   SOCIOB2B: { percent: 8, minimum: 4350 },
@@ -187,15 +194,21 @@ export function quoteCheckout(input: unknown): CheckoutQuote {
 
   const couponCode = typeof body.couponCode === 'string' ? body.couponCode.trim().toUpperCase() : '';
   const coupon = couponCode ? COUPONS[couponCode] : undefined;
-  if (couponCode && (!coupon || (coupon.expiresAt && Date.now() >= coupon.expiresAt))) {
+  if (
+    couponCode &&
+    (!coupon ||
+      (coupon.startsAt && Date.now() < coupon.startsAt) ||
+      (coupon.expiresAt && Date.now() >= coupon.expiresAt))
+  ) {
     throw new Error('El código de descuento no es válido o ya venció.');
   }
   if (coupon && subtotal < coupon.minimum) {
     throw new Error(`El cupón ${couponCode} aplica a partir de $${coupon.minimum.toLocaleString('es-MX')} MXN en productos.`);
   }
 
-  const couponDiscount = coupon ? Math.round((subtotal * coupon.percent) / 100) : 0;
-  const shipping = subtotal >= 899 ? 0 : 99;
+  const couponDiscount = coupon ? Math.round(subtotal * coupon.percent) / 100 : 0;
+  const freeShippingThreshold = getBuenFinFreeShippingThreshold();
+  const shipping = subtotal >= freeShippingThreshold ? 0 : 99;
   return {
     lines,
     subtotal,

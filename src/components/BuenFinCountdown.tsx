@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowRight, CalendarDays, Clock3, Tag, Truck } from 'lucide-react';
-
-// The official 2026 event runs November 13–17. The shop's existing November
-// coupons remain valid through November 30, so the banner changes phase rather
-// than implying that those offers expire with the event.
-const BUEN_FIN_START = new Date('2026-11-13T00:00:00-06:00').getTime();
-const BUEN_FIN_END = new Date('2026-11-18T00:00:00-06:00').getTime();
-const NOVEMBER_PROMO_END = new Date('2026-12-01T00:00:00-06:00').getTime();
+import {
+  BUEN_FIN_END,
+  BUEN_FIN_START,
+  NOVEMBER_PROMOTION_START,
+  NOVEMBER_PROMOTION_END,
+} from '../data/promotionRules';
 
 type CountdownMode = 'before' | 'during' | 'last-days' | 'expired';
 
@@ -17,8 +16,8 @@ function getCountdown(now: number) {
   if (now < BUEN_FIN_END) {
     return { mode: 'during' as const, target: BUEN_FIN_END };
   }
-  if (now < NOVEMBER_PROMO_END) {
-    return { mode: 'last-days' as const, target: NOVEMBER_PROMO_END };
+  if (now < NOVEMBER_PROMOTION_END) {
+    return { mode: 'last-days' as const, target: NOVEMBER_PROMOTION_END };
   }
   return { mode: 'expired' as const, target: now };
 }
@@ -47,6 +46,8 @@ export const BuenFinCountdown: React.FC = () => {
     return () => window.clearInterval(interval);
   }, []);
 
+  if (now < NOVEMBER_PROMOTION_START) return null;
+
   const { mode, target } = getCountdown(now);
   if (mode === 'expired') return null;
 
@@ -66,33 +67,66 @@ export const BuenFinCountdown: React.FC = () => {
     >
       <div className="mx-auto grid max-w-[1160px] gap-4 rounded-2xl border border-[#E7DDEE] bg-white p-4 shadow-sm sm:grid-cols-[1fr_auto] sm:items-center sm:p-5">
         <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#7133A0]">
-            <CalendarDays aria-hidden="true" className="h-4 w-4" />
-            <span>El Buen Fin 2026 · 13 al 17 de noviembre</span>
-          </div>
+          {mode === 'last-days' ? (
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-bold uppercase tracking-[0.14em] text-[#7133A0]">
+              <CalendarDays aria-hidden="true" className="h-4 w-4" />
+              <span>Promociones de noviembre · hasta el 30 de noviembre</span>
+            </div>
+          ) : (
+            <div className="flex flex-wrap items-center gap-2">
+              <img
+                src="/images/buen-fin-horizontal-2026-oficial.png"
+                alt="Identidad oficial de El Buen Fin 2026 para MIPYMES"
+                className="h-auto w-[180px] max-w-full object-contain sm:w-[220px]"
+                width="7382"
+                height="3089"
+              />
+              <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#7133A0]">13 al 17 de noviembre de 2026</span>
+            </div>
+          )}
           <h2 className="mt-1.5 text-lg font-extrabold tracking-tight text-[#201927] sm:text-xl">
             {mode === 'before'
-              ? 'Prepara tu carrito y aprovecha tus beneficios de noviembre'
+              ? 'Un beneficio especial para comprar más por menos'
               : mode === 'during'
-                ? 'El Buen Fin ya comenzó: elige tus productos y aplica tu código'
+                ? 'Activa tu descuento exclusivo de El Buen Fin'
                 : 'Aún puedes aprovechar las promociones de noviembre'}
           </h2>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1.5 text-xs leading-relaxed text-[#51495B]">
-            <span className="inline-flex items-center gap-1.5">
-              <Tag aria-hidden="true" className="h-3.5 w-3.5 text-[#466B00]" />
-              10% con <strong className="font-mono text-[#201927]">HOY10</strong> desde $449
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Tag aria-hidden="true" className="h-3.5 w-3.5 text-[#466B00]" />
-              15% con <strong className="font-mono text-[#201927]">AMIGAS15</strong> desde $1,100
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <Truck aria-hidden="true" className="h-3.5 w-3.5 text-[#466B00]" />
-              Envío gratis desde $899
-            </span>
+            {mode === 'last-days' ? (
+              <>
+                <span className="inline-flex items-center gap-1.5">
+                  <Tag aria-hidden="true" className="h-3.5 w-3.5 text-[#466B00]" />
+                  10% con <strong className="font-mono text-[#201927]">HOY10</strong> desde $449
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Tag aria-hidden="true" className="h-3.5 w-3.5 text-[#466B00]" />
+                  15% con <strong className="font-mono text-[#201927]">AMIGAS15</strong> desde $1,100
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Truck aria-hidden="true" className="h-3.5 w-3.5 text-[#466B00]" />
+                  Envío gratis desde $899
+                </span>
+              </>
+            ) : (
+              <>
+                <span className="inline-flex items-center gap-1.5">
+                  <Tag aria-hidden="true" className="h-3.5 w-3.5 text-[#466B00]" />
+                  12% con <strong className="font-mono text-[#201927]">BUENFIN12</strong> desde $799
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <Truck aria-hidden="true" className="h-3.5 w-3.5 text-[#466B00]" />
+                  Envío gratis desde $799
+                </span>
+                <span className="inline-flex items-center gap-1.5 font-semibold text-[#201927]">
+                  Pack Dúo: $799 → $703.12
+                </span>
+              </>
+            )}
           </div>
           <p className="mt-2 text-[10px] leading-relaxed text-[#71687A]">
-            Cupones vigentes hasta el 30 de noviembre de 2026. Se aplica un código por pedido; envío sujeto a cobertura.
+            {mode === 'last-days'
+              ? 'Los códigos HOY10 y AMIGAS15 siguen vigentes hasta el 30 de noviembre de 2026. Un código por pedido; envío sujeto a cobertura.'
+              : 'Código BUENFIN12 válido exclusivamente del 13 al 17 de noviembre de 2026. Un código por pedido; envío sujeto a cobertura.'}
           </p>
         </div>
 
