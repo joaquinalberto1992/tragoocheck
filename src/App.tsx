@@ -1,4 +1,5 @@
 import { ProductVisual } from './components/ProductVisual';
+import { Analytics } from '@vercel/analytics/react';
 import { VideoGallery } from './components/VideoGallery';
 import { UpcomingProducts } from './components/UpcomingProducts';
 import React, { useState, useEffect } from 'react';
@@ -1388,6 +1389,7 @@ export default function App() {
         orders={orders}
         onOrdersUpdated={(updatedOrders) => setOrders(updatedOrders)}
       />
+      <Analytics />
     </div>
   );
 }
