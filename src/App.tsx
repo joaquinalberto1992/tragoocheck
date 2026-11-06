@@ -1,5 +1,6 @@
 import { ProductVisual } from './components/ProductVisual';
 import { Analytics } from '@vercel/analytics/react';
+import { BuenFinCountdown } from './components/BuenFinCountdown';
 import { VideoGallery } from './components/VideoGallery';
 import { UpcomingProducts } from './components/UpcomingProducts';
 import React, { useState, useEffect } from 'react';
@@ -352,9 +353,9 @@ export default function App() {
         )}
       </header>
 
-      <a href="#promociones" aria-label="Ver promociones Tragoo Check de noviembre" className="block border-b border-[#E7DDEE] bg-[#F7F2FA] px-4 py-2.5 text-center text-xs sm:text-sm text-[#3A2845] hover:bg-[#F1EAF6]">
-        <span className="mr-2 inline-flex items-center gap-1.5 rounded-full bg-[#5B2A78] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white">Tragoo Check · Noviembre</span>
-        {isNovemberPromotionActive ? <span className="font-semibold">Promociones del mes: HOY10 ahorra 10% desde $449 · AMIGAS15 ahorra 15% desde $1,100 · Hasta el 30 de noviembre</span> : <span className="font-semibold">Consulta las promociones y condiciones vigentes</span>}
+      <a href="#buen-fin" aria-label="Ver cuenta regresiva y promociones para El Buen Fin" className="block border-b border-[#E7DDEE] bg-[#F7F2FA] px-4 py-2.5 text-center text-xs sm:text-sm text-[#3A2845] hover:bg-[#F1EAF6]">
+        <span className="mr-2 inline-flex items-center gap-1.5 rounded-full bg-[#5B2A78] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white">El Buen Fin · 13–17 nov</span>
+        {isNovemberPromotionActive ? <span className="font-semibold">10% con HOY10 desde $449 · 15% con AMIGAS15 desde $1,100 · Envío gratis desde $899</span> : <span className="font-semibold">Consulta las promociones y condiciones vigentes</span>}
       </a>
       <div className="border-b border-[#E8E4EB] bg-white px-4 py-2.5">
         <div className="mx-auto flex max-w-[1160px] flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-medium text-[#51495B] sm:text-xs">
@@ -363,6 +364,7 @@ export default function App() {
           <span className="inline-flex items-center gap-1.5"><MessageCircle className="h-4 w-4 text-[#5B2A78]" />Atención por WhatsApp</span>
         </div>
       </div>
+      <BuenFinCountdown />
 
       {/* Optional Stripe Return Confirmation Banner */}
       {stripeReturnFolio && (
