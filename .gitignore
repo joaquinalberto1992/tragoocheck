@@ -13,3 +13,4 @@ tmp/
 .vercel
 .agents/
 skills-lock.json
+.aistudio/artifacts/brain/**/.tempmediaStorage/
