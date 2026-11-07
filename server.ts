@@ -53,7 +53,7 @@ export interface OrderRecord {
   couponDiscount?: number;
   shipping: number;
   total: number;
-  paymentMethod: 'link_pago' | 'stripe';
+  paymentMethod: 'link_pago' | 'stripe' | 'transferencia';
   paymentStatus: 'pendiente_comprobante' | 'pagado' | 'enviado';
   transferReference?: string;
   stripeLast4?: string;

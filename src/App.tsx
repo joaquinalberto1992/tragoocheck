@@ -20,6 +20,7 @@ import {
   ClipboardList,
   Video,
   CreditCard,
+  Landmark,
   Menu,
   X,
 } from 'lucide-react';
@@ -1075,7 +1076,9 @@ export default function App() {
               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <div className="space-y-1">
                   <div className="text-xs font-semibold text-[#466B00]">
-                    {merchantConfig.hasStripeCheckout ? 'Pago seguro con tarjeta o link de pago por WhatsApp · 479 229 3687' : 'Solicita tu link de pago por WhatsApp · 479 229 3687'}
+                    {merchantConfig.hasStripeCheckout
+                      ? 'Tarjeta segura con Stripe, link o transferencia por WhatsApp · 479 229 3687'
+                      : 'Solicita link o datos para transferencia por WhatsApp · 479 229 3687'}
                   </div>
                   <h3 className="text-lg sm:text-xl font-bold text-[#201927]">
                     Completa tu compra y revisa el total y el envío antes de pagar.
@@ -1095,7 +1098,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3.5">
                 {merchantConfig.hasStripeCheckout && (
                   <div className="p-4 rounded-xl bg-white border border-[#E8E4EB] space-y-1.5">
                     <div className="flex items-center gap-2 text-xs font-bold text-[#201927]">
@@ -1117,6 +1120,15 @@ export default function App() {
                     <strong className="text-[#201927]">479 229 3687</strong>, te
                     compartimos tu link oficial de cobro para pagar con tarjeta de
                     débito o crédito y tu confirmación.
+                  </p>
+                </div>
+                <div className="p-4 rounded-xl bg-white border border-[#E8E4EB] space-y-1.5">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[#201927]">
+                    <Landmark className="w-4 h-4 text-[#466B00]" />
+                    <span>Transferencia bancaria</span>
+                  </div>
+                  <p className="text-xs text-[#51495B] leading-relaxed">
+                    Solicita los datos de la cuenta por WhatsApp. Te confirmaremos el total; realiza la transferencia después de recibirlos y envía tu comprobante por el mismo chat.
                   </p>
                 </div>
               </div>

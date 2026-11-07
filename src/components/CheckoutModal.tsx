@@ -7,6 +7,7 @@ import {
   Copy,
   Check,
   CreditCard,
+  Landmark,
   Truck,
   MessageCircle,
   Sparkles,
@@ -40,7 +41,7 @@ export interface MerchantConfigClient {
   stripeMode?: 'test' | 'live' | 'off';
 }
 
-export type OrderPaymentMethod = 'link_pago' | 'stripe';
+export type OrderPaymentMethod = 'link_pago' | 'stripe' | 'transferencia';
 
 export interface ConfirmedOrder {
   folio: string;
@@ -291,6 +292,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const getPaymentMethodTitle = (method: OrderPaymentMethod) => {
     if (method === 'stripe') return 'Pago con tarjeta procesado por Stripe';
+    if (method === 'transferencia') return 'Transferencia bancaria (datos solicitados por WhatsApp)';
     return 'Link de Pago con Tarjeta (Solicito link de pago por WhatsApp)';
   };
 
@@ -336,9 +338,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       `*Método de pago elegido:*`,
       `👉 *${getPaymentMethodTitle(order.paymentMethod)}*`,
       ``,
-      order.paymentStatus === 'pagado'
+      order.paymentStatus === 'pagado' && order.paymentMethod === 'stripe'
         ? `El pago ya aparece confirmado por Stripe. ¿Me confirmas la recepción del pedido? ¡Gracias!`
-        : `¿Me confirmas disponibilidad y me compartes el link de pago por aquí? ¡Gracias!`,
+        : order.paymentStatus === 'pagado'
+          ? `Ya realicé el pago de este pedido. Te comparto el comprobante por aquí para confirmar la recepción. ¡Gracias!`
+          : order.paymentMethod === 'transferencia'
+            ? `Aún no he realizado la transferencia. ¿Me compartes por aquí los datos bancarios y confirmas el total? Enviaré el comprobante en este mismo chat. ¡Gracias!`
+            : `¿Me confirmas disponibilidad y me compartes el link de pago por aquí? ¡Gracias!`,
     ].join('\n');
   };
 
@@ -393,7 +399,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       total,
       paymentMethod,
       paymentStatus: 'pendiente_comprobante',
-      transferReference: paymentMethod === 'link_pago' ? 'Link de Pago vía WhatsApp' : undefined,
+      transferReference:
+        paymentMethod === 'link_pago'
+          ? 'Link de Pago vía WhatsApp'
+          : paymentMethod === 'transferencia'
+            ? 'Datos bancarios solicitados por WhatsApp'
+            : undefined,
     };
 
     try {
@@ -511,8 +522,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             </h2>
             <p className="text-[11px] sm:text-xs text-[#466B00]">
               {merchantConfig.hasStripeCheckout
-                ? 'Compra sin crear cuenta · Tarjeta segura · Link por WhatsApp'
-                : 'Compra sin crear cuenta · Solicita tu link por WhatsApp'}
+                ? 'Compra sin crear cuenta · Tarjeta segura · Link o transferencia por WhatsApp'
+                : 'Compra sin crear cuenta · Link o transferencia por WhatsApp'}
             </p>
           </div>
           <button
@@ -551,11 +562,13 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
                 <p className="text-xs sm:text-sm text-[#51495B] leading-relaxed">
                   Toca el botón verde de abajo para abrir WhatsApp con tu pedido
-                  completo. Ahí mismo te enviaremos de inmediato tu{' '}
+                  completo. Ahí mismo te enviaremos de inmediato{' '}
                   <strong className="text-[#201927]">
                     {confirmedOrder.paymentMethod === 'stripe'
                       ? 'confirmación de pago con tarjeta'
-                      : 'link de pago seguro con tarjeta'}
+                      : confirmedOrder.paymentMethod === 'transferencia'
+                        ? 'los datos para realizar la transferencia y recibir el comprobante'
+                        : 'el link de pago seguro con tarjeta'}
                   </strong>{' '}
                   y tu guía de envío express.
                 </p>
@@ -899,7 +912,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <label className="block text-xs font-bold text-[#201927]">
                   1. Elige cómo deseas pagar
                 </label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   {merchantConfig.hasStripeCheckout && (
                     <button
                       type="button"
@@ -942,14 +955,33 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       Solicita el enlace de pago por WhatsApp
                     </div>
                   </button>
-
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('transferencia')}
+                    className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
+                      paymentMethod === 'transferencia'
+                        ? 'bg-[#F2F7E9] border-[#C7DCA9] text-[#201927]'
+                        : 'bg-white border-[#E7E2EA] text-[#625969] hover:text-[#201927]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <Landmark className="w-4 h-4 text-[#466B00]" />
+                      <span className="font-mono text-[10px] font-bold text-[#466B00]">SPEI</span>
+                    </div>
+                    <div className="text-xs font-bold text-[#201927] mt-1.5">Transferencia bancaria</div>
+                    <div className="text-[11px] text-[#625969] mt-0.5 leading-snug">
+                      Solicita los datos de la cuenta por WhatsApp
+                    </div>
+                  </button>
                 </div>
               </div>
 
               <div className="rounded-xl border border-[#E7E2EA] bg-white px-3.5 py-3 text-[11px] leading-relaxed text-[#51495B]">
                 {paymentMethod === 'stripe'
                   ? 'Pagarás en el checkout seguro de Stripe. Al confirmarse el pago, verás el folio y podrás coordinar la entrega por WhatsApp. Los datos de tu tarjeta se capturan en Stripe.'
-                  : 'Se abrirá WhatsApp con tu pedido y dirección. Te responderemos con el enlace de pago; el pedido se paga al abrir ese enlace.'}
+                  : paymentMethod === 'transferencia'
+                    ? 'Se abrirá WhatsApp con tu pedido y dirección para solicitar los datos bancarios. Espera a recibirlos y confirmar el total antes de transferir; después podrás enviar el comprobante por el mismo chat.'
+                    : 'Se abrirá WhatsApp con tu pedido y dirección. Te responderemos con el enlace de pago; el pedido se paga al abrir ese enlace.'}
               </div>
 
               {/* Contact, delivery, and optional receipt email details */}
@@ -977,7 +1009,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <div className="rounded-lg border border-[#E7E2EA] bg-white px-3 py-2.5 text-[11px] leading-relaxed text-[#51495B]">
                   {paymentMethod === 'stripe'
                     ? 'Usaremos estos datos para preparar el envío. El pago con tarjeta se procesa en Stripe.'
-                    : 'Usaremos estos datos para preparar tu pedido y solicitar el enlace de pago por WhatsApp.'}
+                    : paymentMethod === 'transferencia'
+                      ? 'Usaremos estos datos para preparar tu pedido y solicitar los datos bancarios por WhatsApp.'
+                      : 'Usaremos estos datos para preparar tu pedido y solicitar el enlace de pago por WhatsApp.'}
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <input
@@ -1059,7 +1093,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   <p className="text-[10px] leading-relaxed text-[#625969]">
                     {paymentMethod === 'stripe'
                       ? 'Stripe enviará el recibo cuando el pago con tarjeta se confirme.'
-                      : 'Incluiremos este correo en tu solicitud de pago por WhatsApp.'}
+                      : paymentMethod === 'transferencia'
+                        ? 'Incluiremos este correo en tu solicitud de transferencia por WhatsApp.'
+                        : 'Incluiremos este correo en tu solicitud de pago por WhatsApp.'}
                   </p>
                 </div>
 
@@ -1122,6 +1158,8 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             >
               {paymentMethod === 'stripe' ? (
                 <CreditCard className="w-4 h-4 shrink-0" />
+              ) : paymentMethod === 'transferencia' ? (
+                <Landmark className="w-4 h-4 shrink-0" />
               ) : (
                 <MessageCircle className="w-4 h-4 shrink-0" />
               )}
@@ -1132,7 +1170,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     : 'Enviando pedido a WhatsApp...'
                   : paymentMethod === 'stripe'
                   ? `Pagar con tarjeta en Stripe · $${total.toLocaleString('es-MX')}`
-                  : `Solicitar link de pago · $${total.toLocaleString('es-MX')}`}
+                  : paymentMethod === 'transferencia'
+                    ? `Solicitar datos para transferencia · $${total.toLocaleString('es-MX')}`
+                    : `Solicitar link de pago · $${total.toLocaleString('es-MX')}`}
               </span>
             </button>
           </div>

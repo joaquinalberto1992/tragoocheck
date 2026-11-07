@@ -657,7 +657,9 @@ export const MerchantPanelModal: React.FC<MerchantPanelModalProps> = ({
                             <span className="text-[#A19BB2]">
                               {order.paymentMethod === 'stripe'
                                 ? 'Tarjeta (Stripe)'
-                                : 'Link de Pago (WhatsApp)'}
+                                : order.paymentMethod === 'transferencia'
+                                  ? 'Transferencia (WhatsApp)'
+                                  : 'Link de Pago (WhatsApp)'}
                             </span>
                             <span aria-hidden="true" className="text-[#524A68]">
                               ·
