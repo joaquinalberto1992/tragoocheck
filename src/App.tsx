@@ -229,11 +229,7 @@ export default function App() {
   };
 
   const handleBuyNow = (product: ProductKit) => {
-    setCart((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id);
-      if (existing) return prev;
-      return [{ product, quantity: 1 }];
-    });
+    setCart([{ product, quantity: 1 }]);
     if (isBuenFinPromotionActive && product.id === 'pack-amigas-2x') {
       setSelectedCouponCode('BUENFIN12');
     }
