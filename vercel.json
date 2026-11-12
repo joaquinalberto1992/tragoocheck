@@ -1,6 +1,7 @@
 {
   "rewrites": [
-    { "source": "/instagram", "destination": "/index.html" }
+    { "source": "/instagram", "destination": "/index.html" },
+    { "source": "/comprar", "destination": "/index.html" }
   ],
   "headers": [
     {
