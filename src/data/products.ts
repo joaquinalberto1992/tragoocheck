@@ -3,6 +3,7 @@ import {
   BUEN_FIN_START,
   NOVEMBER_PROMOTION_END,
 } from './promotionRules';
+import { DELIVERY_POLICY, RETURN_POLICY } from './storePolicies';
 
 export type ProductCategory = 'individual' | 'promocion' | 'mayoreo' | 'familia' | 'navidad';
 
@@ -813,7 +814,11 @@ export const FAQS = [
   {
     question: '¿Cuáles son las condiciones de envío y cuándo es gratis?',
     answer:
-      'Todos los pedidos de una sola pieza o pedidos pequeños menores a $899 MXN pagan un envío express único de $99 MXN a cualquier parte de México. En todos los pedidos a partir de $899 MXN (como el Pack Trío 3x, Pack Squad 5x, Pack VIP 10x y todas las Cajas de Mayoreo), el Envío Express Asegurado es completamente GRATIS.',
+      `Todos los pedidos de una sola pieza o pedidos pequeños menores a $899 MXN pagan $99 MXN de envío a México. En pedidos a partir de $899 MXN, el envío es gratis. ${DELIVERY_POLICY}`,
+  },
+  {
+    question: '¿Cómo solicito una devolución?',
+    answer: RETURN_POLICY,
   },
   {
     question: '¿Puedo añadir Tragoo Check a la pantalla de inicio?',
@@ -826,4 +831,3 @@ export const FAQS = [
       'Este es un producto de un solo uso para fines informativos y de detección personal solamente. No garantiza el 100% de precisión, puede generar falsos positivos y no detecta todas las sustancias. Un resultado sin cambio no confirma que una bebida sea segura. No reutilizar. La exposición a ciertos jabones o químicos puede reducir la detección o provocar un cambio de color falso. No está clasificado como dispositivo médico de diagnóstico in vitro (IVD). Si sospechas adulteración, no consumas la bebida y busca ayuda.',
   },
 ];
-

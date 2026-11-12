@@ -21,6 +21,7 @@ import {
   isBuenFinActive,
   REGULAR_FREE_SHIPPING_THRESHOLD,
 } from '../data/promotionRules';
+import { DELIVERY_ESTIMATE, RETURN_POLICY } from '../data/storePolicies';
 
 export interface CartItem {
   product: ProductKit;
@@ -325,6 +326,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           ? `GRATIS (Pedido >= $${effectiveThreshold.toLocaleString('es-MX')} MXN)`
           : `$${order.shipping} MXN`
       }`,
+      `• Entrega estimada: ${DELIVERY_ESTIMATE} desde la confirmación del pago`,
       `• *TOTAL A PAGAR: $${order.total.toLocaleString('es-MX')} MXN*`,
       ...(instagramSource ? [`• Canal: Instagram`] : []),
       ...(order.customerName ? [`• Nombre: ${order.customerName}`] : []),
@@ -652,6 +654,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   </span>
                 </div>
               </div>
+              <p className="text-xs leading-relaxed text-[#51495B]">Entrega estimada: {DELIVERY_ESTIMATE} desde la confirmación del pago.</p>
             </div>
           ) : cart.length === 0 ? (
             /* EMPTY CART STATE */
@@ -743,6 +746,9 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </span>
                   )}
                 </div>
+              </div>
+              <div className="rounded-xl border border-[#E7E2EA] bg-[#F8F7FA] px-3.5 py-3 text-xs leading-relaxed text-[#51495B]">
+                <strong className="text-[#201927]">Entrega estimada: {DELIVERY_ESTIMATE}</strong> desde la confirmación del pago. {RETURN_POLICY}
               </div>
 
               {/* Cart Items List */}
@@ -1149,6 +1155,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </span>
               </div>
             </div>
+            <p className="text-[11px] leading-relaxed text-[#51495B]">Entrega estimada: {DELIVERY_ESTIMATE} desde la confirmación del pago. Devoluciones por WhatsApp; solicítalas preferentemente al día hábil siguiente de recibir el pedido. Conservas tu plazo legal de 5 días hábiles.</p>
 
             <button
               type="submit"

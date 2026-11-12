@@ -47,6 +47,7 @@ import {
   getBuenFinFreeShippingThreshold,
   isBuenFinActive,
 } from './data/promotionRules';
+import { DELIVERY_ESTIMATE, DELIVERY_POLICY, RETURN_POLICY } from './data/storePolicies';
 import { ReactionSimulator } from './components/ReactionSimulator';
 import { WholesaleSection } from './components/WholesaleSection';
 import {
@@ -419,6 +420,7 @@ export default function App() {
         <div className="mx-auto flex max-w-[1160px] flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[11px] font-medium text-[#51495B] sm:text-xs">
           <span className="inline-flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-[#5B2A78]" />Pago con tarjeta procesado por Stripe</span>
           <span className="inline-flex items-center gap-1.5"><Globe className="h-4 w-4 text-[#5B2A78]" />Envío $99 · Gratis desde ${freeShippingThreshold.toLocaleString('es-MX')} MXN</span>
+          <span className="inline-flex items-center gap-1.5"><Check className="h-4 w-4 text-[#5B2A78]" />Entrega estimada: {DELIVERY_ESTIMATE}</span>
           <span className="inline-flex items-center gap-1.5"><MessageCircle className="h-4 w-4 text-[#5B2A78]" />Atención por WhatsApp</span>
         </div>
       </div>
@@ -575,7 +577,7 @@ export default function App() {
                     <strong className="text-[#466B00]">
                       Envío Express Asegurado es GRATIS
                     </strong>
-                    .
+                    . Entrega estimada: <strong className="text-[#201927]">{DELIVERY_ESTIMATE}</strong> desde la confirmación del pago.
                   </p>
                 </div>
               </div>
@@ -695,7 +697,7 @@ export default function App() {
                 </div>
                 <div className="text-xs text-[#51495B] mt-0.5">
                   Pedidos menores a ${freeShippingThreshold.toLocaleString('es-MX')} MXN pagan $99 MXN de envío a
-                  todo México
+                  todo México. Entrega estimada: {DELIVERY_ESTIMATE} desde la confirmación del pago.
                 </div>
               </div>
 
@@ -889,7 +891,7 @@ export default function App() {
                 </h2>
                 {isInstagramLanding && (
                   <p className="max-w-2xl text-sm leading-relaxed text-[#51495B]">
-                    Precios en MXN, compra sin crear cuenta y pago con tarjeta en Stripe. El envío y el total se muestran antes de confirmar.
+                    Precios en MXN, compra sin crear cuenta y pago con tarjeta en Stripe. El envío, el total y la entrega estimada de {DELIVERY_ESTIMATE} se muestran antes de confirmar.
                   </p>
                 )}
               </div>
@@ -1311,6 +1313,20 @@ export default function App() {
           </div>
         </section>
 
+        <section id="envios-devoluciones" className="border-t border-[#E8E4EB] bg-white py-10 sm:py-14">
+          <div className="mx-auto grid max-w-[1160px] gap-4 px-4 sm:grid-cols-2 sm:px-6">
+            <div className="rounded-2xl border border-[#E7E2EA] bg-[#F8F7FA] p-5 sm:p-6">
+              <div className="flex items-center gap-2 text-[#466B00]"><Globe className="h-5 w-5" /><h2 className="text-base font-bold text-[#201927]">Envíos claros</h2></div>
+              <p className="mt-2 text-sm leading-relaxed text-[#51495B]">{DELIVERY_POLICY} El costo del envío aparece en el carrito antes de pagar.</p>
+            </div>
+            <div className="rounded-2xl border border-[#E7E2EA] bg-[#F8F7FA] p-5 sm:p-6">
+              <div className="flex items-center gap-2 text-[#5B2A78]"><MessageCircle className="h-5 w-5" /><h2 className="text-base font-bold text-[#201927]">Devoluciones sin dudas</h2></div>
+              <p className="mt-2 text-sm leading-relaxed text-[#51495B]">{RETURN_POLICY}</p>
+              <a href={`https://wa.me/${cleanWhatsAppPhone}?text=${encodeURIComponent('Hola Tragoo Check. Quiero consultar una devolución. Mi folio es: ')}`} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex text-sm font-semibold text-[#5B2A78] underline underline-offset-2">Solicitar devolución por WhatsApp</a>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ SECTION */}
         <section
           id="preguntas"
@@ -1334,7 +1350,7 @@ export default function App() {
                     ? `Agrega tus productos al carrito, revisa el total y el envío y paga con tarjeta en el checkout seguro de Stripe. Después puedes enviar el folio por WhatsApp para coordinar el envío.`
                     : `Agrega tus productos al carrito y revisa el total y el envío. Escríbenos por WhatsApp para solicitar un link de pago con tarjeta.`
                   : idx === 2
-                    ? `El envío cuesta $99 MXN cuando el pedido no alcanza el mínimo de envío gratis. Durante El Buen Fin (13 al 17 de noviembre de 2026), el envío es gratis desde $799 MXN; fuera de esas fechas, desde $899 MXN. El monto y el método de envío se muestran antes de pagar.`
+                    ? `El envío cuesta $99 MXN cuando el pedido no alcanza el mínimo de envío gratis. Durante El Buen Fin (13 al 17 de noviembre de 2026), el envío es gratis desde $799 MXN; fuera de esas fechas, desde $899 MXN. ${DELIVERY_POLICY} El monto y el método de envío se muestran antes de pagar.`
                   : faq.answer;
                 return (
                   <div key={idx} className="py-5">
@@ -1427,7 +1443,7 @@ export default function App() {
               </div>
               <p className="text-xs text-[#665D70] leading-relaxed">
               Compra en línea o por WhatsApp 479 229 3687. Pedidos menores a ${freeShippingThreshold.toLocaleString('es-MX')} MXN pagan $99 MXN de
-                envío; envío gratis en compras desde ${freeShippingThreshold.toLocaleString('es-MX')} MXN.
+                envío; envío gratis en compras desde ${freeShippingThreshold.toLocaleString('es-MX')} MXN. Entrega estimada: {DELIVERY_ESTIMATE} tras confirmar el pago. <a href="#envios-devoluciones" className="font-semibold text-[#5B2A78] underline underline-offset-2">Envíos y devoluciones</a>.
               </p>
             </div>
           </div>
