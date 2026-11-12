@@ -59,7 +59,7 @@ import braceletGroupImage from '../assets/images/tragoo-pulseras-grupo-cinco-cle
 import braceletRefillsImage from '../assets/images/tragoo-repuestos-pulseras-clean.webp';
 import testingStrawsImage from '../assets/images/tragoo-popotes-prueba-clean.webp';
 import cupCoverImage from '../assets/images/tragoo-protector-reusable-clean.webp';
-import cupCoverLedImage from '../assets/images/tragoo-protector-led-clean.webp';
+import cupCoverLedImage from '../assets/images/tragoo-protector-led-logo-clean.png';
 import heartBraceletImage from '../assets/images/tragoo-pulsera-corazon-clean.webp';
 import nailStickers30Image from '../assets/images/tragoo-stickers-corazon-30-clean.webp';
 import safeGlowSetImage from '../assets/images/tragoo-safeglow-set-white.webp';
@@ -636,15 +636,15 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     idealFor: 'Conciertos, bares, festivales y reuniones.', stockCount: null,
   },
   {
-    id: 'protector-vasos-led', category: 'individual', name: 'Protector para Vasos con Luz LED 360°',
+    id: 'protector-vasos-led', category: 'individual', name: 'Cubrevasos Tragoo Check con Luz LED 360°',
     subtitle: 'Cubierta elástica Tragoo Check con iluminación LED alrededor del vaso. Incluye tres modos de luz y batería recargable por USB-C.',
-    kicker: 'LED 360° · 3 modos · Recargable', price: 249, unitPriceNumeric: 249,
+    kicker: 'Nuevo · LED 360° · Recargable', price: 249, unitPriceNumeric: 249,
     unitPriceLabel: '$249 MXN por protector LED', kitEquivalentCount: 0,
     image: cupCoverLedImage,
-    gallery: [{ src: cupCoverLedImage, alt: 'Protector de tela Tragoo Check con anillo LED y cable USB-C sobre fondo blanco' }],
+    gallery: [{ src: cupCoverLedImage, alt: 'Cubrevasos negro con logo Tragoo Check, anillo de luz LED y cable USB-C sobre fondo blanco' }],
     contentsSummary: '1 protector con LED 360° · Cable USB-C', substancesDetected: '', reactionTime: '',
     includedItems: ['Iluminación LED de 360° con tres modos', 'Batería recargable mediante USB-C', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'],
-    idealFor: 'Eventos nocturnos, conciertos y reuniones.', stockCount: null,
+    idealFor: 'Eventos nocturnos, conciertos y reuniones.', stockCount: null, featured: true,
   },
   {
     id: 'pulsera-corazon', category: 'individual', name: 'Pulsera Detectora con Charm Corazón',

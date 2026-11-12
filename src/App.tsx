@@ -491,6 +491,11 @@ export default function App() {
                   </button>
                   <a href="#kits" className="inline-flex items-center justify-center rounded-xl border border-[#DCD3E2] bg-white px-5 py-3.5 text-sm font-semibold text-[#201927] hover:bg-[#F4F1F6]">Ver todos los productos</a>
                 </div>
+                {isInstagramLanding && !socialProduct && (
+                  <a href="/comprar?producto=protector-vasos-led" className="inline-flex items-center gap-2 text-sm font-semibold text-[#5B2A78] hover:underline">
+                    Nuevo: Cubrevasos Tragoo Check con Luz LED 360° · $249 MXN <ArrowRight className="h-4 w-4" />
+                  </a>
+                )}
                 <p className="text-xs text-[#51495B]">Pago con tarjeta procesado por Stripe · Atención por WhatsApp · El total se confirma antes de pagar.</p>
               </div>
               <div className="order-1 overflow-hidden rounded-3xl border border-[#E3DAE8] bg-white p-3 shadow-sm md:order-2">
