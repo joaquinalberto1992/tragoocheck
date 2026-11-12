@@ -96,7 +96,7 @@ export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [heroView, setHeroView] = useState<
     'video' | 'empaque' | 'squad'
-  >('video');
+  >('empaque');
   const [catalogFilter, setCatalogFilter] = useState<
     'all' | 'individual' | 'promocion' | 'accesorios' | 'navidad'
   >(isInstagramLanding ? 'individual' : 'all');
@@ -121,13 +121,6 @@ export default function App() {
     const interval = window.setInterval(() => setPromotionNow(Date.now()), 1000);
     return () => window.clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    if (!isInstagramLanding) return;
-    window.requestAnimationFrame(() => {
-      document.getElementById('kits')?.scrollIntoView({ block: 'start' });
-    });
-  }, [isInstagramLanding]);
 
   useEffect(() => {
     fetch('/api/config')
@@ -461,7 +454,46 @@ export default function App() {
 
       {/* Main Content */}
       <main className="flex-1">
+        {isInstagramLanding && (
+          <section className="border-b border-[#E8E4EB] bg-[#FBFAFC] py-8 sm:py-12">
+            <div className="mx-auto grid max-w-[1060px] items-center gap-6 px-4 sm:px-6 md:grid-cols-2 md:gap-10">
+              <div className="order-2 space-y-5 md:order-1">
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#5B2A78]">Llegaste desde @tragoocheck · Tienda oficial</p>
+                <h1 className="font-display text-3xl font-extrabold leading-tight tracking-tight text-[#201927] sm:text-4xl">Tu kit para la próxima salida, con precio claro desde el inicio.</h1>
+                <p className="text-sm leading-relaxed text-[#51495B]">El Kit Noche Completa incluye 5 tiras, 10 stickers para uñas y un estuche llavero. Revisa el contenido y las instrucciones antes de elegir. Compra sin crear cuenta.</p>
+                <div className="rounded-2xl border border-[#E3DAE8] bg-white p-4">
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="font-semibold text-[#201927]">Kit Noche Completa</span>
+                    <span className="text-xl font-extrabold text-[#201927]">$449 <span className="text-xs font-medium">MXN</span></span>
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-[#51495B]">Envío $99 MXN para este kit. Entrega estimada: {DELIVERY_ESTIMATE} desde la confirmación del pago.</p>
+                  {isNovemberPromotionActive && !isBuenFinPromotionActive && (
+                    <p className="mt-2 text-xs font-semibold text-[#466B00]">Hoy: código HOY10 · 10% de descuento desde $449 MXN. Se aplica al elegir este kit aquí.</p>
+                  )}
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (isNovemberPromotionActive && !isBuenFinPromotionActive) setSelectedCouponCode('HOY10');
+                      handleBuyNow(PRODUCT_KITS[0]);
+                    }}
+                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#A3E635] px-5 py-3.5 text-sm font-bold text-[#0B0910] hover:bg-[#B4E75B]"
+                  >
+                    Elegir kit y ver total <ArrowRight className="h-4 w-4" />
+                  </button>
+                  <a href="#kits" className="inline-flex items-center justify-center rounded-xl border border-[#DCD3E2] bg-white px-5 py-3.5 text-sm font-semibold text-[#201927] hover:bg-[#F4F1F6]">Ver todos los productos</a>
+                </div>
+                <p className="text-xs text-[#51495B]">Pago con tarjeta procesado por Stripe · Atención por WhatsApp · El total se confirma antes de pagar.</p>
+              </div>
+              <div className="order-1 overflow-hidden rounded-3xl border border-[#E3DAE8] bg-white p-3 shadow-sm md:order-2">
+                <img src={HERO_PRODUCT_IMAGE} alt="Empaque Tragoo Check Kit Noche Completa y estuche llavero" className="aspect-square w-full object-contain" />
+              </div>
+            </div>
+          </section>
+        )}
         {/* HERO SECTION */}
+        {!isInstagramLanding && (
         <section className="py-6 sm:py-8 md:py-14">
           <div className="max-w-[1160px] mx-auto px-4 sm:px-6 space-y-6 sm:space-y-8">
             {/* 5-6 Second Persuasive Women's Slogan Rotator */}
@@ -598,18 +630,8 @@ export default function App() {
                       src={activeHeroImage}
                       alt="Empaque oficial Tragoo Check Kit Noche Completa con llavero mini-tumbler"
                       referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
-                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4 sm:p-5">
-                      <div className="flex items-center justify-between text-xs text-[#466B00] font-mono">
-                        <span>
-                          {heroView === 'empaque'
-                            ? 'KIT NOCHE COMPLETA · BOLSA DOY-PACK + LLAVERO'
-                            : 'PACK SQUAD 5X · 5 BOLSAS + 5 LLAVEROS'}
-                        </span>
-                        <span>@TRAGOOCHECK</span>
-                      </div>
-                    </div>
                   </div>
                 )}
 
@@ -730,6 +752,7 @@ export default function App() {
             </div>
           </div>
         </section>
+        )}
 
         {/* ACTIVE PROMOTIONS & COUPONS BAR */}
         <section id="promociones" className="py-12 border-t border-[#E8E4EB] bg-[#F8F7FA]">
