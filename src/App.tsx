@@ -234,6 +234,13 @@ export default function App() {
     setIsCheckoutOpen(true);
   };
 
+  const handleBuyStarterKit = () => {
+    if (promotionNow >= NOVEMBER_PROMOTION_START && promotionNow < NOVEMBER_PROMOTION_END) {
+      setSelectedCouponCode('HOY10');
+    }
+    handleBuyNow(PRODUCT_KITS[0]);
+  };
+
   const handleUpdateQuantity = (productId: string, delta: number) => {
     setCart((prev) =>
       prev
@@ -467,17 +474,14 @@ export default function App() {
                     <span className="text-xl font-extrabold text-[#201927]">$449 <span className="text-xs font-medium">MXN</span></span>
                   </div>
                   <p className="mt-1 text-xs leading-relaxed text-[#51495B]">Envío $99 MXN para este kit. Entrega estimada: {DELIVERY_ESTIMATE} desde la confirmación del pago.</p>
-                  {isNovemberPromotionActive && !isBuenFinPromotionActive && (
-                    <p className="mt-2 text-xs font-semibold text-[#466B00]">Hoy: código HOY10 · 10% de descuento desde $449 MXN. Se aplica al elegir este kit aquí.</p>
+                  {isNovemberPromotionActive && (
+                    <p className="mt-2 text-xs font-semibold text-[#466B00]">Código HOY10 · 10% de descuento desde $449 MXN. Se aplica al elegir este kit aquí.</p>
                   )}
                 </div>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <button
                     type="button"
-                    onClick={() => {
-                      if (isNovemberPromotionActive && !isBuenFinPromotionActive) setSelectedCouponCode('HOY10');
-                      handleBuyNow(PRODUCT_KITS[0]);
-                    }}
+                    onClick={handleBuyStarterKit}
                     className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#A3E635] px-5 py-3.5 text-sm font-bold text-[#0B0910] hover:bg-[#B4E75B]"
                   >
                     Elegir kit y ver total <ArrowRight className="h-4 w-4" />
@@ -554,7 +558,7 @@ export default function App() {
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                     <button
                       type="button"
-                      onClick={() => handleBuyNow(PRODUCT_KITS[0])}
+                      onClick={handleBuyStarterKit}
                       className="inline-flex items-center justify-center gap-2.5 px-6 py-3.5 rounded-xl bg-[#A3E635] hover:bg-[#B4E75B] text-[#0B0910] font-bold text-sm transition-colors cursor-pointer whitespace-nowrap shrink-0 shadow-lg shadow-[#A3E635]/10"
                     >
                       <CreditCard className="w-4 h-4 shrink-0" />
@@ -622,7 +626,7 @@ export default function App() {
                     onVideoUploaded={(newUrl) =>
                       setMerchantConfig((prev) => ({ ...prev, videoUrl: newUrl }))
                     }
-                    onBuyKit={() => handleBuyNow(PRODUCT_KITS[0])}
+                    onBuyKit={handleBuyStarterKit}
                   />
                 ) : (
                   <div className="relative flex-1 min-h-[320px] sm:min-h-[360px] rounded-2xl overflow-hidden border border-[#E7E2EA] bg-white flex flex-col justify-end">
