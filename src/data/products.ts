@@ -125,7 +125,7 @@ export const PROMO_COUPONS: PromoCoupon[] = [
     discountPercent: 12,
     minPurchase: 799,
     description:
-      'Oferta exclusiva del 13 al 17 de noviembre de 2026: 12% de descuento desde $799 MXN y envío gratis desde $799 MXN. El Pack Dúo de $799 queda en $703.12 MXN con este código.',
+      'Oferta exclusiva del 13 al 17 de noviembre de 2026: 12% de descuento desde $799 MXN y envío gratis desde $399 MXN en productos antes de descuentos. El Pack Dúo de $799 queda en $703.12 MXN con este código.',
     startsAt: BUEN_FIN_COUPON_START,
     expiresAt: BUEN_FIN_COUPON_END,
   },

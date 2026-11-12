@@ -115,7 +115,7 @@ export const BuenFinCountdown: React.FC = () => {
                 </span>
                 <span className="inline-flex items-center gap-1.5">
                   <Truck aria-hidden="true" className="h-3.5 w-3.5 text-[#466B00]" />
-                  Envío gratis desde $799
+                  Envío gratis desde $399
                 </span>
                 <span className="inline-flex items-center gap-1.5 font-semibold text-[#201927]">
                   Pack Dúo: $799 → $703.12

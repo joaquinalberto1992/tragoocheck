@@ -408,9 +408,9 @@ export default function App() {
         <a href="#buen-fin" aria-label="Ver cuenta regresiva y promociones para El Buen Fin" className="block border-b border-[#E7DDEE] bg-[#F7F2FA] px-4 py-2.5 text-center text-xs sm:text-sm text-[#3A2845] hover:bg-[#F1EAF6]">
           <span className="mr-2 inline-flex items-center gap-1.5 rounded-full bg-[#5B2A78] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-wide text-white">El Buen Fin · 13–17 nov</span>
           {isBuenFinPromotionActive ? (
-            <span className="font-semibold">12% con BUENFIN12 desde $799 · Pack Dúo $703.12 · Envío gratis desde $799</span>
+            <span className="font-semibold">12% con BUENFIN12 desde $799 · Pack Dúo $703.12 · Envío gratis desde $399 en productos</span>
           ) : (
-            <span className="font-semibold">Del 13 al 17: 12% con BUENFIN12 desde $799 · Envío gratis desde $799</span>
+            <span className="font-semibold">Del 13 al 17: 12% con BUENFIN12 desde $799 · Envío gratis desde $399 en productos</span>
           )}
         </a>
       ) : isNovemberPromotionActive ? (
@@ -1001,7 +1001,7 @@ export default function App() {
                         {isBuenFinPromotionActive && kit.id === 'pack-amigas-2x'
                           ? '12% adicional con BUENFIN12 · $703.12 + envío gratis'
                           : isBuenFinPromotionActive
-                            ? kit.kicker.replaceAll('$899', '$799')
+                            ? kit.kicker.replaceAll('$899', '$399')
                             : kit.kicker}
                       </div>
 
@@ -1037,7 +1037,7 @@ export default function App() {
                         {isBuenFinPromotionActive && kit.id === 'pack-amigas-2x'
                           ? 'Dos Kits Noche Completa con sus 2 llaveros mini-tumbler Tragoo Check. Con BUENFIN12 queda en $703.12 MXN y recibe envío gratis del 13 al 17 de noviembre.'
                           : isBuenFinPromotionActive
-                            ? kit.subtitle.replaceAll('$899', '$799')
+                            ? kit.subtitle.replaceAll('$899', '$399')
                             : kit.subtitle}
                       </p>
                       {kit.substancesDetected && (
@@ -1380,7 +1380,7 @@ export default function App() {
                     ? `Agrega tus productos al carrito, revisa el total y el envío y paga con tarjeta en el checkout seguro de Stripe. Después puedes enviar el folio por WhatsApp para coordinar el envío.`
                     : `Agrega tus productos al carrito y revisa el total y el envío. Escríbenos por WhatsApp para solicitar un link de pago con tarjeta.`
                   : idx === 2
-                    ? `El envío cuesta $99 MXN cuando el pedido no alcanza el mínimo de envío gratis. Durante El Buen Fin (13 al 17 de noviembre de 2026), el envío es gratis desde $799 MXN; fuera de esas fechas, desde $899 MXN. ${DELIVERY_POLICY} El monto y el método de envío se muestran antes de pagar.`
+                    ? `El envío cuesta $99 MXN cuando el pedido no alcanza el mínimo de envío gratis. Durante El Buen Fin (13 al 17 de noviembre de 2026), el envío es gratis desde $399 MXN en productos antes de descuentos; fuera de esas fechas, desde $899 MXN. ${DELIVERY_POLICY} El monto y el método de envío se muestran antes de pagar.`
                   : faq.answer;
                 return (
                   <div key={idx} className="py-5">

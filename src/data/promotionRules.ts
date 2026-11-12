@@ -5,7 +5,7 @@ export const BUEN_FIN_END = Date.parse('2026-11-18T06:00:00.000Z');
 export const NOVEMBER_PROMOTION_END = Date.parse('2026-12-01T06:00:00.000Z');
 
 export const REGULAR_FREE_SHIPPING_THRESHOLD = 899;
-export const BUEN_FIN_FREE_SHIPPING_THRESHOLD = 799;
+export const BUEN_FIN_FREE_SHIPPING_THRESHOLD = 399;
 
 export function isBuenFinActive(now = Date.now()): boolean {
   return now >= BUEN_FIN_START && now < BUEN_FIN_END;
