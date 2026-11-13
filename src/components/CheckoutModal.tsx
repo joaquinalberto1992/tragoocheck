@@ -321,7 +321,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       ...(order.couponDiscount
         ? [`• Cupón ${order.couponCode}: -$${order.couponDiscount.toLocaleString('es-MX')} MXN`]
         : []),
-      `• Envío Express: ${
+      `• Envío: ${
         order.shipping === 0
           ? `GRATIS (Pedido >= $${effectiveThreshold.toLocaleString('es-MX')} MXN)`
           : `$${order.shipping} MXN`
@@ -572,7 +572,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         ? 'los datos para realizar la transferencia y recibir el comprobante'
                         : 'el link de pago seguro con tarjeta'}
                   </strong>{' '}
-                  y tu guía de envío express.
+                  y tu guía de envío.
                 </p>
 
                 <div className="pt-1 space-y-2.5">
@@ -640,7 +640,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   </div>
                 ))}
                 <div className="flex justify-between text-[#625969]">
-                  <span>Envío Express</span>
+                  <span>Envío</span>
                   <span className="font-mono">
                     {confirmedOrder.shipping === 0
                       ? 'GRATIS'
@@ -689,14 +689,14 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
           ) : (
             /* Cart, payment method, and delivery details */
             <>
-              {/* Strict $899 MXN Free Shipping Banner */}
+              {/* Free shipping threshold from the active promotion rules */}
               <div className="p-3.5 rounded-xl bg-white border border-[#E7E2EA] space-y-2">
                 <div className="flex items-center gap-2.5 text-xs">
                   <Truck className="w-4 h-4 text-[#466B00] shrink-0" />
                   {qualifiesFreeShipping ? (
                     <span className="text-[#201927] font-medium">
                       ¡Pedido de ${effectiveThreshold} MXN o más! Tienes{' '}
-                      <strong className="text-[#466B00]">Envío Express Gratis</strong>.
+                      <strong className="text-[#466B00]">Envío Gratis</strong>.
                     </span>
                   ) : (
                     <span className="text-[#51495B]">
@@ -877,7 +877,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     </div>
                     <div className="text-[#625969] mt-0.5">
                       Con este agregado llegas al mínimo de ${effectiveThreshold.toLocaleString('es-MX')} para tener{' '}
-                      <strong className="text-[#201927]">Envío Express Gratis</strong>.
+                      <strong className="text-[#201927]">Envío Gratis</strong>.
                     </div>
                   </div>
                   <button
@@ -1139,7 +1139,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 </div>
               )}
               <div className="flex justify-between text-[#625969]">
-                <span>Envío Express Discreto</span>
+                <span>Envío</span>
                 <span className="font-mono text-[#201927]">
                   {shipping === 0 ? (
                     <strong className="text-[#466B00]">GRATIS (≥${effectiveThreshold.toLocaleString('es-MX')})</strong>

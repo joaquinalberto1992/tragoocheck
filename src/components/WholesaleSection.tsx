@@ -14,6 +14,7 @@ import {
   WHOLESALE_MASTER_IMAGE,
   ProductKit,
 } from '../data/products';
+import { getBuenFinFreeShippingThreshold } from '../data/promotionRules';
 
 interface WholesaleSectionProps {
   onBuyWholesaleKit: (kit: ProductKit) => void;
@@ -75,13 +76,14 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
   const totalRetailValue = baseRetailPrice * calcUnits;
   const estimatedProfit = totalRetailValue - totalInvestment;
   const includedDisplays = Math.max(1, Math.floor(calcUnits / 30));
+  const freeShippingThreshold = getBuenFinFreeShippingThreshold();
 
   const handleAddCustomLotToCheckout = () => {
     const customWholesaleProduct: ProductKit = {
       id: `lote-mayoreo-${calcProductType}-${calcUnits}`,
       category: 'mayoreo',
       name: `Lote Mayorista: ${calcUnits}x ${productTitle}`,
-      subtitle: `Pedido mayorista (${businessType}) a $${wholesaleUnitCost} MXN c/u con ${includedDisplays} exhibidor(es) y Envío Asegurado Gratis.`,
+      subtitle: `Pedido mayorista (${businessType}) a $${wholesaleUnitCost} MXN c/u con ${includedDisplays} exhibidor(es). El envío se calcula según destino y se muestra antes del pago.`,
       kicker: `Mayoreo Personalizado · ${calcUnits} unidades (-${discountPercent}%)`,
       price: totalInvestment,
       compareAtPrice: totalRetailValue,
@@ -89,13 +91,13 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
       unitPriceLabel: `$${wholesaleUnitCost} MXN por unidad`,
       kitEquivalentCount: calcUnits,
       image: calcUnits >= 60 ? WHOLESALE_MASTER_IMAGE : WHOLESALE_BOX_IMAGE,
-      contentsSummary: `${calcUnits} unidades de ${productTitle} · ${includedDisplays} Exhibidor(es) · Envío Gratis`,
-      substancesDetected: 'Cobertura certificada según formato seleccionado',
-      reactionTime: '10 a 15 segundos',
+      contentsSummary: `${calcUnits} unidades de ${productTitle} · ${includedDisplays} Exhibidor(es)`,
+      substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+      reactionTime: 'Cada formato incluido tiene su propio instructivo.',
       includedItems: [
         `${calcUnits} paquetes individuales sellados de ${productTitle}`,
         `${includedDisplays} Caja(s) Exhibidora(s) negra mate oficial Tragoo Check`,
-        'Envío Express Asegurado sin costo (por superar $899 MXN)',
+        'El envío y cualquier promoción vigente se muestran en el carrito antes del pago',
       ],
       idealFor: businessType,
       stockCount: 20,
@@ -149,20 +151,20 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
               <span>Escala Oficial de Precio Garantizado por Kit Noche Completa (Público: $449 MXN)</span>
             </div>
             <span className="text-[11px] text-[#625969]">
-              A mayor volumen, mejor precio garantizado + Envío Gratis en todos los paquetes ≥ $899 MXN
+              A mayor volumen, mejor precio garantizado · Envío gratis desde $${freeShippingThreshold.toLocaleString('es-MX')} MXN en productos
             </span>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 text-center">
             {[
-              { qty: '1 pza', unit: '$449', disc: 'Público', ship: '+$99 envío' },
-              { qty: '2 pzas', unit: '$399.50', disc: '-11%', ship: '+$99 envío' },
-              { qty: '3 pzas', unit: '$375', disc: '-16%', ship: 'Envío Gratis' },
-              { qty: '5 pzas', unit: '$349', disc: '-22%', ship: 'Envío Gratis' },
-              { qty: '15 pzas', unit: '$290', disc: '-35%', ship: 'Mayoreo N1' },
-              { qty: '30 pzas', unit: '$260', disc: '-42%', ship: '+1 Exhibidor' },
-              { qty: '60–120', unit: '$230–$205', disc: '-54%', ship: 'Master Box' },
-              { qty: '250–500', unit: '$185–$165', disc: '-63%', ship: 'Socio Mega' },
+              { qty: '1 pza', unit: '$449', disc: 'Público', orderTotal: 449, extra: 'Kit individual' },
+              { qty: '2 pzas', unit: '$399.50', disc: '-11%', orderTotal: 799, extra: 'Pack Dúo' },
+              { qty: '3 pzas', unit: '$375', disc: '-16%', orderTotal: 1125, extra: 'Pack Trío' },
+              { qty: '5 pzas', unit: '$349', disc: '-22%', orderTotal: 1745, extra: 'Pack grupo' },
+              { qty: '15 pzas', unit: '$290', disc: '-35%', orderTotal: 4350, extra: 'Mayoreo N1' },
+              { qty: '30 pzas', unit: '$260', disc: '-42%', orderTotal: 7800, extra: '+1 Exhibidor' },
+              { qty: '60–120', unit: '$230–$205', disc: '-54%', orderTotal: 13800, extra: 'Master Box' },
+              { qty: '250–500', unit: '$185–$165', disc: '-63%', orderTotal: 46250, extra: 'Socio Mega' },
             ].map((tier, idx) => (
               <div
                 key={idx}
@@ -177,7 +179,10 @@ export const WholesaleSection: React.FC<WholesaleSectionProps> = ({
                   {tier.unit}
                 </div>
                 <div className="font-mono text-[10px] font-bold text-[#466B00] mt-0.5">
-                  {tier.disc} · {tier.ship}
+                  {tier.disc}
+                </div>
+                <div className="text-[10px] text-[#625969] font-semibold mt-1.5">
+                  {tier.orderTotal >= freeShippingThreshold ? 'Envío Gratis' : 'Envío en carrito'} · {tier.extra}
                 </div>
               </div>
             ))}

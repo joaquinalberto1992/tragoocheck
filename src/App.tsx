@@ -32,7 +32,7 @@ import {
   CHRISTMAS_PRODUCTS,
   ALL_PRODUCTS,
   getVisibleCoupons,
-  HERO_PRODUCT_IMAGE,
+  HERO_LIFESTYLE_IMAGE,
   KIT_STICKERS_IMAGE,
   INSTAGRAM_URL,
   INSTAGRAM_HANDLE,
@@ -63,7 +63,6 @@ import {
   WomenSloganBanner,
   HeroVideoPlayer,
 } from './components/VideoStoryShowcase';
-import squadPackImage from './assets/images/tragoo-pack-kit-noche-completa-5-clean.webp';
 
 const INTERNAL_TRAFFIC_KEY = 'tc_internal_traffic';
 
@@ -290,12 +289,9 @@ export default function App() {
       ? [...PROMO_BUNDLES, ...BRACELET_PRODUCTS.filter((product) => product.category === 'promocion')]
       : [...PRODUCT_KITS, ...PROMO_BUNDLES, ...BRACELET_PRODUCTS, ...CHRISTMAS_PRODUCTS];
 
-  const activeHeroImage =
-    heroView === 'empaque'
-      ? HERO_PRODUCT_IMAGE
-      : heroView === 'squad'
-      ? squadPackImage
-      : HERO_PRODUCT_IMAGE;
+  const heroVisualProduct = heroView === 'squad'
+    ? PROMO_BUNDLES.find((product) => product.id === 'pack-squad-5x') || PRODUCT_KITS[0]
+    : PRODUCT_KITS[0];
 
   const activeInstagramUrl = merchantConfig.instagramUrl || INSTAGRAM_URL;
   const cleanWhatsAppPhone = normalizeWhatsAppPhone(
@@ -499,7 +495,7 @@ export default function App() {
                 <p className="text-xs text-[#51495B]">Pago con tarjeta procesado por Stripe · Atención por WhatsApp · El total se confirma antes de pagar.</p>
               </div>
               <div className="order-1 overflow-hidden rounded-3xl border border-[#E3DAE8] bg-white p-3 shadow-sm md:order-2">
-                <img src={socialProduct?.image || HERO_PRODUCT_IMAGE} alt={socialProduct?.name || 'Empaque Tragoo Check Kit Noche Completa y estuche llavero'} className="aspect-square w-full object-contain" />
+                <ProductVisual product={socialProduct || PRODUCT_KITS[0]} />
               </div>
             </div>
           </section>
@@ -619,7 +615,7 @@ export default function App() {
                     partir de <strong className="text-[#466B00]">${freeShippingThreshold.toLocaleString('es-MX')} MXN</strong>{' '}
                     (Pack Trío 3x, Pack Squad 5x y todas las Cajas de Mayoreo) el{' '}
                     <strong className="text-[#466B00]">
-                      Envío Express Asegurado es GRATIS
+                      El envío es GRATIS
                     </strong>
                     . Entrega estimada: <strong className="text-[#201927]">{DELIVERY_ESTIMATE}</strong> desde la confirmación del pago.
                   </p>
@@ -638,12 +634,7 @@ export default function App() {
                   />
                 ) : (
                   <div className="relative flex-1 min-h-[320px] sm:min-h-[360px] rounded-2xl overflow-hidden border border-[#E7E2EA] bg-white flex flex-col justify-end">
-                    <img
-                      src={activeHeroImage}
-                      alt="Empaque oficial Tragoo Check Kit Noche Completa con llavero mini-tumbler"
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-contain"
-                    />
+                    <ProductVisual product={heroVisualProduct} layout="hero" />
                   </div>
                 )}
 
@@ -679,8 +670,8 @@ export default function App() {
                     }`}
                   >
                     <img
-                      src={HERO_PRODUCT_IMAGE}
-                      alt="Kit Noche Completa"
+                      src={HERO_LIFESTYLE_IMAGE}
+                      alt="Sticker corazón Tragoo Check junto a una bebida"
                       referrerPolicy="no-referrer"
                       className="w-9 h-9 rounded-lg object-cover shrink-0"
                     />
@@ -699,8 +690,8 @@ export default function App() {
                     }`}
                   >
                     <img
-                      src={squadPackImage}
-                      alt="Pack Squad 5x"
+                      src={HERO_LIFESTYLE_IMAGE}
+                      alt="Detalle de un sticker corazón Tragoo Check junto a una bebida"
                       referrerPolicy="no-referrer"
                       className="w-9 h-9 rounded-lg object-cover shrink-0"
                     />
@@ -1061,7 +1052,7 @@ export default function App() {
                         {kit.substancesDetected && (
                         <div>
                           <span className="text-[#665D70] block">
-                            Lectura de prueba:
+                            Indicaciones del formato:
                           </span>
                           <span className="text-[#51495B]">
                             {kit.substancesDetected}
@@ -1194,7 +1185,7 @@ export default function App() {
               <div className="lg:col-span-6 space-y-6">
                 <div className="space-y-1.5">
                   <div className="text-xs font-semibold text-[#466B00]">
-                    Formato real de la sticker para uñas
+                    Instrucciones para el sticker de uñas
                   </div>
                   <h2 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#201927]">
                     CÓMO APLICAR:
@@ -1205,7 +1196,7 @@ export default function App() {
                   {[
                     'Limpia y seca la superficie de tu uña.',
                     'Despega un sticker y colócalo en cualquier uña.',
-                    'Coloca una gota de tu bebida sobre el sticker y espera 10-15 segundos.',
+                    'Coloca una gota de tu bebida sobre el sticker y espera el tiempo indicado en el empaque de este formato.',
                     'Deja secar el sticker y revisa el cambio de color.',
                   ].map((stepText, idx) => (
                     <div

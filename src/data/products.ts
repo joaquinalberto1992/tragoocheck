@@ -20,6 +20,7 @@ export interface ProductKit {
   kitEquivalentCount: number;
   image: string;
   gallery?: { src: string; alt: string }[];
+  imageBadge?: string;
   contentsSummary: string;
   substancesDetected: string;
   reactionTime: string;
@@ -40,19 +41,11 @@ export interface PromoCoupon {
 }
 
 // Import assets through Vite so their URLs point to the built files in `dist`.
-import heroProductImage from '../assets/images/tragoo-kit-noche-completa-logo-clean.webp';
 import heroLifestyleImage from '../assets/images/hero_drink_test_1792021357545.jpg';
 import wholesaleBoxImage from '../assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg';
 import wholesaleMasterImage from '../assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg';
 import kitStickersImage from '../assets/images/tragoo-sticker-corazon-closeup-clean.webp';
 import kitStripsImage from '../assets/images/tragoo-kit-tiras-reactivas-clean.webp';
-import duoPackImage from '../assets/images/tragoo-pack-kit-noche-completa-2-clean.webp';
-import squadPackImage from '../assets/images/tragoo-pack-kit-noche-completa-5-clean.webp';
-import packKits3Image from '../assets/images/tragoo-pack-kits-3-clean.webp';
-import packKits4Image from '../assets/images/tragoo-pack-kits-4-clean.webp';
-import packKits6Image from '../assets/images/tragoo-pack-kits-6-clean.webp';
-import packKits8Image from '../assets/images/tragoo-pack-kits-8-clean.webp';
-import packKits10Image from '../assets/images/tragoo-pack-kits-10-clean.webp';
 import braceletDetailImage from '../assets/images/tragoo-pulsera-individual-clean.webp';
 import braceletTrioImage from '../assets/images/tragoo-pulseras-trio-clean.webp';
 import braceletGroupImage from '../assets/images/tragoo-pulseras-grupo-cinco-clean.webp';
@@ -70,9 +63,9 @@ import sosFamilyGpsImage from '../assets/images/tragoo-sos-family-gps-pack-clean
 import christmasSmartCupImage from '../assets/images/tragoo-navidad-vaso-led-individual.png';
 import christmasCupSizesImage from '../assets/images/tragoo-navidad-vasos-led-colores.png';
 
-export const HERO_PRODUCT_IMAGE = heroProductImage;
 export const HERO_LIFESTYLE_IMAGE = heroLifestyleImage;
 export const KIT_STICKERS_IMAGE = kitStickersImage;
+export const KIT_STRIPS_IMAGE = kitStripsImage;
 export const WHOLESALE_BOX_IMAGE = wholesaleBoxImage;
 export const WHOLESALE_MASTER_IMAGE = wholesaleMasterImage;
 
@@ -102,6 +95,7 @@ export const CHRISTMAS_PRODUCTS: ProductKit[] = [
     unitPriceNumeric: price,
     unitPriceLabel: `Desde 1 pieza · 5% menos desde 2 vasos`, kitEquivalentCount: 0,
     image: christmasCupSizesImage,
+    imageBadge: `Tamaño elegido: ${size} ml`,
     gallery: [{ src: christmasCupSizesImage, alt: 'Vasos LED navideños Tragoo Check en cinco tamaños y colores sobre fondo blanco' }],
     contentsSummary: `1 vaso LED reutilizable de ${size} ml con tapa y popote`,
     substancesDetected: '', reactionTime: '',
@@ -170,9 +164,9 @@ export function getVisibleCoupons(now = Date.now()): PromoCoupon[] {
 }
 
 // STRICTLY DECREASING UNIT PRICE PROGRESSION FOR KIT NOCHE COMPLETA:
-// 1 pieza: $449.00 c/u (+ $99 envío por ser < $899 MXN)
-// 2 piezas (Pack Dúo): $399.50 c/u ($799 total + $99 envío por ser < $899 MXN)
-// 3 piezas (Pack Trío): $375.00 c/u ($1,125 total · ENVÍO GRATIS por superar $899 MXN)
+// 1 pieza: $449.00 c/u (el envío se calcula en el carrito)
+// 2 piezas (Pack Dúo): $399.50 c/u ($799 total; el envío se calcula en el carrito)
+// 3 piezas (Pack Trío): $375.00 c/u ($1,125 total; envío según regla vigente)
 // 5 piezas (Pack Squad 5x): $349.00 c/u ($1,745 total · ENVÍO GRATIS)
 // 10 piezas (Pack VIP 10x): $319.00 c/u ($3,190 total · ENVÍO GRATIS)
 // 15 piezas (Mayoreo Nivel 1): $290.00 c/u ($4,350 total · ENVÍO GRATIS)
@@ -189,17 +183,18 @@ export const PRODUCT_KITS: ProductKit[] = [
     name: 'Kit Noche Completa (1 Pieza)',
     subtitle:
       'Tiras reactivas, stickers de uñas y estuche llavero mini-tumbler para llevarlo en la bolsa o con las llaves.',
-    kicker: 'Individual · +$99 envío (Envío gratis desde $899)',
+    kicker: 'Kit individual · envío calculado en el carrito',
     price: 449,
     compareAtPrice: 549,
     unitPriceNumeric: 449,
     unitPriceLabel: '$449.00 MXN por kit (1 pza)',
     kitEquivalentCount: 1,
-    image: HERO_PRODUCT_IMAGE,
+    image: heroLifestyleImage,
+    imageBadge: '5 tiras + 10 stickers',
     contentsSummary:
       '5 tiras multipanel · 10 stickers de uñas · 1 llavero mini-tumbler Tragoo Check',
-    substancesDetected: 'GHB, ketamina, escopolamina, cocaína y aminas adulterantes',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Cada formato incluido tiene su propio instructivo.',
     includedItems: [
       '10 stickers reactivos discretos para uñas (detección rápida de GHB)',
       '5 tiras reactivas de doble panel en bolsa doy-pack negra mate resellable',
@@ -216,16 +211,17 @@ export const PRODUCT_KITS: ProductKit[] = [
     name: 'Kit Stickers Para Uñas (10 pzas)',
     subtitle:
       '10 stickers pequeños en forma de corazón, diseñados para colocarse discretamente sobre una uña. Sigue las instrucciones incluidas.',
-    kicker: 'Individual · +$99 envío (Envío gratis desde $899)',
+    kicker: 'Kit individual · envío calculado en el carrito',
     price: 249,
     compareAtPrice: 299,
     unitPriceNumeric: 249,
     unitPriceLabel: '$24.90 MXN por sticker (10 pruebas)',
     kitEquivalentCount: 1,
     image: kitStickersImage,
+    imageBadge: '10 stickers',
     contentsSummary: '10 stickers adhesivos para uñas · Bolsa resellable Tragoo Check',
     substancesDetected: 'GHB (ácido gamma-hidroxibutírico)',
-    reactionTime: '10 a 15 segundos',
+    reactionTime: 'Sigue el tiempo impreso en el empaque de este producto.',
     includedItems: [
       '10 stickers pequeños en forma de corazón para uñas (un solo uso)',
       'Tarjeta negra impermeable portastickers + bolsa doy-pack Tragoo Check',
@@ -241,17 +237,18 @@ export const PRODUCT_KITS: ProductKit[] = [
     name: 'Kit Tiras Reactivas (5 pzas)',
     subtitle:
       '5 tiras reactivas multipanel en bolsa doy-pack negra mate resellable que cabe en cualquier cartera.',
-    kicker: 'Individual · +$99 envío (Envío gratis desde $899)',
+    kicker: 'Kit individual · envío calculado en el carrito',
     price: 299,
     compareAtPrice: 349,
     unitPriceNumeric: 299,
     unitPriceLabel: '$59.80 MXN por tira doble (5 pruebas)',
     kitEquivalentCount: 1,
     image: kitStripsImage,
+    imageBadge: '5 tiras',
     contentsSummary: '5 tiras reactivas multipanel · Empaque hermético Tragoo Check',
     substancesDetected:
-      'GHB, ketamina, escopolamina, cocaína y sustancias a base de aminas',
-    reactionTime: '15 segundos',
+      'Consulta la guía de interpretación incluida con este formato.',
+    reactionTime: 'Consulta el tiempo indicado en el empaque de este formato.',
     includedItems: [
       '5 tiras diagnósticas portátiles con doble almohadilla reactiva',
       'Bolsa doy-pack negra mate resellable con protección UV y antihumedad',
@@ -266,7 +263,7 @@ export const PRODUCT_KITS: ProductKit[] = [
     name: 'Kit Recarga Total (Refill 30 Pruebas)',
     subtitle:
       'Doble dotación de repuesto (20 Stickers + 10 Tiras) con reverso instructivo oficial para rellenar tu llavero Tragoo Check.',
-    kicker: 'Repuesto · +$99 envío (Envío gratis desde $899)',
+    kicker: 'Repuesto · envío calculado en el carrito',
     price: 549,
     compareAtPrice: 698,
     unitPriceNumeric: 274.5,
@@ -274,8 +271,8 @@ export const PRODUCT_KITS: ProductKit[] = [
     kitEquivalentCount: 2,
     image: kitStripsImage,
     contentsSummary: '10 tiras multipanel · 20 stickers de uñas (Refill sin llavero)',
-    substancesDetected: 'GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Cada formato incluido tiene su propio instructivo.',
     includedItems: [
       '2 bolsas resellables Tragoo Check con 5 tiras reactivas cada una (10 tiras)',
       '2 tarjetas con 10 stickers de uñas cada una (20 stickers)',
@@ -292,22 +289,21 @@ export const PROMO_BUNDLES: ProductKit[] = [
     category: 'promocion',
     name: 'Pack Dúo Noche Segura (2x Kits Completos)',
     subtitle:
-      'Dos Kits Noche Completa con sus 2 llaveros mini-tumbler Tragoo Check. Agrega $100 MXN más para envío gratis.',
-    kicker: '11% OFF por kit · Sale a $399.50 c/u (+ $99 envío)',
+      'Dos Kits Noche Completa con sus 2 llaveros mini-tumbler Tragoo Check. El costo de envío se calcula automáticamente en el carrito.',
+    kicker: '11% de ahorro · $399.50 por kit · envío según subtotal',
     price: 799,
     compareAtPrice: 898,
     unitPriceNumeric: 399.5,
     unitPriceLabel: '$399.50 MXN por kit (Ahorras $99)',
     kitEquivalentCount: 2,
-    image: duoPackImage,
+    image: heroLifestyleImage,
     contentsSummary: '10 tiras multipanel · 20 stickers de uñas · 2 llaveros mini-tumbler',
-    substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '2x bolsas doy-pack Tragoo Check con 5 tiras reactivas cada una (10 tiras)',
       '2x tarjetas con 10 stickers de uñas cada una (20 stickers)',
       '2x estuches llavero mini-tumbler Tragoo Check con mosquetón',
-      'Nota: Por ser menor a $899 MXN, suma 1 Kit Stickers para obtener Envío Gratis',
     ],
     idealFor: 'Salir en pareja de amigas o compartir con tu roomie.',
     stockCount: 18,
@@ -317,22 +313,21 @@ export const PROMO_BUNDLES: ProductKit[] = [
     category: 'promocion',
     name: 'Pack Trío Amigas & Festival (3x Kits Completos)',
     subtitle:
-      'Tres Kits Noche Completa con 3 llaveros mini-tumbler. Al superar $899 MXN ya incluye Envío Express Gratis.',
+      'Tres Kits Noche Completa con 3 llaveros mini-tumbler. El costo de envío se calcula automáticamente en el carrito.',
     kicker: '16.5% OFF por kit · Sale a $375 c/u + ENVÍO GRATIS',
     price: 1125,
     compareAtPrice: 1347,
     unitPriceNumeric: 375,
     unitPriceLabel: '$375.00 MXN por kit · Envío Gratis incluido',
     kitEquivalentCount: 3,
-    image: packKits3Image,
+    image: heroLifestyleImage,
     contentsSummary: '15 tiras multipanel · 30 stickers de uñas · 3 llaveros mini-tumbler',
-    substancesDetected: 'GHB, ketamina, escopolamina, cocaína y aminas adulterantes',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '3 Kits Noche Completa individuales listos para 3 amigas',
       '30 stickers micro-reactivos para uñas + 15 tiras reactivas multipanel',
       '3 estuches llavero mini-tumbler con mosquetón de seguridad',
-      'Envío Express Gratis incluido (por superar $899 MXN) + 5 stickers de regalo',
     ],
     idealFor: 'Trío de amigas, festivales de música, viajes a la playa y puentes.',
     stockCount: 15,
@@ -350,15 +345,14 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 349,
     unitPriceLabel: '$349.00 MXN por kit (Ahorras $500 + Envío Gratis)',
     kitEquivalentCount: 5,
-    image: squadPackImage,
+    image: heroLifestyleImage,
     contentsSummary: '25 tiras multipanel · 50 stickers de uñas · 5 llaveros mini-tumbler',
-    substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '5 Kits Noche Completa individuales listos para repartir en tu grupo',
       '50 stickers de uñas + 25 tiras reactivas + 5 llaveros mini-tumbler Tragoo Check',
-      '1 tarjeta extra de 10 stickers de regalo para el grupo',
-      'Envío Express Asegurado Gratis a todo México',
+      'Envío gratis al alcanzar el mínimo vigente mostrado en el carrito',
     ],
     idealFor: 'Grupos de amigas, graduaciones, viajes de generación y cumpleaños.',
     stockCount: 12,
@@ -375,15 +369,14 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 319,
     unitPriceLabel: '$319.00 MXN por kit (Ahorras $1,300 + Envío Gratis)',
     kitEquivalentCount: 10,
-    image: packKits10Image,
+    image: heroLifestyleImage,
     contentsSummary: '50 tiras multipanel · 100 stickers de uñas · 10 llaveros mini-tumbler',
-    substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '10 Kits Noche Completa con sus 10 llaveros mini-tumbler individuales',
       '100 stickers de uñas + 50 tiras reactivas en total',
-      '2 tarjetas extra de 10 stickers de regalo (20 stickers extra)',
-      'Envío Express Asegurado Gratis a cualquier ciudad de México',
+      'Envío gratis al alcanzar el mínimo vigente mostrado en el carrito',
     ],
     idealFor: 'Despedidas de soltera en playa, graduaciones y grupos grandes.',
     stockCount: 9,
@@ -414,9 +407,16 @@ for (const combination of combinations) {
     unitPriceNumeric: price / quantity,
     unitPriceLabel: `${(price / quantity).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} MXN por kit`,
     kitEquivalentCount: quantity,
-    image: quantity === 4 ? packKits4Image : quantity === 6 ? packKits6Image : packKits8Image,
-    contentsSummary: `${quantity * 5} tiras · ${quantity * 10} stickers · ${quantity} llaveros`,
-    includedItems: parts.flatMap(part => part.includedItems),
+    image: heroLifestyleImage,
+    contentsSummary: `${quantity * 5} tiras reactivas · ${quantity * 10} stickers para uñas · ${quantity} llaveros mini-tumbler`,
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Cada formato incluido tiene su propio instructivo.',
+    includedItems: [
+      `${quantity} Kits Noche Completa individuales`,
+      `${quantity * 5} tiras reactivas`,
+      `${quantity * 10} stickers para uñas`,
+      `${quantity} llaveros mini-tumbler Tragoo Check`,
+    ],
     idealFor: 'Grupos que quieren repartir un kit completo por persona.',
     stockCount: Math.min(...inventoryLimits), featured: false,
   });
@@ -435,15 +435,15 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 290,
     unitPriceLabel: '$290.00 MXN por kit (Precio público: $449)',
     kitEquivalentCount: 15,
-    image: WHOLESALE_BOX_IMAGE,
+    image: heroLifestyleImage,
     contentsSummary:
       '15 Kits Noche Completa (75 tiras · 150 stickers · 15 llaveros mini-tumbler)',
-    substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '15 Kits Noche Completa Tragoo Check sellados con su llavero mini-tumbler',
       'Venta al público: $6,735 MXN → Tu ganancia neta: $2,385 MXN (+55% ROI)',
-      'Envío Express Asegurado Gratis + Kit digital de videos para redes',
+      'Envío calculado según el destino; el monto se confirma antes del pago',
     ],
     idealFor: 'Emprendedoras, colectivas universitarias, wedding planners y boutiques.',
     stockCount: 10,
@@ -460,15 +460,15 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 260,
     unitPriceLabel: '$260.00 MXN por kit (Precio público: $449)',
     kitEquivalentCount: 30,
-    image: WHOLESALE_BOX_IMAGE,
+    image: heroLifestyleImage,
     contentsSummary: '30 Kits Noche Completa + 1 Caja Exhibidora Oficial Tragoo Check',
-    substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '30 Kits Noche Completa con bolsa doy-pack, llavero mini-tumbler y código QR',
       'Venta al público: $13,470 MXN → Tu ganancia neta: $5,670 MXN (+72% ROI)',
       '1 Caja Exhibidora negra mate oficial + Señalética de Barra Segura',
-      'Facturación CFDI inmediata y Envío Express Asegurado Gratis',
+      'Envío calculado según el destino; el monto se confirma antes del pago',
     ],
     idealFor: 'Bares, antros, restaurantes, hoteles, farmacias y universidades.',
     stockCount: 8,
@@ -486,15 +486,15 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 230,
     unitPriceLabel: '$230.00 MXN por kit (Precio público: $449)',
     kitEquivalentCount: 60,
-    image: WHOLESALE_MASTER_IMAGE,
+    image: heroLifestyleImage,
     contentsSummary: '60 Kits Noche Completa + 2 Exhibidores Oficiales Tragoo Check',
-    substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '60 Kits Noche Completa (300 tiras + 600 stickers + 60 llaveros mini-tumbler)',
       'Venta al público: $26,940 MXN → Tu ganancia neta: $13,140 MXN (+95% ROI)',
       '2 Cajas Exhibidoras oficiales Tragoo Check + Material POP',
-      'Facturación CFDI y Envío Express Asegurado Gratis',
+      'Envío calculado según el destino; el monto se confirma antes del pago',
     ],
     idealFor: 'Distribuidores regionales, cadenas de bares y grupos de entretenimiento.',
     stockCount: 6,
@@ -511,15 +511,15 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 205,
     unitPriceLabel: '$205.00 MXN por kit (Más del doble de retorno)',
     kitEquivalentCount: 120,
-    image: WHOLESALE_MASTER_IMAGE,
+    image: heroLifestyleImage,
     contentsSummary: '120 Kits Noche Completa + 4 Exhibidores Oficiales Tragoo Check',
-    substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '120 Kits Noche Completa (600 tiras + 1,200 stickers + 120 llaveros)',
       'Venta al público: $53,880 MXN → Tu ganancia neta: $29,280 MXN (+119% ROI)',
       '4 Cajas Exhibidoras de mostrador + Mención como Punto Oficial en @tragoocheck',
-      'Envío Asegurado VIP Gratis + Factura CFDI',
+      'Envío cotizado según destino antes del pago + Factura CFDI',
     ],
     idealFor: 'Festivales, cadenas de antros, universidades y distribuidores mayoristas.',
     stockCount: 5,
@@ -537,10 +537,10 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 185,
     unitPriceLabel: '$185.00 MXN por kit (Precio Distribuidor Estatal)',
     kitEquivalentCount: 250,
-    image: WHOLESALE_MASTER_IMAGE,
+    image: heroLifestyleImage,
     contentsSummary: '250 Kits Noche Completa + 8 Exhibidores Oficiales Tragoo Check',
-    substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '250 Kits Noche Completa (1,250 tiras + 2,500 stickers + 250 llaveros)',
       'Venta al público: $112,250 MXN → Tu ganancia neta: $66,000 MXN (+142% ROI)',
@@ -562,10 +562,10 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 165,
     unitPriceLabel: '$165.00 MXN por kit (Tarifa Mínima Nacional)',
     kitEquivalentCount: 500,
-    image: WHOLESALE_MASTER_IMAGE,
+    image: heroLifestyleImage,
     contentsSummary: '500 Kits Noche Completa + 15 Exhibidores Oficiales Tragoo Check',
-    substancesDetected: 'Panel completo: GHB, ketamina, escopolamina, cocaína y aminas',
-    reactionTime: '10 a 15 segundos',
+    substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
+    reactionTime: 'Consulta el instructivo de cada formato incluido.',
     includedItems: [
       '500 Kits Noche Completa (2,500 tiras + 5,000 stickers + 500 llaveros)',
       'Venta al público: $224,500 MXN → Tu ganancia neta: $142,000 MXN (+172% ROI)',
@@ -595,6 +595,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: 'SafeBag · Precio de lanzamiento', price: 1999, compareAtPrice: 2499,
     unitPriceNumeric: 1999, unitPriceLabel: '$1,999 MXN por bolsa', kitEquivalentCount: 0,
     image: safeBagImage,
+    imageBadge: '1 bolsa · 1 accesorio · tiras incluidas',
     gallery: [{ src: safeBagImage, alt: 'Bolsa SafeBag negra Tragoo Check con forro fucsia y accesorio colgante sobre fondo blanco' }],
     contentsSummary: '1 bolsa SafeBag negra · 1 accesorio colgante · tiras de prueba incluidas',
     substancesDetected: '', reactionTime: '',
@@ -607,6 +608,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: 'Alarma personal · Diseño portátil', price: 249,
     unitPriceNumeric: 249, unitPriceLabel: '$249 MXN por alarma', kitEquivalentCount: 0,
     image: personalAlarmImage,
+    imageBadge: '1 alarma · 1 correa',
     gallery: [{ src: personalAlarmImage, alt: 'Alarma personal naranja Tragoo Check con correa y aro metálico sobre fondo blanco' }],
     contentsSummary: '1 alarma personal naranja · 1 correa con aro metálico',
     substancesDetected: '', reactionTime: '',
@@ -641,6 +643,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: 'Nuevo · LED 360° · Recargable', price: 249, unitPriceNumeric: 249,
     unitPriceLabel: '$249 MXN por protector LED', kitEquivalentCount: 0,
     image: cupCoverLedImage,
+    imageBadge: '1 cubrevasos · cable USB-C',
     gallery: [{ src: cupCoverLedImage, alt: 'Cubrevasos negro con logo Tragoo Check, anillo de luz LED y cable USB-C sobre fondo blanco' }],
     contentsSummary: '1 protector con LED 360° · Cable USB-C', substancesDetected: '', reactionTime: '',
     includedItems: ['Iluminación LED de 360° con tres modos', 'Batería recargable mediante USB-C', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'],
@@ -652,6 +655,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '1 pulsera · 3 repuestos incluidos', price: 499, unitPriceNumeric: 499,
     unitPriceLabel: '$499 MXN · incluye 3 repuestos', kitEquivalentCount: 0,
     image: heartBraceletImage,
+    imageBadge: '1 pulsera · 3 repuestos',
     gallery: [{ src: heartBraceletImage, alt: 'Pulsera plateada con dije de corazón amarillo en su estuche, junto a tres repuestos' }],
     contentsSummary: '1 pulsera Tragoo Check · 3 stickers de repuesto', substancesDetected: '', reactionTime: '',
     includedItems: ['Pulsera plateada con charm de corazón', '3 stickers reactivos de repuesto', 'Probada con personas reales y evaluada en estudios propios de Tragoo Check'],
@@ -663,6 +667,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '10 popotes de prueba', price: 599, unitPriceNumeric: 59.9,
     unitPriceLabel: '$59.90 MXN por popote', kitEquivalentCount: 0,
     image: testingStrawsImage,
+    imageBadge: 'Paquete de 10',
     gallery: [{ src: testingStrawsImage, alt: 'Popotes de prueba Tragoo Check con indicadores de color; imagen representativa del producto' }],
     contentsSummary: '10 popotes de prueba Tragoo Check', substancesDetected: 'GHB', reactionTime: '10 a 15 segundos',
     includedItems: ['10 popotes de prueba Tragoo Check', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'], idealFor: 'Eventos y reuniones.', stockCount: null,
@@ -673,6 +678,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '20 popotes de prueba', price: 1499, unitPriceNumeric: 74.95,
     unitPriceLabel: '$74.95 MXN por popote', kitEquivalentCount: 0,
     image: testingStrawsImage,
+    imageBadge: 'Paquete de 20',
     gallery: [{ src: testingStrawsImage, alt: 'Popotes de prueba Tragoo Check con indicadores de color; imagen representativa del producto' }],
     contentsSummary: '20 popotes de prueba Tragoo Check', substancesDetected: 'GHB', reactionTime: '10 a 15 segundos',
     includedItems: ['20 popotes de prueba Tragoo Check', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'], idealFor: 'Compartir en eventos y reuniones.', stockCount: null,
@@ -683,6 +689,7 @@ export const BRACELET_PRODUCTS: ProductKit[] = [
     kicker: '30 popotes de prueba', price: 2299, unitPriceNumeric: 2299 / 30,
     unitPriceLabel: '$76.63 MXN por popote', kitEquivalentCount: 0,
     image: testingStrawsImage,
+    imageBadge: 'Paquete de 30',
     gallery: [{ src: testingStrawsImage, alt: 'Popotes de prueba Tragoo Check con indicadores de color; imagen representativa del producto' }],
     contentsSummary: '30 popotes de prueba Tragoo Check', substancesDetected: 'GHB', reactionTime: '10 a 15 segundos',
     includedItems: ['30 popotes de prueba Tragoo Check', 'Probado con personas reales y evaluado en estudios propios de Tragoo Check'], idealFor: 'Grupos y eventos.', stockCount: null,
@@ -748,6 +755,7 @@ export const FAMILY_PRODUCTS: ProductKit[] = [
     unitPriceLabel: '1 pulsera SOS Bluetooth · $499 MXN',
     kitEquivalentCount: 0,
     image: sosFamilyBluetoothImage,
+    imageBadge: '1 pulsera · cable y manual',
     gallery: [{ src: sosFamilyBluetoothImage, alt: 'Empaque Tragoo Check SOS Family Bluetooth y pulsera negra sobre fondo blanco, con foto de madre e hija' }],
     contentsSummary: '1 pulsera SOS Bluetooth · app Tragoo Check',
     substancesDetected: '',
@@ -775,6 +783,7 @@ export const FAMILY_PRODUCTS: ProductKit[] = [
     unitPriceLabel: '1 pulsera GPS/SIM · $1,499 MXN',
     kitEquivalentCount: 0,
     image: sosFamilyGpsImage,
+    imageBadge: '1 pulsera · plan de servicio aparte',
     gallery: [{ src: sosFamilyGpsImage, alt: 'Empaque Tragoo Check SOS Family GPS/SIM con pulsera blanca sobre fondo blanco y foto de madre e hija' }],
     contentsSummary: '1 pulsera SOS GPS/SIM · plan de servicio desde $99 MXN/mes',
     substancesDetected: '',
@@ -809,12 +818,12 @@ export const FAQS = [
   {
     question: '¿Cómo se aplica el sticker y qué significa el resultado?',
     answer:
-      '1) Limpia y seca la superficie de tu uña. 2) Coloca un sticker nuevo. 3) Sigue la guía incluida para aplicar la muestra y esperar el tiempo indicado. 4) Compara el color con la guía. Si muestra una alerta, no tomes la bebida. Una lectura sin cambio solo corresponde a las sustancias incluidas en la prueba y no descarta otras; mantén tu vaso a la vista y busca ayuda si te sientes mal.',
+      'Los tiempos y la lectura cambian según el formato. Sigue la guía del empaque específico que recibiste y no mezcles las indicaciones de stickers, tiras, popotes o pulseras. Para el sticker de uñas, limpia y seca la superficie, coloca uno nuevo, aplica una gota y compara el color con la guía. Si muestra una alerta, no tomes la bebida. Un resultado sin cambio no confirma que una bebida sea segura.',
   },
   {
     question: '¿Cuáles son las condiciones de envío y cuándo es gratis?',
     answer:
-      `Todos los pedidos de una sola pieza o pedidos pequeños menores a $899 MXN pagan $99 MXN de envío a México. En pedidos a partir de $899 MXN, el envío es gratis. ${DELIVERY_POLICY}`,
+      `El costo y cualquier promoción de envío se calculan en el carrito según el total del pedido, la fecha y el destino. ${DELIVERY_POLICY}`,
   },
   {
     question: '¿Cómo solicito una devolución?',
