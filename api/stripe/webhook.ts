@@ -111,16 +111,18 @@ export async function POST(request: Request): Promise<Response> {
       }, 0);
       try {
         await vercelTrack('tc_stripe_paid', {
-          currency: 'MXN',
           value: (session.amount_total || 0) / 100,
-          item_count: itemCount,
-          item_ids: itemIds,
-          payment_method: 'stripe',
-          source: metadata.source || 'direct',
-          medium: metadata.medium || 'direct',
-          campaign: metadata.campaign || '',
-          content: metadata.content || '',
-          payment_event_id: event.id,
+          context: [
+            'currency=MXN',
+            'payment_method=stripe',
+            `source=${metadata.source || 'direct'}`,
+            `medium=${metadata.medium || 'direct'}`,
+            `campaign=${metadata.campaign || ''}`,
+            `content=${metadata.content || ''}`,
+            `quantity=${itemCount}`,
+            `items=${itemIds}`,
+            `event=${event.id}`,
+          ].join('|').slice(0, 255),
         });
       } catch {
         // Analytics outages must not fail or retry a confirmed payment webhook.

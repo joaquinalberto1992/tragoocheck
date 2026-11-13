@@ -216,18 +216,21 @@ export function trackCommerceEvent(eventName: string, event: CommerceEvent = {})
   const quantity = event.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
   const itemIds = event.items?.map((item) => item.id).join(',').slice(0, 240) || '';
 
+  const context = [
+    'currency=MXN',
+    `source=${source.slice(0, 40)}`,
+    `medium=${medium.slice(0, 40)}`,
+    `campaign=${campaign.slice(0, 60)}`,
+    `content=${content.slice(0, 40)}`,
+    `quantity=${quantity}`,
+    `items=${itemIds}`,
+    event.method ? `method=${event.method.slice(0, 24)}` : '',
+    event.coupon ? `coupon=${event.coupon.slice(0, 32)}` : '',
+  ].filter(Boolean).join('|').slice(0, 255);
   const vercelData: Record<string, Scalar> = {
-    currency: 'MXN',
-    item_count: quantity,
-    item_ids: itemIds,
-    source: source.slice(0, 80),
-    medium: medium.slice(0, 80),
-    campaign: campaign.slice(0, 120),
-    content: content.slice(0, 80),
+    value: typeof event.value === 'number' ? event.value : null,
+    context,
   };
-  if (typeof event.value === 'number') vercelData.value = event.value;
-  if (event.method) vercelData.payment_method = event.method;
-  if (event.coupon) vercelData.coupon = event.coupon;
 
   try {
     vercelTrack(`tc_${eventName}`, vercelData);
