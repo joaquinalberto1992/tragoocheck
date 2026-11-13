@@ -71,7 +71,7 @@ const defaultData: StoreData = {
     whatsappNumber: '524792293687',
     instagramUrl: 'https://www.instagram.com/tragoocheck/',
     customDomain: 'tragoocheck.shop',
-    videoUrl: '/videos/intro-premium.mp4',
+    videoUrl: '/videos/tragoo-oficial-2026.mp4',
     shippingFee: 99,
     freeShippingThreshold: 899,
   },
@@ -295,7 +295,7 @@ async function startServer() {
     try {
       const data = loadStoreData();
       const configuredPath = safeVideoFilePath(data.config.videoUrl);
-      const fallbackPath = path.resolve(publicDir, 'videos', 'intro-premium.mp4');
+      const fallbackPath = path.resolve(publicDir, 'videos', 'tragoo-oficial-2026.mp4');
       const videoPath = configuredPath && fs.existsSync(configuredPath) && fs.statSync(configuredPath).isFile()
         ? configuredPath
         : fallbackPath;
@@ -375,7 +375,7 @@ async function startServer() {
       whatsappNumber: data.config.whatsappNumber,
       instagramUrl: data.config.instagramUrl,
       customDomain: data.config.customDomain,
-      videoUrl: safeVideoFilePath(data.config.videoUrl) ? data.config.videoUrl : '/videos/intro-premium.mp4',
+      videoUrl: '/videos/tragoo-oficial-2026.mp4',
       shippingFee: 99,
       freeShippingThreshold: 899,
       cardNumberRef: 'Tarjeta en Stripe o link de pago por WhatsApp',

@@ -41,9 +41,17 @@ export interface PromoCoupon {
 }
 
 // Import assets through Vite so their URLs point to the built files in `dist`.
+import heroProductImage from '../assets/images/tragoo-kit-noche-completa-logo-clean.webp';
 import heroLifestyleImage from '../assets/images/hero_drink_test_1792021357545.jpg';
 import wholesaleBoxImage from '../assets/images/tragoo_caja_mayoreo_display_1792022756046.jpg';
 import wholesaleMasterImage from '../assets/images/tragoo_mayoreo_premium_master_1792024987601.jpg';
+import duoPackImage from '../assets/images/tragoo-pack-kit-noche-completa-2-clean.webp';
+import squadPackImage from '../assets/images/tragoo-pack-kit-noche-completa-5-clean.webp';
+import packKits3Image from '../assets/images/tragoo-pack-kits-3-clean.webp';
+import packKits4Image from '../assets/images/tragoo-pack-kits-4-clean.webp';
+import packKits6Image from '../assets/images/tragoo-pack-kits-6-clean.webp';
+import packKits8Image from '../assets/images/tragoo-pack-kits-8-clean.webp';
+import packKits10Image from '../assets/images/tragoo-pack-kits-10-clean.webp';
 import kitStickersImage from '../assets/images/tragoo-sticker-corazon-closeup-clean.webp';
 import kitStripsImage from '../assets/images/tragoo-kit-tiras-reactivas-clean.webp';
 import braceletDetailImage from '../assets/images/tragoo-pulsera-individual-clean.webp';
@@ -189,7 +197,7 @@ export const PRODUCT_KITS: ProductKit[] = [
     unitPriceNumeric: 449,
     unitPriceLabel: '$449.00 MXN por kit (1 pza)',
     kitEquivalentCount: 1,
-    image: heroLifestyleImage,
+    image: heroProductImage,
     imageBadge: '5 tiras + 10 stickers',
     contentsSummary:
       '5 tiras multipanel · 10 stickers de uñas · 1 llavero mini-tumbler Tragoo Check',
@@ -296,7 +304,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 399.5,
     unitPriceLabel: '$399.50 MXN por kit (Ahorras $99)',
     kitEquivalentCount: 2,
-    image: heroLifestyleImage,
+    image: duoPackImage,
     contentsSummary: '10 tiras multipanel · 20 stickers de uñas · 2 llaveros mini-tumbler',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Consulta el instructivo de cada formato incluido.',
@@ -320,7 +328,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 375,
     unitPriceLabel: '$375.00 MXN por kit · Envío Gratis incluido',
     kitEquivalentCount: 3,
-    image: heroLifestyleImage,
+    image: packKits3Image,
     contentsSummary: '15 tiras multipanel · 30 stickers de uñas · 3 llaveros mini-tumbler',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Consulta el instructivo de cada formato incluido.',
@@ -345,7 +353,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 349,
     unitPriceLabel: '$349.00 MXN por kit (Ahorras $500 + Envío Gratis)',
     kitEquivalentCount: 5,
-    image: heroLifestyleImage,
+    image: squadPackImage,
     contentsSummary: '25 tiras multipanel · 50 stickers de uñas · 5 llaveros mini-tumbler',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Consulta el instructivo de cada formato incluido.',
@@ -369,7 +377,7 @@ export const PROMO_BUNDLES: ProductKit[] = [
     unitPriceNumeric: 319,
     unitPriceLabel: '$319.00 MXN por kit (Ahorras $1,300 + Envío Gratis)',
     kitEquivalentCount: 10,
-    image: heroLifestyleImage,
+    image: packKits10Image,
     contentsSummary: '50 tiras multipanel · 100 stickers de uñas · 10 llaveros mini-tumbler',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Consulta el instructivo de cada formato incluido.',
@@ -407,7 +415,7 @@ for (const combination of combinations) {
     unitPriceNumeric: price / quantity,
     unitPriceLabel: `${(price / quantity).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })} MXN por kit`,
     kitEquivalentCount: quantity,
-    image: heroLifestyleImage,
+    image: quantity === 4 ? packKits4Image : quantity === 6 ? packKits6Image : packKits8Image,
     contentsSummary: `${quantity * 5} tiras reactivas · ${quantity * 10} stickers para uñas · ${quantity} llaveros mini-tumbler`,
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Cada formato incluido tiene su propio instructivo.',
@@ -435,7 +443,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 290,
     unitPriceLabel: '$290.00 MXN por kit (Precio público: $449)',
     kitEquivalentCount: 15,
-    image: heroLifestyleImage,
+    image: WHOLESALE_BOX_IMAGE,
     contentsSummary:
       '15 Kits Noche Completa (75 tiras · 150 stickers · 15 llaveros mini-tumbler)',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
@@ -460,7 +468,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 260,
     unitPriceLabel: '$260.00 MXN por kit (Precio público: $449)',
     kitEquivalentCount: 30,
-    image: heroLifestyleImage,
+    image: WHOLESALE_BOX_IMAGE,
     contentsSummary: '30 Kits Noche Completa + 1 Caja Exhibidora Oficial Tragoo Check',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Consulta el instructivo de cada formato incluido.',
@@ -486,7 +494,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 230,
     unitPriceLabel: '$230.00 MXN por kit (Precio público: $449)',
     kitEquivalentCount: 60,
-    image: heroLifestyleImage,
+    image: WHOLESALE_MASTER_IMAGE,
     contentsSummary: '60 Kits Noche Completa + 2 Exhibidores Oficiales Tragoo Check',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Consulta el instructivo de cada formato incluido.',
@@ -511,7 +519,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 205,
     unitPriceLabel: '$205.00 MXN por kit (Más del doble de retorno)',
     kitEquivalentCount: 120,
-    image: heroLifestyleImage,
+    image: WHOLESALE_MASTER_IMAGE,
     contentsSummary: '120 Kits Noche Completa + 4 Exhibidores Oficiales Tragoo Check',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Consulta el instructivo de cada formato incluido.',
@@ -537,7 +545,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 185,
     unitPriceLabel: '$185.00 MXN por kit (Precio Distribuidor Estatal)',
     kitEquivalentCount: 250,
-    image: heroLifestyleImage,
+    image: WHOLESALE_MASTER_IMAGE,
     contentsSummary: '250 Kits Noche Completa + 8 Exhibidores Oficiales Tragoo Check',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Consulta el instructivo de cada formato incluido.',
@@ -562,7 +570,7 @@ export const WHOLESALE_KITS: ProductKit[] = [
     unitPriceNumeric: 165,
     unitPriceLabel: '$165.00 MXN por kit (Tarifa Mínima Nacional)',
     kitEquivalentCount: 500,
-    image: heroLifestyleImage,
+    image: WHOLESALE_MASTER_IMAGE,
     contentsSummary: '500 Kits Noche Completa + 15 Exhibidores Oficiales Tragoo Check',
     substancesDetected: 'Consulta la guía de cada formato incluido para revisar sus indicaciones.',
     reactionTime: 'Consulta el instructivo de cada formato incluido.',

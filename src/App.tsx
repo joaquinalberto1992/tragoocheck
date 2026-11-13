@@ -33,7 +33,6 @@ import {
   CHRISTMAS_PRODUCTS,
   ALL_PRODUCTS,
   getVisibleCoupons,
-  HERO_LIFESTYLE_IMAGE,
   KIT_STICKERS_IMAGE,
   INSTAGRAM_URL,
   INSTAGRAM_HANDLE,
@@ -98,7 +97,7 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
   whatsappNumber: '524792293687',
   instagramUrl: INSTAGRAM_URL,
   customDomain: 'tragoocheck.shop',
-  videoUrl: '/videos/intro-premium.mp4',
+  videoUrl: '/videos/tragoo-oficial-2026.mp4',
   shippingFee: 99,
   freeShippingThreshold: 899,
   hasLiveStripeKey: false,
@@ -408,9 +407,9 @@ export default function App() {
       ? [...PROMO_BUNDLES, ...BRACELET_PRODUCTS.filter((product) => product.category === 'promocion')]
       : [...PRODUCT_KITS, ...PROMO_BUNDLES, ...BRACELET_PRODUCTS, ...CHRISTMAS_PRODUCTS];
 
-  const heroVisualProduct = heroView === 'squad'
-    ? PROMO_BUNDLES.find((product) => product.id === 'pack-squad-5x') || PRODUCT_KITS[0]
-    : PRODUCT_KITS[0];
+  const squadVisualProduct =
+    PROMO_BUNDLES.find((product) => product.id === 'pack-squad-5x') || PRODUCT_KITS[0];
+  const heroVisualProduct = heroView === 'squad' ? squadVisualProduct : PRODUCT_KITS[0];
 
   const activeInstagramUrl = merchantConfig.instagramUrl || INSTAGRAM_URL;
   const cleanWhatsAppPhone = normalizeWhatsAppPhone(
@@ -789,8 +788,8 @@ export default function App() {
                     }`}
                   >
                     <img
-                      src={HERO_LIFESTYLE_IMAGE}
-                      alt="Sticker corazón Tragoo Check junto a una bebida"
+                      src={PRODUCT_KITS[0].image}
+                      alt="Kit Noche Completa Tragoo Check con tiras, stickers y llavero mini-tumbler"
                       referrerPolicy="no-referrer"
                       className="w-9 h-9 rounded-lg object-cover shrink-0"
                     />
@@ -809,8 +808,8 @@ export default function App() {
                     }`}
                   >
                     <img
-                      src={HERO_LIFESTYLE_IMAGE}
-                      alt="Detalle de un sticker corazón Tragoo Check junto a una bebida"
+                      src={squadVisualProduct.image}
+                      alt="Pack de cinco kits Noche Completa Tragoo Check"
                       referrerPolicy="no-referrer"
                       className="w-9 h-9 rounded-lg object-cover shrink-0"
                     />
