@@ -22,6 +22,7 @@ import {
   REGULAR_FREE_SHIPPING_THRESHOLD,
 } from '../data/promotionRules';
 import { DELIVERY_ESTIMATE, RETURN_POLICY } from '../data/storePolicies';
+import { getCampaignAttribution, trackCommerceEvent } from '../lib/analytics';
 
 export interface CartItem {
   product: ProductKit;
@@ -262,6 +263,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       return;
     }
     setAppliedCoupon(found);
+    trackCommerceEvent('select_promotion', {
+      value: total,
+      coupon: found.code,
+      items: cart.map(({ product, quantity }) => ({
+        id: product.id,
+        name: product.name,
+        price: getEffectiveUnitPrice(product, quantity, christmasCupQuantity),
+        quantity,
+        category: product.category,
+      })),
+    });
     if (subtotal < found.minPurchase) {
       setCouponFeedback(
         `Cupón ${found.code} seleccionado (válido desde $${found.minPurchase.toLocaleString(
@@ -271,6 +283,22 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     } else {
       setCouponFeedback(`¡Cupón ${found.code} (-${found.discountPercent}%) aplicado!`);
     }
+  };
+
+  const selectPaymentMethod = (method: OrderPaymentMethod) => {
+    setPaymentMethod(method);
+    const paymentItems = cart.map(({ product, quantity }) => ({
+        id: product.id,
+        name: product.name,
+        price: getEffectiveUnitPrice(product, quantity, christmasCupQuantity),
+        quantity,
+        category: product.category,
+      }));
+    trackCommerceEvent('payment_method_selected', {
+      value: total,
+      method,
+      items: paymentItems,
+    });
   };
 
   const buildOrderItemsPayload = () => {
@@ -367,6 +395,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       !postalCode.trim() ||
       (sendReceiptByEmail && !customerEmail.trim())
     ) {
+      trackCommerceEvent('checkout_validation_error', { method: paymentMethod });
       setErrorMsg(
         'Completa tu nombre, WhatsApp y dirección de entrega. Agrega un correo si quieres recibir el comprobante.'
       );
@@ -379,6 +408,20 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
     setErrorMsg(null);
     setIsSubmitting(true);
+
+    const analyticsItems = cart.map(({ product, quantity }) => ({
+      id: product.id,
+      name: product.name,
+      price: getEffectiveUnitPrice(product, quantity, christmasCupQuantity),
+      quantity,
+      category: product.category,
+    }));
+    trackCommerceEvent('add_shipping_info', {
+      value: total,
+      method: paymentMethod,
+      coupon: couponDiscount > 0 ? appliedCoupon?.code : undefined,
+      items: analyticsItems,
+    });
 
     const generatedFolio = `TC-${crypto.randomUUID().toUpperCase()}`;
 
@@ -439,8 +482,21 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             folio: checkout.folio,
             couponCode: couponDiscount > 0 ? appliedCoupon?.code : undefined,
             items: cart.map(({ product, quantity }) => ({ id: product.id, quantity })),
+            ...getCampaignAttribution(),
           })
         );
+        trackCommerceEvent('add_payment_info', {
+          value: total,
+          method: 'card',
+          coupon: couponDiscount > 0 ? appliedCoupon?.code : undefined,
+          items: analyticsItems,
+        });
+        trackCommerceEvent('checkout_redirect', {
+          value: total,
+          method: 'stripe',
+          coupon: couponDiscount > 0 ? appliedCoupon?.code : undefined,
+          items: analyticsItems,
+        });
         window.location.assign(checkout.url);
         return;
       }
@@ -448,12 +504,24 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setConfirmedOrder(orderPayload);
       onOrderCreated(orderPayload);
       onClearCart();
+      trackCommerceEvent('whatsapp_order_request', {
+        value: total,
+        method: paymentMethod,
+        coupon: couponDiscount > 0 ? appliedCoupon?.code : undefined,
+        items: analyticsItems,
+      });
+      trackCommerceEvent('generate_lead', {
+        value: total,
+        method: paymentMethod,
+        items: analyticsItems,
+      });
 
       // Open WhatsApp directly (works on Android, iOS Safari & Desktop)
       const waUrl = buildWhatsAppUrl(orderPayload);
       window.location.href = waUrl;
     } catch (err) {
       if (paymentMethod === 'stripe') {
+        trackCommerceEvent('checkout_error', { value: total, method: 'stripe', items: analyticsItems });
         setErrorMsg(
           err instanceof Error ? err.message : 'No se pudo iniciar el pago con Stripe.'
         );
@@ -462,6 +530,17 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
       setConfirmedOrder(orderPayload);
       onOrderCreated(orderPayload);
       onClearCart();
+      trackCommerceEvent('whatsapp_order_request', {
+        value: total,
+        method: paymentMethod,
+        coupon: couponDiscount > 0 ? appliedCoupon?.code : undefined,
+        items: analyticsItems,
+      });
+      trackCommerceEvent('generate_lead', {
+        value: total,
+        method: paymentMethod,
+        items: analyticsItems,
+      });
       window.location.href = buildWhatsAppUrl(orderPayload);
     } finally {
       setIsSubmitting(false);
@@ -922,7 +1001,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   {merchantConfig.hasStripeCheckout && (
                     <button
                       type="button"
-                      onClick={() => setPaymentMethod('stripe')}
+                      onClick={() => selectPaymentMethod('stripe')}
                       className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
                         paymentMethod === 'stripe'
                           ? 'bg-[#F2F7E9] border-[#C7DCA9] text-[#201927]'
@@ -941,7 +1020,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   )}
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod('link_pago')}
+                    onClick={() => selectPaymentMethod('link_pago')}
                     className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
                       paymentMethod === 'link_pago'
                         ? 'bg-[#F2F7E9] border-[#C7DCA9] text-[#201927]'
@@ -963,7 +1042,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                   </button>
                   <button
                     type="button"
-                    onClick={() => setPaymentMethod('transferencia')}
+                    onClick={() => selectPaymentMethod('transferencia')}
                     className={`p-3 rounded-xl border text-left transition-colors cursor-pointer ${
                       paymentMethod === 'transferencia'
                         ? 'bg-[#F2F7E9] border-[#C7DCA9] text-[#201927]'

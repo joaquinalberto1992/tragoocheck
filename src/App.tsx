@@ -1,5 +1,6 @@
 import { ProductVisual } from './components/ProductVisual';
 import { Analytics, type BeforeSendEvent } from '@vercel/analytics/react';
+import { AnalyticsConsent } from './components/AnalyticsConsent';
 import { BuenFinCountdown } from './components/BuenFinCountdown';
 import { VideoGallery } from './components/VideoGallery';
 import { UpcomingProducts } from './components/UpcomingProducts';
@@ -63,6 +64,11 @@ import {
   WomenSloganBanner,
   HeroVideoPlayer,
 } from './components/VideoStoryShowcase';
+import {
+  getCampaignAttribution,
+  trackCommerceEvent,
+  type CommerceItem,
+} from './lib/analytics';
 
 const INTERNAL_TRAFFIC_KEY = 'tc_internal_traffic';
 
@@ -77,6 +83,15 @@ const analyticsBeforeSend = (event: BeforeSendEvent) => {
 
   return event;
 };
+
+const getAnalyticsItems = (items: CartItem[]): CommerceItem[] =>
+  items.map(({ product, quantity }) => ({
+    id: product.id,
+    name: product.name,
+    price: product.price,
+    quantity,
+    category: product.category,
+  }));
 
 const DEFAULT_CONFIG: MerchantConfigClient = {
   cardNumberRef: 'Tarjeta en Stripe o link de pago por WhatsApp',
@@ -93,7 +108,8 @@ const DEFAULT_CONFIG: MerchantConfigClient = {
 export default function App() {
   const isInstagramLanding = window.location.pathname === '/instagram';
   const isProductLanding = window.location.pathname === '/comprar';
-  const productId = new URLSearchParams(window.location.search).get('producto');
+  const productId = (window as Window & { __tragooProductId?: string }).__tragooProductId
+    || new URLSearchParams(window.location.search).get('producto');
   const socialProduct = isProductLanding
     ? ALL_PRODUCTS.find((product) => product.id === productId)
     : undefined;
@@ -128,6 +144,27 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    const catalog = document.getElementById('kits');
+    if (!catalog || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver((entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      trackCommerceEvent('view_item_list', {
+        itemListName: 'catalogo_principal',
+        items: ALL_PRODUCTS.map((product) => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          quantity: 1,
+          category: product.category,
+        })),
+      });
+      observer.disconnect();
+    }, { threshold: 0.15 });
+    observer.observe(catalog);
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
     fetch('/api/config')
       .then((r) => r.json())
       .then((data) => {
@@ -141,9 +178,14 @@ export default function App() {
       .catch(() => {});
 
     const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get('stripe_session');
+    const sessionId = params.get('stripe_session') || sessionStorage.getItem('tragoo-stripe-return-session');
     if (sessionId) {
-      window.history.replaceState({}, '', window.location.pathname);
+      sessionStorage.removeItem('tragoo-stripe-return-session');
+      if (params.has('stripe_session')) {
+        params.delete('stripe_session');
+        const search = params.toString();
+        window.history.replaceState({}, '', `${window.location.pathname}${search ? `?${search}` : ''}${window.location.hash}`);
+      }
       fetch(`/api/checkout/confirm?session_id=${encodeURIComponent(sessionId)}`, {
         cache: 'no-store',
       })
@@ -152,13 +194,38 @@ export default function App() {
           if (!response.ok || !result.paid || !result.whatsappUrl) {
             throw new Error(result.error || 'No pudimos confirmar el pago.');
           }
+          let pending: { items?: { id: string; quantity: number }[]; source?: string; medium?: string; campaign?: string; content?: string } = {};
+          try {
+            pending = JSON.parse(sessionStorage.getItem('tragoo-pending-stripe') || '{}');
+          } catch {
+            // The Stripe confirmation is still valid if session storage is unavailable.
+          }
+          const purchasedItems = Array.isArray(pending.items)
+            ? pending.items.flatMap(({ id, quantity }) => {
+                const product = ALL_PRODUCTS.find((candidate) => candidate.id === id);
+                return product && Number.isInteger(quantity) && quantity > 0
+                  ? [{ id: product.id, name: product.name, quantity, category: product.category }]
+                  : [];
+              })
+            : [];
+          const attribution = getCampaignAttribution();
+          trackCommerceEvent('purchase', {
+            value: result.total,
+            transactionId: result.folio,
+            items: purchasedItems,
+            source: pending.source || attribution.source,
+            medium: pending.medium || attribution.medium,
+            campaign: pending.campaign || attribution.campaign,
+            content: pending.content || attribution.content,
+          });
           setStripeReturnFolio(result.folio);
           setStripePaymentMessage('Pago confirmado. Abriendo WhatsApp para enviar tu pedido.');
           setStripeWhatsAppUrl(result.whatsappUrl);
           sessionStorage.removeItem('tragoo-pending-stripe');
-          window.location.assign(result.whatsappUrl);
+          window.setTimeout(() => window.location.assign(result.whatsappUrl), 650);
         })
         .catch(() => {
+          trackCommerceEvent('payment_confirmation_error', { method: 'stripe' });
           setStripeReturnFolio('Pago pendiente de confirmar');
           setStripePaymentMessage(
             'No pudimos verificar el pago automáticamente. Contacta a Tragoo Check por WhatsApp antes de volver a pagar.'
@@ -182,6 +249,22 @@ export default function App() {
         if (typeof pending.couponCode === 'string') {
           setSelectedCouponCode(pending.couponCode);
         }
+        const cancelledItems = Array.isArray(pending.items)
+          ? pending.items.flatMap(({ id, quantity }: { id: string; quantity: number }) => {
+              const product = ALL_PRODUCTS.find((candidate) => candidate.id === id);
+              return product && Number.isInteger(quantity) && quantity > 0
+                ? [{ id: product.id, name: product.name, quantity, category: product.category }]
+                : [];
+            })
+          : [];
+        trackCommerceEvent('checkout_cancelled', {
+          method: 'stripe',
+          items: cancelledItems,
+          source: pending.source,
+          medium: pending.medium,
+          campaign: pending.campaign,
+          content: pending.content,
+        });
         const restored = Array.isArray(pending.items)
           ? pending.items
               .map((item: { id: string; quantity: number }) => ({
@@ -210,6 +293,18 @@ export default function App() {
   );
 
   const handleAddToCart = (product: ProductKit, openDrawer = false) => {
+    const currentItem = cart.find((item) => item.product.id === product.id);
+    const nextCart = currentItem
+      ? cart.map((item) => item.product.id === product.id
+          ? { ...item, quantity: item.quantity + 1 }
+          : item)
+      : [...cart, { product, quantity: 1 }];
+    const selectedItem = { id: product.id, name: product.name, price: product.price, quantity: 1, category: product.category };
+    trackCommerceEvent('view_item', { items: [selectedItem] });
+    trackCommerceEvent('add_to_cart', {
+      value: product.price,
+      items: [{ id: product.id, name: product.name, price: product.price, quantity: 1, category: product.category }],
+    });
     setCart((prev) => {
       const existing = prev.find((i) => i.product.id === product.id);
       if (existing) {
@@ -223,11 +318,17 @@ export default function App() {
       setSelectedCouponCode('BUENFIN12');
     }
     if (openDrawer) {
+      trackCommerceEvent('view_cart', { value: nextCart.reduce((sum, item) => sum + item.product.price * item.quantity, 0), items: getAnalyticsItems(nextCart) });
+      trackCommerceEvent('begin_checkout', { value: nextCart.reduce((sum, item) => sum + item.product.price * item.quantity, 0), items: getAnalyticsItems(nextCart) });
       setIsCheckoutOpen(true);
     }
   };
 
   const handleBuyNow = (product: ProductKit) => {
+    const item = { id: product.id, name: product.name, price: product.price, quantity: 1, category: product.category };
+    trackCommerceEvent('view_item', { items: [item] });
+    trackCommerceEvent('select_item', { itemListName: 'catalogo_principal', items: [item] });
+    trackCommerceEvent('begin_checkout', { value: product.price, items: [item] });
     setCart([{ product, quantity: 1 }]);
     if (isBuenFinPromotionActive && product.id === 'pack-amigas-2x') {
       setSelectedCouponCode('BUENFIN12');
@@ -243,6 +344,13 @@ export default function App() {
   };
 
   const handleUpdateQuantity = (productId: string, delta: number) => {
+    const target = cart.find((item) => item.product.id === productId);
+    if (target && delta !== 0) {
+      trackCommerceEvent(delta > 0 ? 'add_to_cart' : 'remove_from_cart', {
+        value: target.product.price * Math.abs(delta),
+        items: [{ id: target.product.id, name: target.product.name, price: target.product.price, quantity: Math.abs(delta), category: target.product.category }],
+      });
+    }
     setCart((prev) =>
       prev
         .map((item) =>
@@ -255,11 +363,22 @@ export default function App() {
   };
 
   const handleRemoveItem = (productId: string) => {
+    const removed = cart.find((item) => item.product.id === productId);
+    if (removed) {
+      trackCommerceEvent('remove_from_cart', {
+        value: removed.product.price * removed.quantity,
+        items: [{ id: removed.product.id, name: removed.product.name, price: removed.product.price, quantity: removed.quantity, category: removed.product.category }],
+      });
+    }
     setCart((prev) => prev.filter((item) => item.product.id !== productId));
   };
 
   const handleOpenOrder = () => {
     if (cart.length) {
+      const items = getAnalyticsItems(cart);
+      const value = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+      trackCommerceEvent('view_cart', { value, items });
+      trackCommerceEvent('begin_checkout', { value, items });
       setIsCheckoutOpen(true);
       setIsMobileMenuOpen(false);
       return;
@@ -1528,6 +1647,7 @@ export default function App() {
         orders={orders}
         onOrdersUpdated={(updatedOrders) => setOrders(updatedOrders)}
       />
+      <AnalyticsConsent />
       <Analytics beforeSend={analyticsBeforeSend} />
     </div>
   );
