@@ -14,6 +14,12 @@ const checkoutAttempts = new Map<string, { count: number; resetAt: number }>();
 const CHECKOUT_WINDOW_MS = 60_000;
 const CHECKOUT_MAX_ATTEMPTS = 12;
 
+function analyticsTag(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  const safe = value.trim().toLowerCase().replace(/[^a-z0-9_-]/g, '').slice(0, 80);
+  return /^[a-z][a-z0-9_-]*$/.test(safe) ? safe : '';
+}
+
 function checkoutRateLimited(request: Request): boolean {
   const forwardedFor = request.headers.get('x-real-ip') || request.headers.get('x-forwarded-for') || '';
   const address = forwardedFor.split(',')[0]?.trim() || 'unknown';
@@ -90,6 +96,12 @@ export async function POST(request: Request): Promise<Response> {
     const city = String(body.city || '').trim().slice(0, 80);
     const state = String(body.state || '').trim().slice(0, 80);
     const postalCode = String(body.postalCode || '').trim().slice(0, 12);
+    const attribution = {
+      source: analyticsTag(body.source),
+      medium: analyticsTag(body.medium),
+      campaign: analyticsTag(body.campaign),
+      content: analyticsTag(body.content),
+    };
 
     const phoneDigits = customerPhone.replace(/\D/g, '');
     if (
@@ -177,6 +189,7 @@ export async function POST(request: Request): Promise<Response> {
         shipping: String(quote.shipping),
         total: String(quote.total),
         paymentStatus: 'pending',
+        ...attribution,
       },
       success_url: `${checkoutOrigin(request)}/?stripe_session={CHECKOUT_SESSION_ID}`,
       cancel_url: `${checkoutOrigin(request)}/?stripe_cancelled=1`,

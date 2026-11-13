@@ -469,6 +469,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             city: orderPayload.city,
             state: orderPayload.state,
             postalCode: orderPayload.postalCode,
+            ...getCampaignAttribution(),
           }),
         });
         const checkout = await res.json();

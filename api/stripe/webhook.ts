@@ -1,4 +1,5 @@
 import type Stripe from 'stripe';
+import { track as vercelTrack } from '@vercel/analytics/server';
 import { stripeClient } from '../_shared.js';
 
 function json(data: unknown, status = 200): Response {
@@ -100,6 +101,31 @@ export async function POST(request: Request): Promise<Response> {
         paymentEventAt: new Date(event.created * 1000).toISOString(),
       },
     });
+
+    if (paidEvent) {
+      const itemParts = (metadata.items || '').split(',').filter(Boolean).map((item) => item.split(':'));
+      const itemIds = itemParts.map(([id]) => id).filter(Boolean).join(',').slice(0, 240);
+      const itemCount = itemParts.reduce((sum, [, quantity]) => {
+        const parsed = Number(quantity);
+        return sum + (Number.isInteger(parsed) && parsed > 0 ? parsed : 0);
+      }, 0);
+      try {
+        await vercelTrack('tc_stripe_paid', {
+          currency: 'MXN',
+          value: (session.amount_total || 0) / 100,
+          item_count: itemCount,
+          item_ids: itemIds,
+          payment_method: 'stripe',
+          source: metadata.source || 'direct',
+          medium: metadata.medium || 'direct',
+          campaign: metadata.campaign || '',
+          content: metadata.content || '',
+          payment_event_id: event.id,
+        });
+      } catch {
+        // Analytics outages must not fail or retry a confirmed payment webhook.
+      }
+    }
 
     return json({ received: true, paymentStatus: paidEvent ? 'paid' : 'failed' });
   } catch (error) {
